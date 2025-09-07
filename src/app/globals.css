@@ -1,26 +1,250 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 字体声明 */
+@font-face {
+  font-family: 'Alibaba PuHuiTi 2.0';
+  src: url('/fonts/AlibabaPuHuiTi-2-55-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@font-face {
+  font-family: 'Alibaba PuHuiTi 2.0';
+  src: url('/fonts/AlibabaPuHuiTi-2-45-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@font-face {
+  font-family: 'Alibaba PuHuiTi 2.0';
+  src: url('/fonts/AlibabaPuHuiTi-2-75-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DingTalk JinBuTi';
+  src: url('/fonts/DingTalk JinBuTi.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  /* 防止浏览器强制加粗 */
+  font-synthesis: none;
+}
+
+/* 自定义字体工具类 */
+@layer utilities {
+  .font-light {
+    font-family: 'Alibaba PuHuiTi 2.0', sans-serif;
+    font-weight: 300;
+  }
+  
+  .font-regular {
+    font-family: 'Alibaba PuHuiTi 2.0', sans-serif;
+    font-weight: 400;
+  }
+  
+  .font-bold {
+    font-family: 'Alibaba PuHuiTi 2.0', sans-serif;
+    font-weight: 600;
+  }
+
+  .font-Ding {
+    font-family: 'DingTalk JinBuTi', sans-serif;
+    font-weight: 400;
+    /* 防止浏览器强制加粗 */
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* 简化的颜色类名 */
+@layer utilities {
+  /* 品牌色 */
+  .bg-brand { background-color: hsl(var(--brand-main)); }
+  .bg-brand-bg { background-color: hsl(var(--brand-bg)); }
+  .bg-brand-stroke { background-color: hsl(var(--brand-stroke)); }
+  .text-brand { color: hsl(var(--brand-main)); }
+  .text-brand-stroke { color: hsl(var(--brand-stroke)); }
+  .border-brand-stroke { border-color: hsl(var(--brand-stroke)); }
+
+  /* 背景色 - 简化版 */
+  .bg-card { background-color: hsl(var(--neutral-bg-card)); }
+  .bg-hover { background-color: hsl(var(--neutral-bg-hover)); }
+  .bg-press { background-color: hsl(var(--neutral-bg-press)); }
+  .bg-divider { background-color: hsl(var(--neutral-bg-divider)); }
+  .bg-stroke { background-color: hsl(var(--neutral-bg-stroke)); }
+  .bg-others { background-color: hsl(var(--neutral-others-bg)); }
+  .bg-transparent { background-color: hsl(var(--neutral-others-transparent)); }
+
+  /* 文字颜色 - 简化版 */
+  .text-main { color: hsl(var(--neutral-fg-main)); }
+  .text-secondary { color: hsl(var(--neutral-fg-secondary)); }
+  .text-tertiary { color: hsl(var(--neutral-fg-tertiary)); }
+  .text-quaternary { color: hsl(var(--neutral-fg-quaternary)); }
+  .text-disabled { color: hsl(var(--neutral-fg-disabled)); }
+
+  /* 边框颜色 - 简化版 */
+  .border-stroke { border-color: hsl(var(--neutral-bg-stroke)); }
+  .border-divider { border-color: hsl(var(--neutral-bg-divider)); }
+
+  /* 功能色 - 简化版 */
+  .bg-green { background-color: hsl(var(--function-green-bg)); }
+  .bg-green-stroke { background-color: hsl(var(--function-green-stroke)); }
+  .text-green-stroke { color: hsl(var(--function-green-stroke)); }
+  .border-green-stroke { border-color: hsl(var(--function-green-stroke)); }
+
+  .bg-blue { background-color: hsl(var(--function-blue-bg)); }
+  .bg-blue-stroke { background-color: hsl(var(--function-blue-stroke)); }
+  .text-blue-stroke { color: hsl(var(--function-blue-stroke)); }
+  .border-blue-stroke { border-color: hsl(var(--function-blue-stroke)); }
+}
+ 
+@layer base {
+  :root {
+    /* 现有的 shadcn/ui 变量 */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+ 
+    --radius: 0.5rem;
+    
+    /* 浅色主题颜色 tokens */
+    --brand-main: 176 58% 52%;
+    --brand-bg: 176 58% 52% / 10%;
+    --brand-stroke: 176 62% 44%;
+    
+    --neutral-bg-hover: 232 20% 14% / 3%;
+    --neutral-bg-press: 232 20% 14% / 5%;
+    --neutral-bg-divider: 232 20% 14% / 10%;
+    --neutral-bg-stroke: 232 20% 14% / 15%;
+    --neutral-bg-card: 0 0% 100%;
+    
+    --neutral-fg-main: 232 20% 14% / 95%;
+    --neutral-fg-secondary: 232 20% 14% / 85%;
+    --neutral-fg-tertiary: 232 20% 14% / 65%;
+    --neutral-fg-quaternary: 232 20% 14% / 45%;
+    --neutral-fg-disabled: 232 20% 14% / 30%;
+    
+    --neutral-others-bg: 230 28% 12% / 2%;
+    --neutral-others-transparent: 0 0% 100% / 0%;
+    
+    --function-green-bg: 176 58% 52% / 8%;
+    --function-green-stroke: 176 61% 47%;
+    --function-blue-bg: 228 71% 52% / 6%;
+    --function-blue-stroke: 228 75% 52%;
+  }
+ 
+  .dark {
+    /* 现有的 shadcn/ui 深色变量 */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    
+    /* 深色主题颜色 tokens */
+    --brand-main: 176 58% 52%;
+    --brand-bg: 176 58% 52% / 10%;
+    --brand-stroke: 176 62% 44%;
+    
+    --neutral-bg-hover: 0 0% 100% / 10%;
+    --neutral-bg-press: 0 0% 100% / 15%;
+    --neutral-bg-divider: 0 0% 100% / 20%;
+    --neutral-bg-stroke: 0 0% 100% / 25%;
+    --neutral-bg-card: 232 22% 13%;
+    
+    --neutral-fg-main: 0 0% 100% / 95%;
+    --neutral-fg-secondary: 0 0% 100% / 85%;
+    --neutral-fg-tertiary: 0 0% 100% / 65%;
+    --neutral-fg-quaternary: 0 0% 100% / 45%;
+    --neutral-fg-disabled: 0 0% 100% / 25%;
+    
+    --neutral-others-bg: 0 0% 100% / 4%;
+    --neutral-others-transparent: 230 32% 12% / 0%;
+    
+    --function-green-bg: 176 58% 52% / 15%;
+    --function-green-stroke: 176 58% 49%;
+    --function-blue-bg: 228 100% 67% / 20%;
+    --function-blue-stroke: 228 100% 67%;
+  }
+}
+ 
+@layer base {
+  /* 重置浏览器默认样式 */
+  * {
+    border-color: hsl(var(--border));
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden; /* 防止水平滚动 */
+  }
+  
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Alibaba PuHuiTi 2.0', 'Inter', system-ui, sans-serif;
+  }
 }
