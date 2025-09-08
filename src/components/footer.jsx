@@ -4,6 +4,7 @@ import LanguageToggle from '@/components/LanguageToggle';
 import TextLink from '@/components/TextLink';
 import IconTextButton from '@/components/icon-text-botton';
 import AnimatedContent from '@/effects/AnimatedContent';
+import CyclingDecryptedText from '@/components/CyclingDecryptedText';
 import { MailIcon, ChatsIcon, BilibiliIcon } from '@/public/icons';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -121,10 +122,20 @@ const Footer = () => {
               flex={false}
               className="h-full flex items-start justify-start"
             >
-              <div className="flex flex-col items-start justify-center gap-4 font-Ding z-10">
+              <div className="flex flex-col items-start justify-center gap-4 font-Ding z-10 select-none">
                   <span className="text-secondary text-[120px] leading-[80%]">Alii</span>
-                  <span className="text-secondary text-[56px] leading-[100%]
-                   mb-2">{t('learningCode')}</span>
+                  <CyclingDecryptedText
+                    texts={[t('learningCode'), t('lastPostDays')]}
+                    cycleInterval={3000}
+                    className="text-[56px] leading-[100%] mb-2"
+                    decryptedProps={{
+                      speed: 40,
+                      maxIterations: 6,
+                      sequential: true,
+                      revealDirection: 'start',
+                      useOriginalCharsOnly: true
+                    }}
+                  />
               </div>
             </AnimatedContent>
             
@@ -150,12 +161,13 @@ const Footer = () => {
                   <div
                     // 使用Tailwind的transition-opacity和duration-300
                     className={
-                      "absolute bottom-8 left-16 font-regular text-disabled text-[14px] leading-[100%] flex flex-row gap-6 z-10 transition-opacity duration-300" +
+                      "absolute bottom-8 left-16 font-regular text-disabled text-[14px] leading-[100%] flex flex-row gap-6 z-10 transition-opacity duration-300 select-none" +
                       (show ? " opacity-100" : " opacity-0")
                     }
                   >
                     <span>{t('copyright')}</span>
                     <span>{t('lastUpdated')}</span>
+                    <span>Build with Cursor</span>
                   </div>
                 );
               }
@@ -193,7 +205,7 @@ const Footer = () => {
                                 text=""
                                 icon={<BilibiliIcon />}
                                 variant="ghost"
-                                size="sm"
+                                size="md"
                                 tooltip={t('bilibiliTooltip')}
                                 onClick={() => {
                                     window.open('https://space.bilibili.com/38773851/favlist?fid=702542351&ftype=create', '_blank'); // 替换为你的B站主页链接
@@ -206,7 +218,7 @@ const Footer = () => {
                                 text=""
                                 icon={<ChatsIcon />}
                                 variant="ghost"
-                                size="sm"
+                                size="md"
                                 tooltip={copyStates.wechat ? t('wechatCopied') : t('wechatTooltip')}
                                 forceTooltipOpen={tooltipStates.wechat}
                                 onClick={async () => {
@@ -225,7 +237,7 @@ const Footer = () => {
                                 text=""
                                 icon={<MailIcon />}
                                 variant="ghost"
-                                size="sm"
+                                size="md"
                                 tooltip={copyStates.email ? t('emailCopied') : t('emailTooltip')}
                                 forceTooltipOpen={tooltipStates.email}
                                 onClick={async () => {

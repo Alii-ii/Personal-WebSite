@@ -46,6 +46,7 @@ export default function Home() {
         flex={true}
         className="flex-1 w-full"
       >
+
         <div className="flex-1 w-full flex items-center justify-center relative z-10">
           {/* 两个人物肖像和过渡文字 */}
           <div className="flex items-center justify-center gap-20 mt-16">
@@ -102,7 +103,7 @@ export default function Home() {
                 />
               </div>
             </Magnet>
-      </div>
+          </div>
 
         </div>
       </AnimatedContent>

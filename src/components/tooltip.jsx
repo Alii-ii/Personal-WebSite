@@ -24,7 +24,7 @@ const TooltipContent = React.forwardRef(
             "data-[side=top]:slide-in-from-bottom-2 " +
             "[&[data-side=top]_.arrow-top]:block [&[data-side=bottom]_.arrow-bottom]:block " +
             "[&[data-side=left]_.arrow-left]:block [&[data-side=right]_.arrow-right]:block " +
-            "pointer-events-none",
+            "pointer-events-none select-none",
           className,
         )}
         {...props}

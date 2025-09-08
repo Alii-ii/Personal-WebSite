@@ -21,7 +21,7 @@ const TextLink = ({
       href={href}
       target={target}
       rel={rel}
-      className={`flex flex-row items-center justify-center gap-0.5 text-secondary font-light text-[16px] 
+      className={`flex flex-row items-center justify-center gap-0.5 text-secondary font-light text-[16px] select-none
         hover:translate-x-[2px] hover:translate-y-[-2px] hover:opacity-80 cursor-pointer duration-200 ${className}`}
       title={title}
     >
