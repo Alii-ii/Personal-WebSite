@@ -3,6 +3,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
 import TextLink from '@/components/TextLink';
 import IconTextButton from '@/components/icon-text-botton';
+import AnimatedContent from '@/effects/AnimatedContent';
 import { MailIcon, ChatsIcon, BilibiliIcon } from '@/public/icons';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -95,7 +96,7 @@ const Footer = () => {
   console.log(t('currentCopyState') + ':', copyStates);
 
   return (
-    <footer className="pb-14 px-16 w-full h-fit flex flex-row justify-between items-stretch">
+    <footer className="pb-14 px-16 w-full h-fit flex flex-row justify-between items-end">
         {/* 背景遮罩 - 独立的快速过渡 */}
         <div
           className={`absolute bottom-0 left-0 right-0 w-full h-[300px] transition-opacity duration-100 z-0
@@ -109,92 +110,141 @@ const Footer = () => {
               "linear-gradient(to top, black 0%, black 50%, transparent 100%)",
           }}
         />
-            {/* 左 */}
-            <div className="flex flex-col items-start justify-center gap-4 font-Ding z-10">
-                <span className="text-secondary text-[120px] leading-[80%]">Alii</span>
-                <span className="text-secondary text-[56px] leading-[100%]
-                 mb-2">{t('learningCode')}</span>
-                <div className="absolute bottom-8 left-16 font-regular text-disabled text-[14px] leading-[100%] flex flex-row gap-6">
+            {/* 左侧内容 - 从左侧滑入 */}
+            <AnimatedContent
+              direction="horizontal"
+              reverse={true}
+              distance={80}
+              duration={1.2}
+              delay={0.2}
+              immediate={true}
+              flex={false}
+              className="h-full flex items-start justify-start"
+            >
+              <div className="flex flex-col items-start justify-center gap-4 font-Ding z-10">
+                  <span className="text-secondary text-[120px] leading-[80%]">Alii</span>
+                  <span className="text-secondary text-[56px] leading-[100%]
+                   mb-2">{t('learningCode')}</span>
+              </div>
+            </AnimatedContent>
+            
+            {/* 版权信息 - 独立于动画框架，保持绝对定位 */}
+            {/* 
+              页面刷新后，延迟后再渐变显示（opacity从0到1）
+              使用Tailwind的transition和opacity类，配合useEffect控制
+              现在transition的时间为300ms
+            */}
+            {(() => {
+              // 使用useState和useEffect实现延迟渐显
+              // 由于JSX中不能直接用hook，这里用IIFE+useState/useEffect
+              // 实际开发建议提取为组件
+              const React = require('react');
+              const { useState, useEffect } = React;
+              function CopyrightFade() {
+                const [show, setShow] = useState(false);
+                useEffect(() => {
+                  const timer = setTimeout(() => setShow(true), 800);
+                  return () => clearTimeout(timer);
+                }, []);
+                return (
+                  <div
+                    // 使用Tailwind的transition-opacity和duration-300
+                    className={
+                      "absolute bottom-8 left-16 font-regular text-disabled text-[14px] leading-[100%] flex flex-row gap-6 z-10 transition-opacity duration-300" +
+                      (show ? " opacity-100" : " opacity-0")
+                    }
+                  >
                     <span>{t('copyright')}</span>
                     <span>{t('lastUpdated')}</span>
+                  </div>
+                );
+              }
+              return <CopyrightFade />;
+            })()}
+
+            {/* 右侧内容 - 从右侧滑入 */}
+            <AnimatedContent
+              direction="horizontal"
+              reverse={false}
+              distance={80}
+              duration={1.2}
+              delay={0.2}
+              immediate={true}
+              flex={false}
+              className="h-full flex items-end justify-end"
+            >
+                <div className="flex flex-col items-end gap-6 z-10"> 
+              
+                    <TextLink
+                        href="https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024?node-id=0-1&t=5jnQ7E3zqn3Wpan5-1"
+                        title={t('portfolioTooltip')}
+                    > {t('portfolio')} </TextLink>
+
+                    <TextLink
+                        href="https://www.miyoushe.com/zzz/accountCenter/postList?id=196941437"
+                        title={t('mainSiteTooltip')}
+                    > {t('mainSite')} </TextLink>
+
+
+                    <div className="flex flex-row items-center justify-center gap-3 mt-4">
+                        <div className="flex flex-row gap-1">
+                            {/* Bilibili 跳转按钮 */}
+                            <IconTextButton
+                                text=""
+                                icon={<BilibiliIcon />}
+                                variant="ghost"
+                                size="sm"
+                                tooltip={t('bilibiliTooltip')}
+                                onClick={() => {
+                                    window.open('https://space.bilibili.com/38773851/favlist?fid=702542351&ftype=create', '_blank'); // 替换为你的B站主页链接
+                                    console.log(t('jumpToBilibili'));
+                                }}
+                            />
+                            {/* 微信号复制按钮 */}
+                            <IconTextButton
+                                key={`wechat-${copyStates.wechat}`}
+                                text=""
+                                icon={<ChatsIcon />}
+                                variant="ghost"
+                                size="sm"
+                                tooltip={copyStates.wechat ? t('wechatCopied') : t('wechatTooltip')}
+                                forceTooltipOpen={tooltipStates.wechat}
+                                onClick={async () => {
+                                    console.log(t('clickWechatCopy'));
+                                    const success = await copyToClipboard('_Alii_', t);
+                                    console.log(t('copyResult') + ':', success);
+                                    if (success) {
+                                        handleCopySuccess('wechat');
+                                        console.log(t('wechatCopiedToClipboard'));
+                                    }
+                                }}
+                            />
+                            {/* 邮箱复制按钮 */}
+                            <IconTextButton
+                                key={`email-${copyStates.email}`}
+                                text=""
+                                icon={<MailIcon />}
+                                variant="ghost"
+                                size="sm"
+                                tooltip={copyStates.email ? t('emailCopied') : t('emailTooltip')}
+                                forceTooltipOpen={tooltipStates.email}
+                                onClick={async () => {
+                                    console.log(t('clickEmailCopy'));
+                                    const success = await copyToClipboard('alii.wong@foxmail.com', t);
+                                    console.log(t('copyResult') + ':', success);
+                                    if (success) {
+                                        handleCopySuccess('email');
+                                        console.log(t('emailCopiedToClipboard'));
+                                    }
+                                }}
+                            />
+                        </div>
+
+                        <ThemeToggle /> 
+                        <LanguageToggle /> 
+                    </div>
                 </div>
-            </div>
-
-            {/* 右 */}
-            <div className="flex flex-col items-end justify-end gap-6 z-10"> 
-            
-            <TextLink
-                href="https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024?node-id=0-1&t=5jnQ7E3zqn3Wpan5-1"
-                title={t('portfolioTooltip')}
-            > {t('portfolio')} </TextLink>
-
-            <TextLink
-                href="https://www.miyoushe.com/zzz/accountCenter/postList?id=196941437"
-                title={t('mainSiteTooltip')}
-            > {t('mainSite')} </TextLink>
-
-
-            <div className="flex flex-row items-center justify-center gap-3 mt-4">
-                <div className="flex flex-row gap-1">
-
-                {/* Bilibili 跳转按钮 */}
-                <IconTextButton
-                    text=""
-                    icon={<BilibiliIcon />}
-                    variant="ghost"
-                    size="sm"
-                    tooltip={t('bilibiliTooltip')}
-                    onClick={() => {
-                        window.open('https://space.bilibili.com/38773851/favlist?fid=702542351&ftype=create', '_blank'); // 替换为你的B站主页链接
-                        console.log(t('jumpToBilibili'));
-                    }}
-                />
-
-                {/* 微信号复制按钮 */}
-                <IconTextButton
-                    key={`wechat-${copyStates.wechat}`}
-                    text=""
-                    icon={<ChatsIcon />}
-                    variant="ghost"
-                    size="sm"
-                    tooltip={copyStates.wechat ? t('wechatCopied') : t('wechatTooltip')}
-                    forceTooltipOpen={tooltipStates.wechat}
-                    onClick={async () => {
-                        console.log(t('clickWechatCopy'));
-                        const success = await copyToClipboard('_Alii_', t);
-                        console.log(t('copyResult') + ':', success);
-                        if (success) {
-                            handleCopySuccess('wechat');
-                            console.log(t('wechatCopiedToClipboard'));
-                        }
-                    }}
-                />
-
-                {/* 邮箱复制按钮 */}
-                <IconTextButton
-                    key={`email-${copyStates.email}`}
-                    text=""
-                    icon={<MailIcon />}
-                    variant="ghost"
-                    size="sm"
-                    tooltip={copyStates.email ? t('emailCopied') : t('emailTooltip')}
-                    forceTooltipOpen={tooltipStates.email}
-                    onClick={async () => {
-                        console.log(t('clickEmailCopy'));
-                        const success = await copyToClipboard('alii.wong@foxmail.com', t);
-                        console.log(t('copyResult') + ':', success);
-                        if (success) {
-                            handleCopySuccess('email');
-                            console.log(t('emailCopiedToClipboard'));
-                        }
-                    }}
-                />
-                </div>
-
-                <ThemeToggle /> 
-                <LanguageToggle /> 
-            </div>
-            </div>
+            </AnimatedContent>
         </footer>
   );
 };

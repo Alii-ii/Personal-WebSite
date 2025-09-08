@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getLastUpdatedText } from '../lib/git-info';
 
 // 翻译数据
 const translations = {
@@ -12,7 +13,7 @@ const translations = {
     mainSite: "主站平台", 
     mainSiteTooltip: "点击访问主站平台",
     copyright: "© Alii.Wong 2025 all rights reserved",
-    lastUpdated: "更新于 2025.9.7",
+    lastUpdated: getLastUpdatedText('zh'),
     
     // 社交按钮
     bilibiliTooltip: "Alii在B站刷什么👀",
@@ -42,7 +43,7 @@ const translations = {
     mainSite: "Main Site",
     mainSiteTooltip: "Click to visit main site",
     copyright: "© Alii.Wong 2025 all rights reserved",
-    lastUpdated: "Updated 2025.9.7",
+    lastUpdated: getLastUpdatedText('en'),
     
     // Social buttons
     bilibiliTooltip: "What is Alii watching on Bilibili 👀",
