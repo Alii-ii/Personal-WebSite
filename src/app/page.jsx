@@ -95,7 +95,7 @@ export default function Home() {
                 <img
                   src="/images/B.png"
                   alt="B面"
-                  className="size-full  opacity-90"
+                  className="size-full "
                   style={{
                     filter: 'drop-shadow(0 4px 40px rgba(91,103,215,0.18))'
                   }}
