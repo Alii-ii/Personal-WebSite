@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run update-date && next build",
+    "build": "next build",
     "start": "next start",
     "update-date": "node scripts/get-last-commit-date.js",
     "export": "next build && next export"
