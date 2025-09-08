@@ -97,7 +97,7 @@ const Footer = () => {
   console.log(t('currentCopyState') + ':', copyStates);
 
   return (
-    <footer className="pb-14 px-16 w-full h-fit flex flex-row justify-between items-end">
+    <footer className="pb-10 md:pb-14 px-6 md:px-16 w-full h-fit flex flex-col md:flex-row justify-between items-start md:items-end gap-2 md:gap-0">
         {/* 背景遮罩 - 独立的快速过渡 */}
         <div
           className={`absolute bottom-0 left-0 right-0 w-full h-[300px] transition-opacity duration-100 z-0
@@ -123,11 +123,11 @@ const Footer = () => {
               className="h-full flex items-start justify-start"
             >
               <div className="flex flex-col items-start justify-center gap-4 font-Ding z-10 select-none">
-                  <span className="text-secondary text-[120px] leading-[80%]">Alii</span>
+                  <span className="text-secondary text-[108px] md:text-[120px] leading-[80%]">Alii</span>
                   <CyclingDecryptedText
                     texts={[t('learningCode'), t('lastPostDays')]}
                     cycleInterval={3000}
-                    className="text-[56px] leading-[100%] mb-2"
+                    className="text-[48px] md:text-[56px] leading-[100%] mb-2"
                     decryptedProps={{
                       speed: 40,
                       maxIterations: 6,
@@ -161,7 +161,7 @@ const Footer = () => {
                   <div
                     // 使用Tailwind的transition-opacity和duration-300
                     className={
-                      "absolute bottom-8 left-16 font-regular text-disabled text-[14px] leading-[100%] flex flex-row gap-6 z-10 transition-opacity duration-300 select-none" +
+                      "absolute bottom-4 md:bottom-8 left-6 md:left-16 font-regular text-disabled text-[13px] md:text-[14px] leading-[100%] flex flex-row gap-4 md:gap-6 z-10 transition-opacity duration-300 select-none truncate" +
                       (show ? " opacity-100" : " opacity-0")
                     }
                   >
@@ -183,23 +183,27 @@ const Footer = () => {
               delay={0.2}
               immediate={true}
               flex={false}
-              className="h-full flex items-end justify-end"
+              className="h-full flex items-start md:items-end justify-start md:justify-end"
             >
-                <div className="flex flex-col items-end gap-6 z-10"> 
-              
-                    <TextLink
-                        href="https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024?node-id=0-1&t=5jnQ7E3zqn3Wpan5-1"
-                        title={t('portfolioTooltip')}
-                    > {t('portfolio')} </TextLink>
+                <div className="flex flex-col items-start md:items-end gap-2 md:gap-6 z-10"> 
 
-                    <TextLink
-                        href="https://www.miyoushe.com/zzz/accountCenter/postList?id=196941437"
-                        title={t('mainSiteTooltip')}
-                    > {t('mainSite')} </TextLink>
+                    {/* 强调入口 */}
+                    <div className="flex flex-row md:flex-col items-center md:items-end justify-start gap-6 pt-4 md:pt-0">
+                        <TextLink
+                            href="https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024?node-id=0-1&t=5jnQ7E3zqn3Wpan5-1"
+                            title={t('portfolioTooltip')}
+                        > {t('portfolio')} </TextLink>
 
+                        <TextLink
+                            href="https://www.miyoushe.com/zzz/accountCenter/postList?id=196941437"
+                            title={t('mainSiteTooltip')}
+                        > {t('mainSite')} </TextLink>
+                    </div>
 
-                    <div className="flex flex-row items-center justify-center gap-3 mt-4">
-                        <div className="flex flex-row gap-1">
+                    {/* 底部行 */}
+                    <div className="flex flex-row-reverse md:flex-row items-center justify-start md:justify-center gap-2 md:gap-3 py-0.5 md:py-4">
+                        {/* 小按钮组 */}
+                        <div className="flex flex-row gap-0.5 md:gap-1">
                             {/* Bilibili 跳转按钮 */}
                             <IconTextButton
                                 text=""
@@ -252,6 +256,7 @@ const Footer = () => {
                             />
                         </div>
 
+                        {/* 切换组 */}
                         <ThemeToggle /> 
                         <LanguageToggle /> 
                     </div>
