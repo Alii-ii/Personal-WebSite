@@ -9,6 +9,7 @@
     "update-date": "node scripts/get-last-commit-date.js",
     "export": "next build && next export"
   },
+  "packageManager": "yarn@1.22.22",
   "dependencies": {
     "@radix-ui/react-tooltip": "1.2.8",
     "clsx": "2.1.1",
