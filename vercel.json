@@ -5,11 +5,6 @@
   "installCommand": "npm ci",
   "devCommand": "npm run dev",
   "regions": ["hkg1"],
-  "functions": {
-    "src/app/**/*.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
