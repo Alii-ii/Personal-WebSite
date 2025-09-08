@@ -8,8 +8,10 @@ const translations = {
   zh: {
     // Footer 组件文本
     learningCode: "最近在吭哧吭哧学代码…",
-    lastPostDays: "距上次投稿123天了…",
+    lastPostDays: "距离上次投稿123天了…",
     portfolio: "作品集",
+    resume: "简历",
+    resumeTooltip: "点击访问简历",
     portfolioTooltip: "点击访问作品集",
     mainSite: "主站平台", 
     mainSiteTooltip: "点击访问主站平台",
@@ -41,6 +43,8 @@ const translations = {
     learningCode: "Recently learning to code…",
     lastPostDays: "123 days since last post…",
     portfolio: "Portfolio",
+    resume: "Resume",
+    resumeTooltip: "Click to visit resume",
     portfolioTooltip: "Click to visit portfolio",
     mainSite: "Main Site",
     mainSiteTooltip: "Click to visit main site",

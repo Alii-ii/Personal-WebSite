@@ -97,7 +97,7 @@ const Footer = () => {
   console.log(t('currentCopyState') + ':', copyStates);
 
   return (
-    <footer className="pb-10 md:pb-14 px-6 md:px-16 w-full h-fit flex flex-col md:flex-row justify-between items-start md:items-end gap-2 md:gap-0">
+    <footer className="pb-10 md:pb-12 px-6 md:px-16 w-full h-fit flex flex-col md:flex-row justify-between items-start md:items-end gap-2 md:gap-0">
         {/* 背景遮罩 - 独立的快速过渡 */}
         <div
           className={`absolute bottom-0 left-0 right-0 w-full h-[300px] transition-opacity duration-100 z-0
@@ -183,12 +183,17 @@ const Footer = () => {
               delay={0.2}
               immediate={true}
               flex={false}
-              className="h-full flex items-start md:items-end justify-start md:justify-end"
+              className="h-full flex items-start md:items-end justify-start md:items-end"
             >
-                <div className="flex flex-col items-start md:items-end gap-2 md:gap-6 z-10"> 
+                <div className="flex flex-col items-start md:items-end gap-1 md:gap-6 z-10"> 
 
                     {/* 强调入口 */}
                     <div className="flex flex-row md:flex-col items-center md:items-end justify-start gap-6 pt-4 md:pt-0">
+                        <TextLink
+                            href="https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024?node-id=0-1&t=5jnQ7E3zqn3Wpan5-1"
+                            title={t('portfolioTooltip')}
+                        > {t('resume')} </TextLink>
+
                         <TextLink
                             href="https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024?node-id=0-1&t=5jnQ7E3zqn3Wpan5-1"
                             title={t('portfolioTooltip')}
@@ -201,7 +206,7 @@ const Footer = () => {
                     </div>
 
                     {/* 底部行 */}
-                    <div className="flex flex-row-reverse md:flex-row items-center justify-start md:justify-center gap-2 md:gap-3 py-0.5 md:py-4">
+                    <div className="flex flex-row-reverse md:flex-row items-center justify-start md:justify-center gap-2 md:gap-3 py-2 md:py-0">
                         {/* 小按钮组 */}
                         <div className="flex flex-row gap-0.5 md:gap-1">
                             {/* Bilibili 跳转按钮 */}
