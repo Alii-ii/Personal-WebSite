@@ -30,7 +30,6 @@ npm install
 npm run dev
 
 # 或者使用其他包管理器
-yarn dev
 pnpm dev
 bun dev
 ```
