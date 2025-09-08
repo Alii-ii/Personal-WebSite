@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run update-date && next build",
     "start": "next start",
-    "update-date": "node scripts/get-last-commit-date.js"
+    "update-date": "node scripts/get-last-commit-date.js",
+    "export": "next build && next export"
   },
   "dependencies": {
     "@radix-ui/react-tooltip": "1.2.8",

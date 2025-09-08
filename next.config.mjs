@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // 静态导出配置 - 适配Cloudflare Pages
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    unoptimized: true
+  },
   // Turbopack配置（已稳定）
   turbopack: {
     rules: {
