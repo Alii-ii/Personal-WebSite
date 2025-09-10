@@ -109,14 +109,14 @@ const Footer = ({ onUnderlinedClick, isGallery = false }) => {
   console.log(t('currentCopyState') + ':', copyStates);
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 pb-10 md:pb-12 px-6 md:px-16 w-full h-fit flex flex-col md:flex-row justify-between items-start md:items-end gap-2 md:gap-0 z-20">
+    <footer className="fixed bottom-0 left-0 right-0 pb-10 md:pb-12 px-6 md:px-16 w-full min-w-[300px] h-fit flex flex-col md:flex-row justify-between items-start md:items-end gap-2 md:gap-0 z-20">
       {/* 背景遮罩 - 独立的快速过渡 */}
       <div
         className={`absolute bottom-0 left-0 right-0 w-full h-[480px] transition-opacity duration-100 z-1 select-none pointer-events-none
         `}
         style={{
           background:
-            "linear-gradient(to top, hsl(var(--neutral-bg-card)), hsl(var(--neutral-bg-card) / 0.8), hsl(var(--neutral-bg-card) / 0.7), transparent)",
+            "linear-gradient(to top, hsl(var(--neutral-bg-card)), hsl(var(--neutral-bg-card) / 0.8), hsl(var(--neutral-bg-card) / 0.5), transparent)",
           backdropFilter: "blur(2px)",
           WebkitBackdropFilter: "blur(48px)",
           maskImage:
