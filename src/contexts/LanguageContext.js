@@ -7,8 +7,8 @@ import { getLastUpdatedText } from '../lib/git-info';
 const translations = {
   zh: {
     // Footer 组件文本
-    learningCode: "最近在吭哧吭哧学代码…",
-    lastPostDays: "距离上次投稿123天了…",
+    learningCode: "最近在吭哧吭哧<underline>学代码</underline>…",
+    lastPostDays: "距离上次<underline>投稿</underline>123天了…",
     portfolio: "作品集",
     resume: "简历",
     resumeTooltip: "点击访问简历",
@@ -40,8 +40,8 @@ const translations = {
   },
   en: {
     // Footer component text
-    learningCode: "Recently learning to code…",
-    lastPostDays: "123 days since last post…",
+    learningCode: "Recently learning to <underline>code</underline>…",
+    lastPostDays: "123 days since last <underline>post</underline>…",
     portfolio: "Portfolio",
     resume: "Resume",
     resumeTooltip: "Click to visit resume",

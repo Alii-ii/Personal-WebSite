@@ -15,7 +15,10 @@ export default function DecryptedText({
   animateOn = 'hover',
   ...props
 }) {
-  const [displayText, setDisplayText] = useState(text);
+  // 清理文本中的标签，用于动画过程
+  const cleanText = text.replace(/<[^>]*>/g, '');
+  
+  const [displayText, setDisplayText] = useState(cleanText);
   const [isHovering, setIsHovering] = useState(false);
   const [isScrambling, setIsScrambling] = useState(false);
   const [revealedIndices, setRevealedIndices] = useState(new Set());
@@ -27,7 +30,7 @@ export default function DecryptedText({
     let currentIteration = 0;
 
     const getNextIndex = revealedSet => {
-      const textLength = text.length;
+      const textLength = cleanText.length;
       switch (revealDirection) {
         case 'start':
           return revealedSet.size;
@@ -52,7 +55,7 @@ export default function DecryptedText({
     };
 
     const availableChars = useOriginalCharsOnly
-      ? Array.from(new Set(text.split(''))).filter(char => char !== ' ')
+      ? Array.from(new Set(cleanText.split(''))).filter(char => char !== ' ')
       : characters.split('');
 
     const shuffleText = (originalText, currentRevealed) => {
@@ -96,11 +99,11 @@ export default function DecryptedText({
       interval = setInterval(() => {
         setRevealedIndices(prevRevealed => {
           if (sequential) {
-            if (prevRevealed.size < text.length) {
+            if (prevRevealed.size < cleanText.length) {
               const nextIndex = getNextIndex(prevRevealed);
               const newRevealed = new Set(prevRevealed);
               newRevealed.add(nextIndex);
-              setDisplayText(shuffleText(text, newRevealed));
+              setDisplayText(shuffleText(cleanText, newRevealed));
               return newRevealed;
             } else {
               clearInterval(interval);
@@ -108,12 +111,12 @@ export default function DecryptedText({
               return prevRevealed;
             }
           } else {
-            setDisplayText(shuffleText(text, prevRevealed));
+            setDisplayText(shuffleText(cleanText, prevRevealed));
             currentIteration++;
             if (currentIteration >= maxIterations) {
               clearInterval(interval);
               setIsScrambling(false);
-              setDisplayText(text);
+              setDisplayText(cleanText);
             }
             return prevRevealed;
           }
@@ -122,7 +125,7 @@ export default function DecryptedText({
     } else {
       // 只有在动画完成后才更新显示文本
       if (isScrambling) {
-        setDisplayText(text);
+        setDisplayText(cleanText);
         setRevealedIndices(new Set());
         setIsScrambling(false);
       }
@@ -131,7 +134,7 @@ export default function DecryptedText({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isHovering, text, speed, maxIterations, sequential, revealDirection, characters, useOriginalCharsOnly]);
+  }, [isHovering, cleanText, speed, maxIterations, sequential, revealDirection, characters, useOriginalCharsOnly]);
 
   useEffect(() => {
     if (animateOn !== 'view' && animateOn !== 'both') return;

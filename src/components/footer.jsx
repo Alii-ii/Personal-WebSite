@@ -41,7 +41,7 @@ const copyToClipboard = async (text, t) => {
  * Footer 组件 - 页面底部区域
  * 包含个人信息、链接和社交图标
  */
-const Footer = () => {
+const Footer = ({ onUnderlinedClick }) => {
   // 获取语言上下文
   const { t } = useLanguage();
   
@@ -93,6 +93,15 @@ const Footer = () => {
     }, 500);
   };
 
+  // 处理下划线文本点击事件
+  const handleUnderlinedClick = (text) => {
+    console.log('点击了下划线文本:', text);
+    // 调用父组件传递的点击处理函数
+    if (onUnderlinedClick) {
+      onUnderlinedClick(text);
+    }
+  };
+
   // 调试：打印当前状态
   console.log(t('currentCopyState') + ':', copyStates);
 
@@ -122,12 +131,15 @@ const Footer = () => {
               flex={false}
               className="h-full flex items-start justify-start"
             >
-              <div className="flex flex-col items-start justify-center gap-4 font-Ding z-10 select-none">
+              <div className="flex flex-col items-start justify-center gap-4 md:pb-4 font-Ding z-10 select-none">
                   <span className="text-secondary text-[108px] md:text-[120px] leading-[80%]">Alii</span>
                   <CyclingDecryptedText
                     texts={[t('learningCode'), t('lastPostDays')]}
                     cycleInterval={3000}
                     className="text-[48px] md:text-[56px] leading-[100%] mb-2"
+                    onUnderlinedClick={handleUnderlinedClick}
+                    underlineOpacity={50}
+                    hoverOpacity={80}
                     decryptedProps={{
                       speed: 40,
                       maxIterations: 6,

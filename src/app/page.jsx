@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from 'react';
 import Footer from '@/components/footer';
 import DotGrid from '@/effects/DotGrid';
 import Magnet from '@/effects/Magnet';
 import AnimatedContent from '@/effects/AnimatedContent';
+import Masonry from '@/effects/Masonry';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { getPortfolioItems, getMasonryConfig } from '@/contexts/PortfolioContext';
 
 /**
  * 首页组件 - 空白页面
@@ -13,6 +16,29 @@ import { useThemeColors } from '@/hooks/useThemeColors';
  */
 export default function Home() {
   const { baseColor, activeColor } = useThemeColors();
+  
+  // 控制显示模式：'canvas' 或 'masonry'
+  const [displayMode, setDisplayMode] = useState('canvas');
+  
+  // 获取作品集数据和配置
+  const portfolioItems = getPortfolioItems();
+  const masonryConfig = getMasonryConfig();
+  
+  // 处理下划线文本点击事件
+  const handleUnderlinedClick = (text) => {
+    console.log('点击了下划线文本:', text);
+    // 确保 text 是字符串类型
+    const textStr = String(text || '');
+    // 如果点击的是"投稿"或"post"，切换到Masonry模式
+    if (textStr.includes('投稿') || textStr.includes('post')) {
+      setDisplayMode('masonry');
+    }
+  };
+  
+  // 返回Canvas模式的函数
+  const returnToCanvas = () => {
+    setDisplayMode('canvas');
+  };
 
   return (
     <div className="min-h-screen w-full flex flex-col relative bg-bg">
@@ -48,8 +74,9 @@ export default function Home() {
       >
 
         <div className="flex-1 w-full flex items-center justify-center relative z-10">
-          {/* 两个人物肖像和过渡文字 */}
-          <div className="flex items-center justify-center gap-20 mt-16">
+          {displayMode === 'canvas' ? (
+            /* Canvas 模式：两个人物肖像和过渡文字 */
+            <div className="flex items-center justify-center gap-20 mt-16">
             {/* 左侧人物肖像 */}
             <Magnet 
               magnetStrength={1}
@@ -103,12 +130,22 @@ export default function Home() {
                 />
               </div>
             </Magnet>
-          </div>
+            </div>
+          ) : (
+            /* Masonry 模式：展示作品集 */
+              
+               <div className="w-full h-full flex-1 flex items-start px-6 md:px-16 py-4 md:py-8">
+                 <Masonry
+                   items={portfolioItems}
+                   {...masonryConfig}
+                 />
+               </div>
+          )}
 
         </div>
       </AnimatedContent>
 
-      <Footer />
+      <Footer onUnderlinedClick={handleUnderlinedClick} />
     </div>
   );
 }

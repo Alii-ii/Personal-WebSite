@@ -12,6 +12,7 @@
   "packageManager": "pnpm@8.15.0",
   "dependencies": {
     "@radix-ui/react-tooltip": "1.2.8",
+    "@supabase/supabase-js": "^2.57.4",
     "clsx": "2.1.1",
     "framer-motion": "^12.23.12",
     "gsap": "3.13.0",
