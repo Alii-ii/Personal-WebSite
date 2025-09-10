@@ -2,11 +2,16 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 
 const useMedia = (queries, values, defaultValue) => {
-  const get = () => values[queries.findIndex(q => matchMedia(q).matches)] ?? defaultValue;
+  const get = () => {
+    if (typeof window === 'undefined') return defaultValue;
+    return values[queries.findIndex(q => matchMedia(q).matches)] ?? defaultValue;
+  };
 
   const [value, setValue] = useState(get);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handler = () => setValue(get);
     queries.forEach(q => matchMedia(q).addEventListener('change', handler));
     return () => queries.forEach(q => matchMedia(q).removeEventListener('change', handler));
@@ -21,7 +26,8 @@ const useMeasure = () => {
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   useLayoutEffect(() => {
-    if (!ref.current) return;
+    if (typeof window === 'undefined' || !ref.current) return;
+    
     const ro = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
       setSize({ width, height });
@@ -34,6 +40,10 @@ const useMeasure = () => {
 };
 
 const preloadImages = async urls => {
+  if (typeof window === 'undefined') {
+    return urls.map(src => ({ src, width: 400, height: 300 }));
+  }
+  
   const imageData = await Promise.all(
     urls.map(
       src =>
@@ -67,14 +77,15 @@ const Masonry = ({
   blurToFocus = true,
   colorShiftOnHover = false
 }) => {
-  const columns = useMedia(
-    ['(min-width:1500px)', '(min-width:1000px)', '(min-width:600px)', '(min-width:400px)'],
-    [5, 4, 3, 2],
-    1
-  );
-  
   // 最大列宽限制（web端）
   const maxColumnWidth = 360;
+  
+  // 基础列数（用于小屏幕）- 设置较小的基础列数，让宽屏幕能显示更多列
+  const baseColumns = useMedia(
+    ['(min-width:400px)'],
+    [1],
+    1
+  );
 
   const [containerRef, { width }] = useMeasure();
   const [imagesReady, setImagesReady] = useState(false);
@@ -129,23 +140,36 @@ const Masonry = ({
   }, [items]);
 
   const grid = useMemo(() => {
-    console.log('计算 grid，参数:', { width, imagesReady, itemsLength: items.length, columns });
+    console.log('计算 grid，参数:', { width, imagesReady, itemsLength: items.length, baseColumns });
     if (!width || width <= 0 || !imagesReady) {
       console.log('grid 计算条件不满足，返回空数组');
       return [];
     }
-    const colHeights = new Array(columns).fill(0);
-    const gap = 16;
-    const totalGaps = (columns - 1) * gap;
-    let columnWidth = (width - totalGaps) / columns;
     
-    // 限制最大列宽（web端）
+    const gap = 16;
+    
+    // 动态计算列数：基于容器宽度和最大列宽
+    let columns = baseColumns;
+    let columnWidth = (width - (columns - 1) * gap) / columns;
+    
+    console.log(`初始计算: 基础列数=${baseColumns}, 容器宽度=${width}px, 初始列宽=${columnWidth}px`);
+    
+    // 如果计算出的列宽大于最大限制，则增加列数
+    while (columnWidth > maxColumnWidth && columns < 20) { // 最多20列，避免过多
+      columns++;
+      columnWidth = (width - (columns - 1) * gap) / columns;
+      console.log(`增加列数到 ${columns}，新列宽: ${columnWidth}px`);
+    }
+    
+    // 如果列宽仍然太大，则限制列宽
     if (columnWidth > maxColumnWidth) {
       console.log(`列宽 ${columnWidth}px 超过最大限制 ${maxColumnWidth}px，已限制为 ${maxColumnWidth}px`);
       columnWidth = maxColumnWidth;
     }
     
-    console.log(`计算出的列宽: ${columnWidth}px，容器宽度: ${width}px，列数: ${columns}`);
+    console.log(`最终结果: 列数=${columns}，列宽=${columnWidth}px，容器宽度=${width}px`);
+    
+    const colHeights = new Array(columns).fill(0);
 
     return items.map((child, index) => {
       const col = colHeights.indexOf(Math.min(...colHeights));
@@ -169,7 +193,7 @@ const Masonry = ({
         originalHeight: imgData.height
       };
     });
-  }, [columns, items, width, imagesReady, imageDimensions]);
+  }, [baseColumns, items, width, imagesReady, imageDimensions, maxColumnWidth]);
   
   console.log('计算出的 grid:', grid);
 
@@ -235,8 +259,8 @@ const Masonry = ({
     }
   };
 
-  // 计算容器总高度
-  const containerHeight = grid.length > 0 ? Math.max(...grid.map(item => item.y + item.h)) + 100 : 0;
+  // 计算容器总高度 - 使用视口高度减去 footer 高度
+  const containerHeight = grid.length > 0 ? Math.max(...grid.map(item => item.y + item.h)) + 200 : 0;
   
   // 计算实际使用的总宽度（考虑列宽限制）
   const actualWidth = grid.length > 0 ? Math.max(...grid.map(item => item.x + item.w)) : 0;
@@ -248,7 +272,7 @@ const Masonry = ({
     <div 
       ref={containerRef} 
       className="relative w-full"
-      style={{ height: containerHeight }}
+      style={{ minHeight: containerHeight }}
     >
       {grid.map(item => (
         <div

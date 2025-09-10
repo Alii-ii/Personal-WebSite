@@ -63,7 +63,14 @@ const portfolioItems = [
     img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-191725.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTkxNzI1LmpwZWciLCJpYXQiOjE3NTc1MDQzODUsImV4cCI6MTg1MjExMjM4NX0.lb7CGClFzNFbYo77vT2o5cHKdq7mLfGnQPkDK_Vup4o',
     tittle: '某电系常驻异常',
   },
-  
+  {
+    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/cover.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvY292ZXIucG5nIiwiaWF0IjoxNzU3NTA1NjUwLCJleHAiOjE4NTIxMTM2NTB9.qJFvR22C80iA5HRQh2_VIQCX_tDNBPQef75q9ZHrZXc',
+    tittle: '孚孚',
+  },
+  {
+    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-191659.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTkxNjU5LmpwZWciLCJpYXQiOjE3NTc1MDYxNDksImV4cCI6MTg1MjExNDE0OX0.e6jchqF-4SAcHYL3I2J9M8yCzMqpbif9w5onbWuq8Gs',
+    tittle: '白术',
+  },
   
 ];
 

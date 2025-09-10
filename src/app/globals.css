@@ -78,7 +78,11 @@
   .border-brand-stroke { border-color: hsl(var(--brand-stroke)); }
 
   /* 背景色 - 简化版 */
+  .bg-bg { background-color: hsl(var(--neutral-bg-card)); }
   .bg-card { background-color: hsl(var(--neutral-bg-card)); }
+  .bg-main { background-color: hsl(var(--neutral-fg-main)); }
+  .bg-secondary { background-color: hsl(var(--neutral-fg-secondary)); }
+  .bg-tertiary { background-color: hsl(var(--neutral-fg-tertiary)); }
   .bg-hover { background-color: hsl(var(--neutral-bg-hover)); }
   .bg-press { background-color: hsl(var(--neutral-bg-press)); }
   .bg-divider { background-color: hsl(var(--neutral-bg-divider)); }
@@ -92,6 +96,7 @@
   .text-tertiary { color: hsl(var(--neutral-fg-tertiary)); }
   .text-quaternary { color: hsl(var(--neutral-fg-quaternary)); }
   .text-disabled { color: hsl(var(--neutral-fg-disabled)); }
+  .text-card { color: hsl(var(--neutral-bg-card)); }
 
   /* 边框颜色 - 简化版 */
   .border-stroke { border-color: hsl(var(--neutral-bg-stroke)); }
@@ -111,38 +116,10 @@
  
 @layer base {
   :root {
-    /* 现有的 shadcn/ui 变量 */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
- 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
- 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
- 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
- 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
- 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
- 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
- 
+    /* 基础配置 */
     --radius: 0.5rem;
     
-    /* 浅色主题颜色 tokens */
+    /* 浅色主题颜色 tokens - 基于 light-tokens.js */
     --brand-main: 176 58% 52%;
     --brand-bg: 176 58% 52% / 10%;
     --brand-stroke: 176 62% 44%;
@@ -169,36 +146,7 @@
   }
  
   .dark {
-    /* 现有的 shadcn/ui 深色变量 */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
- 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
- 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
- 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
- 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
- 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
- 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
- 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    
-    /* 深色主题颜色 tokens */
+    /* 深色主题颜色 tokens - 基于 dark-tokens.js */
     --brand-main: 176 58% 52%;
     --brand-bg: 176 58% 52% / 10%;
     --brand-stroke: 176 62% 44%;
@@ -228,7 +176,7 @@
 @layer base {
   /* 重置浏览器默认样式 */
   * {
-    border-color: hsl(var(--border));
+    border-color: hsl(var(--neutral-bg-stroke));
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -243,8 +191,8 @@
   }
   
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background-color: hsl(var(--neutral-bg-card));
+    color: hsl(var(--neutral-fg-main));
     font-family: 'Alibaba PuHuiTi 2.0', 'Inter', system-ui, sans-serif;
   }
 }

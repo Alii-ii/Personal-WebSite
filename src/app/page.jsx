@@ -1,47 +1,33 @@
 "use client";
 
-import { useState } from 'react';
 import Footer from '@/components/footer';
 import DotGrid from '@/effects/DotGrid';
 import Magnet from '@/effects/Magnet';
 import AnimatedContent from '@/effects/AnimatedContent';
-import Masonry from '@/effects/Masonry';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { getPortfolioItems, getMasonryConfig } from '@/contexts/PortfolioContext';
+import Link from 'next/link';
 
 /**
- * 首页组件 - 空白页面
- * 这是一个简洁的空白页面，等待后续功能开发
+ * 首页组件 - Canvas 模式
+ * 展示两个人物肖像和过渡文字
  * 使用阿里巴巴普惠体字体和自定义颜色系统
  */
 export default function Home() {
   const { baseColor, activeColor } = useThemeColors();
-  
-  // 控制显示模式：'canvas' 或 'masonry'
-  const [displayMode, setDisplayMode] = useState('canvas');
-  
-  // 获取作品集数据和配置
-  const portfolioItems = getPortfolioItems();
-  const masonryConfig = getMasonryConfig();
   
   // 处理下划线文本点击事件
   const handleUnderlinedClick = (text) => {
     console.log('点击了下划线文本:', text);
     // 确保 text 是字符串类型
     const textStr = String(text || '');
-    // 如果点击的是"投稿"或"post"，切换到Masonry模式
+    // 如果点击的是"投稿"或"post"，跳转到 Gallery 页面
     if (textStr.includes('投稿') || textStr.includes('post')) {
-      setDisplayMode('masonry');
+      window.location.href = '/gallery';
     }
-  };
-  
-  // 返回Canvas模式的函数
-  const returnToCanvas = () => {
-    setDisplayMode('canvas');
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col relative bg-bg">
+    <div className="min-h-screen w-full flex flex-col relative bg-bg pb-32 md:pb-40">
 
       {/* 背景点阵效果 */}
       <div className="absolute inset-0 z-0">
@@ -72,11 +58,9 @@ export default function Home() {
         flex={true}
         className="flex-1 w-full"
       >
-
         <div className="flex-1 w-full flex items-center justify-center relative z-10">
-          {displayMode === 'canvas' ? (
-            /* Canvas 模式：两个人物肖像和过渡文字 */
-            <div className="flex items-center justify-center gap-20 mt-16">
+          {/* Canvas 模式：两个人物肖像和过渡文字 */}
+          <div className="flex items-center justify-center gap-20 mt-16">
             {/* 左侧人物肖像 */}
             <Magnet 
               magnetStrength={1}
@@ -130,18 +114,7 @@ export default function Home() {
                 />
               </div>
             </Magnet>
-            </div>
-          ) : (
-            /* Masonry 模式：展示作品集 */
-              
-               <div className="w-full h-full flex-1 flex items-start px-6 md:px-16 py-4 md:py-8">
-                 <Masonry
-                   items={portfolioItems}
-                   {...masonryConfig}
-                 />
-               </div>
-          )}
-
+          </div>
         </div>
       </AnimatedContent>
 
