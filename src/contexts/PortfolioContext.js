@@ -9,78 +9,78 @@ import { getImagesFromFolder, getImageInfo, supabase } from '@/lib/supabase';
 // 作品集图片数据
 const portfolioItems = [
   {
-    img: 'https://alii.work/20250910-180822.png',
+    img: 'https://cdn.alii.work/20250910-180822.png',
     url: '#',
     title: '猫猫',
     description: '这是第一个作品的描述'
   },
   {
-    img: 'https://alii.work/20250910-180838.png',
+    img: 'https://c d ncdn.alii.work/20250910-180838.png',
     url: '#',
     title: '玲',
   },
   {
-    img: 'https://alii.work/20250910-183944.jpeg',
+    img: 'https://cdn.alii.work/20250910-183944.jpeg',
     title: '薇薇安',
   },
   {
-    img: 'https://alii.work/20250910-180757.png',
+    img: 'https://cdn.alii.work/20250910-180757.png',
     tittle: '11号/社长/雅'
   },
   {
-    img: 'https://alii.work/20250910-183952.jpeg',
+    img: 'https://cdn.alii.work/20250910-183952.jpeg',
     tittle: '甘雨',
   },
   {
-    img: 'https://alii.work/20250910-180743.png',
+    img: 'https://cdn.alii.work/20250910-180743.png',
     tittle: '艾莲/玲/猫猫',
   },
   {
-    img: 'https://alii.work/20250910-183948.jpeg',
+    img: 'https://cdn.alii.work/20250910-183948.jpeg',
     tittle: '兄妹拜年',
   },
   {
-    img: 'https://alii.work/20250910-183958.jpeg',
+    img: 'https://cdn.alii.work/20250910-183958.jpeg',
     tittle: '一斗',
   },
   {
-    img: 'https://alii.work/20250910-184010.jpeg',
+    img: 'https://cdn.alii.work/20250910-184010.jpeg',
     tittle: '青衣(竖)',
   },
   {
-    img: 'https://alii.work/20250910-184003.jpeg',
+    img: 'https://cdn.alii.work/20250910-184003.jpeg',
     tittle: '花火',
   },
   {
-    img: 'https://alii.work/20250910-184014.jpeg',
+    img: 'https://cdn.alii.work/20250910-184014.jpeg',
     tittle: '简',
   },
   {
-    img: 'https://alii.work/20250910-184006.jpeg',
+    img: 'https://cdn.alii.work/20250910-184006.jpeg',
     tittle: '帽帽猫',
   },
   {
-    img: 'https://alii.work/20250910-191655.jpeg',
+    img: 'https://cdn.alii.work/20250910-191655.jpeg',
     tittle: '千织',
   },
   {
-    img: 'https://alii.work/20250910-191725.jpeg',
+    img: 'https://cdn.alii.work/20250910-191725.jpeg',
     tittle: '某电系常驻异常',
   },
   {
-    img: 'https://alii.work/cover.png',
+    img: 'https://cdn.alii.work/cover.png',
     tittle: '孚孚',
   },
   {
-    img: 'https://alii.work/20250910-191659.jpeg',
+    img: 'https://cdn.alii.work/20250910-191659.jpeg',
     tittle: '白术',
   },
   {
-    img: 'https://alii.work/20250910-191708.jpeg',
+    img: 'https://cdn.alii.work/20250910-191708.jpeg',
     tittle: '安比',
   },
   {
-    img: 'https://alii.work/20250910-191722.jpeg',
+    img: 'https://cdn.alii.work/20250910-191722.jpeg',
     tittle: '11号',
   },
   
