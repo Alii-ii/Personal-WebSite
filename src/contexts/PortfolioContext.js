@@ -15,7 +15,7 @@ const portfolioItems = [
     description: '这是第一个作品的描述'
   },
   {
-    img: 'https://c d ncdn.alii.work/20250910-180838.png',
+    img: 'https://cdn.alii.work/20250910-180838.png',
     url: '#',
     title: '玲',
   },
