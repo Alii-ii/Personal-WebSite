@@ -494,6 +494,7 @@ const Masonry = ({
                 : '0px 4px 12px 0px rgba(0,0,0,0.08)',
               transform: expandedImageId === item.id && isWebDevice ? 'scale(2)' : 'scale(1)',
               transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              loading: 'lazy',
               maxWidth: '100%',
               maxHeight: '100%',
               width: shouldFillWidth ? '100%' : undefined,
