@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 
 const useMedia = (queries, values, defaultValue) => {
@@ -80,6 +80,15 @@ const Masonry = ({
   // 最大列宽限制（web端）
   const maxColumnWidth = 360;
   
+  // 图片放大功能状态
+  const [expandedImageId, setExpandedImageId] = useState(null);
+  const [isWebDevice, setIsWebDevice] = useState(false);
+  const [expandedImagePosition, setExpandedImagePosition] = useState(null);
+  
+  // 使用 ref 来跟踪当前状态，避免异步更新问题
+  const expandedImageIdRef = useRef(null);
+  const isWebDeviceRef = useRef(false);
+  
   // 基础列数（用于小屏幕）- 设置较小的基础列数，让宽屏幕能显示更多列
   const baseColumns = useMedia(
     ['(min-width:400px)'],
@@ -90,6 +99,167 @@ const Masonry = ({
   const [containerRef, { width }] = useMeasure();
   const [imagesReady, setImagesReady] = useState(false);
   const [imageDimensions, setImageDimensions] = useState({});
+
+  // 设备检测 - 判断是否为Web端
+  useEffect(() => {
+    const checkDevice = () => {
+      const isWeb = window.innerWidth > 768; // 768px作为移动端阈值
+      setIsWebDevice(isWeb);
+      isWebDeviceRef.current = isWeb; // 同步更新 ref
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
+
+  // 同步 expandedImageId 到 ref
+  useEffect(() => {
+    expandedImageIdRef.current = expandedImageId;
+  }, [expandedImageId]);
+
+  // 获取图片实际尺寸的辅助函数
+  const getImageSize = useCallback((imageId) => {
+    // 使用 items 和 imageDimensions 来计算尺寸
+    const item = items.find(item => (item.id || items.indexOf(item)) === imageId);
+    if (item) {
+      const imgData = imageDimensions[item.img] || { width: 400, height: 300 };
+      const aspectRatio = imgData.width / imgData.height;
+      const columnWidth = Math.min(maxColumnWidth, (width - 16) / Math.ceil(width / maxColumnWidth));
+      const height = columnWidth / aspectRatio;
+      return { w: columnWidth, h: height };
+    }
+    // 如果找不到，使用默认尺寸
+    return { w: 300, h: 200 };
+  }, [items, imageDimensions, maxColumnWidth, width]);
+
+  // 键盘快捷键支持 - 使用防抖来避免快速按键问题
+  useEffect(() => {
+    let isProcessing = false; // 防止重复处理
+    
+    const handleKeyDown = (event) => {
+      // 防止重复处理
+      if (isProcessing) {
+        return;
+      }
+      
+      // 使用 ref 获取最新值，避免异步状态更新问题
+      const currentExpandedId = expandedImageIdRef.current;
+      const currentIsWebDevice = isWebDeviceRef.current;
+      
+      if (!currentIsWebDevice || currentExpandedId === null || currentExpandedId === undefined) {
+        return;
+      }
+
+      // 使用 items 而不是 grid 来避免循环依赖
+      const currentIndex = items.findIndex(item => (item.id || items.indexOf(item)) === currentExpandedId);
+      
+      if (currentIndex === -1) {
+        return;
+      }
+
+      // 设置处理标志
+      isProcessing = true;
+
+      switch (event.key) {
+        case 'Escape':
+          // ESC 退出放大
+          event.preventDefault();
+          setExpandedImageId(null);
+          setExpandedImagePosition(null);
+          setTimeout(() => { isProcessing = false; }, 100);
+          break;
+        
+        case 'ArrowUp':
+        case 'ArrowLeft':
+          // 上/左 往前切换
+          event.preventDefault();
+          const prevIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+          const prevItem = items[prevIndex];
+          
+          if (prevItem) {
+            // 使用视口中心而不是容器中心
+            const newId = prevItem.id || prevIndex;
+            const size = getImageSize(newId);
+            const centerX = window.innerWidth / 2 - size.w / 2;
+            const centerY = window.innerHeight / 2 - size.h / 2;
+            setExpandedImagePosition({ x: centerX, y: centerY });
+            setExpandedImageId(newId);
+          }
+          setTimeout(() => { isProcessing = false; }, 100);
+          break;
+        
+        case 'ArrowDown':
+        case 'ArrowRight':
+          // 下/右 往后切换
+          event.preventDefault();
+          const nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+          const nextItem = items[nextIndex];
+          
+          if (nextItem) {
+            // 使用视口中心而不是容器中心
+            const newId = nextItem.id || nextIndex;
+            const size = getImageSize(newId);
+            const centerX = window.innerWidth / 2 - size.w / 2;
+            const centerY = window.innerHeight / 2 - size.h / 2;
+            setExpandedImagePosition({ x: centerX, y: centerY });
+            setExpandedImageId(newId);
+          }
+          setTimeout(() => { isProcessing = false; }, 100);
+          break;
+      }
+    };
+
+    // 添加键盘事件监听器
+    document.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [items, getImageSize]); // 添加 getImageSize 依赖
+
+  // 检查是否需要自适应宽度（移动端阈值到1000px之间）
+  const shouldFillWidth = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    const screenWidth = window.innerWidth;
+    return screenWidth > 768 && screenWidth <= 1000;
+  }, [width]);
+
+  // 图片点击处理 - 使用 useCallback 优化性能
+  const handleImageClick = useCallback((imageId, event) => {
+    if (!isWebDevice) return; // 移动端不处理
+    
+    event.stopPropagation(); // 阻止事件冒泡
+    event.preventDefault(); // 阻止默认行为
+    
+    if (expandedImageId === imageId) {
+      // 点击已放大的图片，缩小
+      setExpandedImageId(null);
+      setExpandedImagePosition(null);
+    } else {
+      // 点击其他图片，放大新图片
+      // 使用 getImageSize 获取实际尺寸
+      const size = getImageSize(imageId);
+      // 计算居中位置 - 使用视口中心而不是容器中心
+      const centerX = window.innerWidth / 2 - size.w / 2;
+      const centerY = window.innerHeight / 2 - size.h / 2;
+      console.log('点击放大 - 视口尺寸:', window.innerWidth, 'x', window.innerHeight);
+      console.log('图片尺寸:', size.w, 'x', size.h);
+      console.log('计算位置:', centerX, centerY);
+      setExpandedImagePosition({ x: centerX, y: centerY });
+      setExpandedImageId(imageId);
+    }
+  }, [isWebDevice, expandedImageId, getImageSize]);
+
+  // 容器点击处理 - 点击空白区域缩小图片
+  const handleContainerClick = useCallback((event) => {
+    // 只有当点击的是容器本身（不是子元素）时才缩小图片
+    if (isWebDevice && expandedImageId && event.target === event.currentTarget) {
+      setExpandedImageId(null);
+      setExpandedImagePosition(null);
+    }
+  }, [isWebDevice, expandedImageId]);
 
   const getInitialPosition = item => {
     const containerRect = containerRef.current?.getBoundingClientRect();
@@ -185,6 +355,7 @@ const Masonry = ({
       
       return { 
         ...child, 
+        id: child.id || index, // 确保有唯一的 id
         x, 
         y, 
         w: columnWidth, 
@@ -227,8 +398,7 @@ const Masonry = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grid, imagesReady, stagger, animateFrom, blurToFocus, duration, ease]);
 
-  const handleMouseEnter = (id, element) => {
-    console.log('鼠标进入:', id, 'scaleOnHover:', scaleOnHover, 'colorShiftOnHover:', colorShiftOnHover);
+  const handleMouseEnter = useCallback((id, element) => {
     if (scaleOnHover) {
       // 直接对传入的 element 应用动画
       gsap.to(element, {
@@ -241,10 +411,9 @@ const Masonry = ({
       const overlay = element.querySelector('.color-overlay');
       if (overlay) gsap.to(overlay, { opacity: 0.3, duration: 0.3 });
     }
-  };
+  }, [scaleOnHover, hoverScale, colorShiftOnHover]);
 
-  const handleMouseLeave = (id, element) => {
-    console.log('鼠标离开:', id);
+  const handleMouseLeave = useCallback((id, element) => {
     if (scaleOnHover) {
       // 直接对传入的 element 应用动画
       gsap.to(element, {
@@ -257,61 +426,94 @@ const Masonry = ({
       const overlay = element.querySelector('.color-overlay');
       if (overlay) gsap.to(overlay, { opacity: 0, duration: 0.3 });
     }
-  };
+  }, [scaleOnHover, colorShiftOnHover]);
 
   // 计算容器总高度 - 使用视口高度减去 footer 高度
-  const containerHeight = grid.length > 0 ? Math.max(...grid.map(item => item.y + item.h)) + 200 : 0;
+  const containerHeight = useMemo(() => {
+    return grid.length > 0 ? Math.max(...grid.map(item => item.y + item.h)) + 200 : 0;
+  }, [grid]);
   
   // 计算实际使用的总宽度（考虑列宽限制）
-  const actualWidth = grid.length > 0 ? Math.max(...grid.map(item => item.x + item.w)) : 0;
-  const shouldCenter = actualWidth < width && actualWidth > 0;
+  const actualWidth = useMemo(() => {
+    return grid.length > 0 ? Math.max(...grid.map(item => item.x + item.w)) : 0;
+  }, [grid]);
   
-  console.log(`容器信息: 总宽度=${width}px, 实际使用宽度=${actualWidth}px, 是否需要居中=${shouldCenter}`);
+  const shouldCenter = useMemo(() => {
+    return actualWidth < width && actualWidth > 0;
+  }, [actualWidth, width]);
+  
 
   return (
     <div 
       ref={containerRef} 
       className="relative w-full"
       style={{ minHeight: containerHeight }}
+      onClick={handleContainerClick}
     >
+      {/* 放大图片时的遮罩层 */}
+      {expandedImageId && isWebDevice && (
+        <div 
+          className="fixed inset-0 bg-bg opacity-50 backdrop-blur-sm z-40"
+          onClick={() => {
+            setExpandedImageId(null);
+            setExpandedImagePosition(null);
+          }}
+        />
+      )}
+      
       {grid.map(item => (
         <div
           data-key={item.id}
-          className="absolute"
+          className={expandedImageId === item.id && expandedImagePosition ? "fixed" : "absolute"}
           style={{ 
             willChange: 'transform, opacity',
-            left: shouldCenter ? item.x + (width - actualWidth) / 2 : item.x,
-            top: item.y,
+            left: expandedImageId === item.id && expandedImagePosition 
+              ? expandedImagePosition.x 
+              : (shouldCenter ? item.x + (width - actualWidth) / 2 : item.x),
+            top: expandedImageId === item.id && expandedImagePosition 
+              ? expandedImagePosition.y 
+              : item.y,
             width: item.w,
-            height: item.h
-          }}
-          // url 为空时点击无响应，否则新窗口打开
-          onClick={() => {
-            if (item.url) {
-              window.open(item.url, 'noopener');
-            }
+            height: item.h,
+            zIndex: expandedImageId === item.id ? 50 : 1, // 提高放大图片的层级
+            transform: 'translateZ(0)', // 启用硬件加速
+            backfaceVisibility: 'hidden' // 优化渲染性能
           }}
           onMouseEnter={e => {
-            console.log('onMouseEnter 事件触发:', item.id);
             handleMouseEnter(item.id, e.currentTarget);
           }}
           onMouseLeave={e => {
-            console.log('onMouseLeave 事件触发:', item.id);
             handleMouseLeave(item.id, e.currentTarget);
           }}
         >
           <div 
-            className="relative w-full h-full rounded-[8px] overflow-hidden border border-stroke border-[0.5px]"
-            style={{ boxShadow: '0px 4px 12px 0px rgba(0,0,0,0.08)' }}>
+            className="relative w-full h-full rounded-[8px] overflow-hidden border border-stroke border-[0.5px] cursor-pointer"
+            style={{ 
+              boxShadow: expandedImageId === item.id && isWebDevice 
+                ? '0px 8px 24px 0px rgba(0,0,0,0.15)' 
+                : '0px 4px 12px 0px rgba(0,0,0,0.08)',
+              transform: expandedImageId === item.id && isWebDevice ? 'scale(2)' : 'scale(1)',
+              transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              maxWidth: '100%',
+              maxHeight: '100%',
+              width: shouldFillWidth ? '100%' : undefined,
+              willChange: 'transform, box-shadow', // 提示浏览器优化这些属性
+              transformOrigin: 'center center' // 确保缩放从中心开始
+            }}
+            onClick={(e) => handleImageClick(item.id, e)}
+          >
             <img
               src={item.img}
               alt={item.title || ''}
-              className="w-full h-full"
+              className="w-full h-full overflow-hidden"
               style={{ 
                 width: '100%', 
                 height: '100%',
                 objectFit: 'cover',
-                objectPosition: 'center'
+                objectPosition: 'center',
+                transform: 'translateZ(0)', // 启用硬件加速
+                backfaceVisibility: 'hidden', // 优化渲染性能
+                imageRendering: 'optimizeQuality' // 优化图片渲染质量
               }}
             />
             {colorShiftOnHover && (

@@ -9,67 +9,79 @@ import { getImagesFromFolder, getImageInfo, supabase } from '@/lib/supabase';
 // 作品集图片数据
 const portfolioItems = [
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-180822.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTgwODIyLnBuZyIsImlhdCI6MTc1NzQ5OTA0NywiZXhwIjoxODUyMTA3MDQ3fQ.46n6SaZLpKOCUW2GssD_lH7iYF-IOGMVkS7QsK42uu4',
+    img: 'https://alii.work/20250910-180822.png',
     url: '#',
     title: '猫猫',
     description: '这是第一个作品的描述'
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-180838.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTgwODM4LnBuZyIsImlhdCI6MTc1NzUwMDQ1OCwiZXhwIjoxODUyMTA4NDU4fQ.LF-hkk9dwN_PRTG6GgqCQUEzZKTiDskwz2LGLzUPdKY',
+    img: 'https://alii.work/20250910-180838.png',
     url: '#',
     title: '玲',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-183944.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTgzOTQ0LmpwZWciLCJpYXQiOjE3NTc1MDE4NjcsImV4cCI6MTg1MjEwOTg2N30.OL8TDQUfjnG_ibmso5nSh1cyDUssVaUlvCg_0lylvtk',
+    img: 'https://alii.work/20250910-183944.jpeg',
     title: '薇薇安',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-180757.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTgwNzU3LnBuZyIsImlhdCI6MTc1NzUwMDQ4NiwiZXhwIjoxODUyMTA4NDg2fQ.wW313uhquszTHz_vIuiT5vPfAIdwSCRh_WASno8AFfk',
+    img: 'https://alii.work/20250910-180757.png',
     tittle: '11号/社长/雅'
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-183952.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTgzOTUyLmpwZWciLCJpYXQiOjE3NTc1MDE5NDYsImV4cCI6MTg1MjEwOTk0Nn0.RneeKkYvMbqN1wp4Y7uBPgYXJxRqWV64R55EdkbtYW0',
+    img: 'https://alii.work/20250910-183952.jpeg',
     tittle: '甘雨',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-180743.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTgwNzQzLnBuZyIsImlhdCI6MTc1NzUwMDczNiwiZXhwIjoxODUyMTA4NzM2fQ.qq0nDKxHQvahw7oHD-5zYVOKiE08vpNRWd5j17WzVUg',
+    img: 'https://alii.work/20250910-180743.png',
     tittle: '艾莲/玲/猫猫',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-183948.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTgzOTQ4LmpwZWciLCJpYXQiOjE3NTc1MDE5MTYsImV4cCI6MTg1MjEwOTkxNn0.7DfvRnh2wMI_Bo3m6WoIvNhwtFuW_yosP62ABZQYlik',
+    img: 'https://alii.work/20250910-183948.jpeg',
     tittle: '兄妹拜年',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-183958.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTgzOTU4LmpwZWciLCJpYXQiOjE3NTc1MDIwNDMsImV4cCI6MTg1MjExMDA0M30.8osSjTrCZsgpZgLmE_lnfnyvrjnKzxi2APVu_cW_u6M',
+    img: 'https://alii.work/20250910-183958.jpeg',
     tittle: '一斗',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-184003.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTg0MDAzLmpwZWciLCJpYXQiOjE3NTc1MDIwODUsImV4cCI6MTg1MjExMDA4NX0.Ysxwu4-fGK1e5A_MLSkJ1s56kZyu6Y9X1F0rltnCoFE',
+    img: 'https://alii.work/20250910-184010.jpeg',
+    tittle: '青衣(竖)',
+  },
+  {
+    img: 'https://alii.work/20250910-184003.jpeg',
     tittle: '花火',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-184014.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTg0MDE0LmpwZWciLCJpYXQiOjE3NTc1MDI0NzIsImV4cCI6MTg1MjExMDQ3Mn0._GmvSGz72A3uz-n07s6n7Bnvafhvtp74rFXASyqaPls',
+    img: 'https://alii.work/20250910-184014.jpeg',
     tittle: '简',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-184006.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTg0MDA2LmpwZWciLCJpYXQiOjE3NTc1MDIxMzIsImV4cCI6MTg1MjExMDEzMn0.g33wd_Upv_vAIrs9l2k7pTr_slOAw5xmOaY9NoKxY4k',
+    img: 'https://alii.work/20250910-184006.jpeg',
     tittle: '帽帽猫',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-191655.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTkxNjU1LmpwZWciLCJpYXQiOjE3NTc1MDQzMDQsImV4cCI6MTg1MjExMjMwNH0.Nuc3R5Vr_Qfxlc9ulfrwCZenuBXIGtMWfJzNTIHvbSQ',
+    img: 'https://alii.work/20250910-191655.jpeg',
     tittle: '千织',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-191725.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTkxNzI1LmpwZWciLCJpYXQiOjE3NTc1MDQzODUsImV4cCI6MTg1MjExMjM4NX0.lb7CGClFzNFbYo77vT2o5cHKdq7mLfGnQPkDK_Vup4o',
+    img: 'https://alii.work/20250910-191725.jpeg',
     tittle: '某电系常驻异常',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/cover.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvY292ZXIucG5nIiwiaWF0IjoxNzU3NTA1NjUwLCJleHAiOjE4NTIxMTM2NTB9.qJFvR22C80iA5HRQh2_VIQCX_tDNBPQef75q9ZHrZXc',
+    img: 'https://alii.work/cover.png',
     tittle: '孚孚',
   },
   {
-    img: 'https://lvttrekvsfvpwjhipuwz.supabase.co/storage/v1/object/sign/images/20250910-191659.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iMjIxNTBiMC00OTFkLTRkYmYtYjU1MC0yYmM0MzE5ZjVhZjciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvMjAyNTA5MTAtMTkxNjU5LmpwZWciLCJpYXQiOjE3NTc1MDYxNDksImV4cCI6MTg1MjExNDE0OX0.e6jchqF-4SAcHYL3I2J9M8yCzMqpbif9w5onbWuq8Gs',
+    img: 'https://alii.work/20250910-191659.jpeg',
     tittle: '白术',
+  },
+  {
+    img: 'https://alii.work/20250910-191708.jpeg',
+    tittle: '安比',
+  },
+  {
+    img: 'https://alii.work/20250910-191722.jpeg',
+    tittle: '11号',
   },
   
 ];
