@@ -99,6 +99,11 @@ const portfolioItems = [
     fallbackImg: '/images/gallery/20250910-191722.jpeg',
     tittle: '11号',
   },
+  // {
+  //   img: '',
+  //   fallbackImg: '',
+  //   tittle: '',
+  // },
   
 ];
 
@@ -118,11 +123,20 @@ const masonryConfig = {
  * 获取作品集数据
  * 每个项目包含 img (CDN链接) 和 fallbackImg (本地图片路径)
  * Masonry 组件会优先使用 fallbackImg，失败时回退到 img
- * @returns {Array} 作品集项目数组
+ * 返回随机排序的作品集数组
+ * @returns {Array} 随机排序的作品集项目数组
  */
 export const getPortfolioItems = () => {
-  // 直接返回作品集数据，每个项目已包含 fallbackImg 字段
-  return portfolioItems;
+  // 创建数组副本，避免修改原始数组
+  const shuffledItems = [...portfolioItems];
+  
+  // 使用 Fisher-Yates 洗牌算法进行随机排序
+  for (let i = shuffledItems.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledItems[i], shuffledItems[j]] = [shuffledItems[j], shuffledItems[i]];
+  }
+  
+  return shuffledItems;
 };
 
 /**

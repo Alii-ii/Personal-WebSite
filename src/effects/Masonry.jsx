@@ -137,6 +137,8 @@ const Masonry = ({
   const [imageDimensions, setImageDimensions] = useState({});
   // 跟踪每个图片项实际使用的图片源（优先本地，失败时使用CDN）
   const [imageSources, setImageSources] = useState({});
+  // 跟踪每个图片项的加载状态：true=已加载, false=加载中, 'error'=加载失败
+  const [imageLoadStatus, setImageLoadStatus] = useState({});
 
   // 设备检测 - 判断是否为Web端
   useEffect(() => {
@@ -152,12 +154,7 @@ const Masonry = ({
     return () => window.removeEventListener('resize', checkDevice);
   }, []);
 
-  // 同步 expandedImageId 到 ref
-  useEffect(() => {
-    expandedImageIdRef.current = expandedImageId;
-  }, [expandedImageId]);
-
-  // 获取图片实际尺寸的辅助函数
+  // 获取图片实际尺寸的辅助函数（用于 Masonry 布局）
   const getImageSize = useCallback((imageId) => {
     // 使用 items 和 imageDimensions 来计算尺寸
     const item = items.find(item => (item.id || items.indexOf(item)) === imageId);
@@ -174,6 +171,64 @@ const Masonry = ({
     // 如果找不到，使用默认尺寸
     return { w: 300, h: 200 };
   }, [items, imageDimensions, imageSources, maxColumnWidth, width]);
+
+  // 计算放大后的图片尺寸（考虑最大阈值限制）
+  const getExpandedImageSize = useCallback((imageId) => {
+    const item = items.find(item => (item.id || items.indexOf(item)) === imageId);
+    if (!item) {
+      return { w: 400, h: 300 };
+    }
+
+    // 获取原始图片尺寸
+    const itemKey = item.id || items.indexOf(item);
+    const actualSrc = imageSources[itemKey] || item.fallbackImg || item.img;
+    const imgData = imageDimensions[actualSrc] || { width: 400, height: 300 };
+    const aspectRatio = imgData.width / imgData.height;
+
+    // 获取屏幕尺寸
+    const maxWidth = window.innerWidth * 0.9; // 最大宽度为屏幕的90%
+    const maxHeight = window.innerHeight * 0.9; // 最大高度为屏幕的90%
+
+    // 计算放大后的尺寸，保持宽高比
+    let expandedWidth = imgData.width;
+    let expandedHeight = imgData.height;
+
+    // 如果宽度超过限制，按宽度缩放
+    if (expandedWidth > maxWidth) {
+      expandedWidth = maxWidth;
+      expandedHeight = expandedWidth / aspectRatio;
+    }
+
+    // 如果高度超过限制，按高度缩放
+    if (expandedHeight > maxHeight) {
+      expandedHeight = maxHeight;
+      expandedWidth = expandedHeight * aspectRatio;
+    }
+
+    return { w: expandedWidth, h: expandedHeight };
+  }, [items, imageDimensions, imageSources]);
+
+  // 同步 expandedImageId 到 ref
+  useEffect(() => {
+    expandedImageIdRef.current = expandedImageId;
+  }, [expandedImageId]);
+
+  // 监听窗口大小变化，重新计算放大图片的位置和尺寸
+  useEffect(() => {
+    if (!isWebDevice || !expandedImageId || !expandedImagePosition) return;
+
+    const handleResize = () => {
+      // 重新计算放大后的尺寸
+      const expandedSize = getExpandedImageSize(expandedImageId);
+      // 重新计算居中位置
+      const centerX = window.innerWidth / 2 - expandedSize.w / 2;
+      const centerY = window.innerHeight / 2 - expandedSize.h / 2;
+      setExpandedImagePosition({ x: centerX, y: centerY });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isWebDevice, expandedImageId, expandedImagePosition, getExpandedImageSize]);
 
   // 键盘快捷键支持 - 使用防抖来避免快速按键问题
   useEffect(() => {
@@ -222,9 +277,9 @@ const Masonry = ({
           if (prevItem) {
             // 使用视口中心而不是容器中心
             const newId = prevItem.id || prevIndex;
-            const size = getImageSize(newId);
-            const centerX = window.innerWidth / 2 - size.w / 2;
-            const centerY = window.innerHeight / 2 - size.h / 2;
+            const expandedSize = getExpandedImageSize(newId);
+            const centerX = window.innerWidth / 2 - expandedSize.w / 2;
+            const centerY = window.innerHeight / 2 - expandedSize.h / 2;
             setExpandedImagePosition({ x: centerX, y: centerY });
             setExpandedImageId(newId);
           }
@@ -241,9 +296,9 @@ const Masonry = ({
           if (nextItem) {
             // 使用视口中心而不是容器中心
             const newId = nextItem.id || nextIndex;
-            const size = getImageSize(newId);
-            const centerX = window.innerWidth / 2 - size.w / 2;
-            const centerY = window.innerHeight / 2 - size.h / 2;
+            const expandedSize = getExpandedImageSize(newId);
+            const centerX = window.innerWidth / 2 - expandedSize.w / 2;
+            const centerY = window.innerHeight / 2 - expandedSize.h / 2;
             setExpandedImagePosition({ x: centerX, y: centerY });
             setExpandedImageId(newId);
           }
@@ -258,7 +313,7 @@ const Masonry = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [items, getImageSize]); // 添加 getImageSize 依赖
+  }, [items, getExpandedImageSize]); // 添加 getExpandedImageSize 依赖
 
   // 检查是否需要自适应宽度（移动端阈值到1000px之间）
   const shouldFillWidth = useMemo(() => {
@@ -267,40 +322,13 @@ const Masonry = ({
     return screenWidth > 768 && screenWidth <= 1000;
   }, [width]);
 
-  // 图片点击处理 - 使用 useCallback 优化性能
-  const handleImageClick = useCallback((imageId, event) => {
-    if (!isWebDevice) return; // 移动端不处理
-    
-    event.stopPropagation(); // 阻止事件冒泡
-    event.preventDefault(); // 阻止默认行为
-    
-    if (expandedImageId === imageId) {
-      // 点击已放大的图片，缩小
-      setExpandedImageId(null);
-      setExpandedImagePosition(null);
-    } else {
-      // 点击其他图片，放大新图片
-      // 使用 getImageSize 获取实际尺寸
-      const size = getImageSize(imageId);
-      // 计算居中位置 - 使用视口中心而不是容器中心
-      const centerX = window.innerWidth / 2 - size.w / 2;
-      const centerY = window.innerHeight / 2 - size.h / 2;
-      console.log('点击放大 - 视口尺寸:', window.innerWidth, 'x', window.innerHeight);
-      console.log('图片尺寸:', size.w, 'x', size.h);
-      console.log('计算位置:', centerX, centerY);
-      setExpandedImagePosition({ x: centerX, y: centerY });
-      setExpandedImageId(imageId);
-    }
-  }, [isWebDevice, expandedImageId, getImageSize]);
-
-  // 容器点击处理 - 点击空白区域缩小图片
-  const handleContainerClick = useCallback((event) => {
-    // 只有当点击的是容器本身（不是子元素）时才缩小图片
-    if (isWebDevice && expandedImageId && event.target === event.currentTarget) {
-      setExpandedImageId(null);
-      setExpandedImagePosition(null);
-    }
-  }, [isWebDevice, expandedImageId]);
+  // 存储原始位置和尺寸的 ref，用于动画
+  const originalPositionsRef = useRef({});
+  // 存储 grid 的 ref，用于在回调中访问
+  const gridRef = useRef([]);
+  const shouldCenterRef = useRef(false);
+  const actualWidthRef = useRef(0);
+  const widthRef = useRef(0);
 
   const getInitialPosition = item => {
     const containerRect = containerRef.current?.getBoundingClientRect();
@@ -339,31 +367,114 @@ const Masonry = ({
       return;
     }
     
-    // 使用更新后的 preloadImages，传入完整 items 以支持优先本地图片
-    preloadImages(items).then(imageData => {
-      console.log('图片预加载完成:', imageData);
-      const dimensions = {};
-      const sources = {};
+    // 重置状态
+    setImageDimensions({});
+    setImageSources({});
+    setImageLoadStatus({});
+    setImagesReady(false);
+    
+    // 逐个加载图片，加载完一个显示一个
+    items.forEach((item, index) => {
+      const itemKey = item.id || index;
       
-      // 为每个 item 建立图片源映射
-      items.forEach((item, index) => {
-        const imgData = imageData[index];
-        // 使用 item 的唯一标识（id 或 index）
-        const itemKey = item.id || index;
-        // 存储该 item 实际使用的图片源
-        sources[itemKey] = imgData.src;
-        // 存储图片尺寸（使用实际使用的图片源作为 key）
-        dimensions[imgData.src] = { width: imgData.width, height: imgData.height };
-      });
+      // 初始状态：标记为加载中
+      setImageLoadStatus(prev => ({
+        ...prev,
+        [itemKey]: 'loading'
+      }));
       
-      setImageSources(sources);
-      setImageDimensions(dimensions);
-      setImagesReady(true);
+      // 优先使用本地图片（fallbackImg），其次使用CDN（img）
+      const primarySrc = item.fallbackImg || item.img;
+      const fallbackSrc = item.fallbackImg ? item.img : null;
+      
+      const img = new Image();
+      
+      // 先尝试加载本地图片
+      img.src = primarySrc;
+      
+      img.onload = () => {
+        // 图片加载成功，立即更新状态并显示
+        const imgData = {
+          src: primarySrc,
+          width: img.naturalWidth,
+          height: img.naturalHeight
+        };
+        
+        setImageSources(prev => ({
+          ...prev,
+          [itemKey]: imgData.src
+        }));
+        
+        setImageDimensions(prev => ({
+          ...prev,
+          [imgData.src]: { width: imgData.width, height: imgData.height }
+        }));
+        
+        setImageLoadStatus(prev => ({
+          ...prev,
+          [itemKey]: true
+        }));
+        
+        // 如果这是第一张图片，标记 imagesReady 为 true，允许开始计算布局
+        setImagesReady(true);
+      };
+      
+      img.onerror = () => {
+        // 如果本地图片加载失败且有CDN备用，尝试CDN
+        if (fallbackSrc) {
+          const fallbackImg = new Image();
+          fallbackImg.src = fallbackSrc;
+          
+          fallbackImg.onload = () => {
+            // CDN 图片加载成功
+            const imgData = {
+              src: fallbackSrc,
+              width: fallbackImg.naturalWidth,
+              height: fallbackImg.naturalHeight
+            };
+            
+            setImageSources(prev => ({
+              ...prev,
+              [itemKey]: imgData.src
+            }));
+            
+            setImageDimensions(prev => ({
+              ...prev,
+              [imgData.src]: { width: imgData.width, height: imgData.height }
+            }));
+            
+            setImageLoadStatus(prev => ({
+              ...prev,
+              [itemKey]: true
+            }));
+            
+            setImagesReady(true);
+          };
+          
+          fallbackImg.onerror = () => {
+            // CDN 也加载失败，标记为错误状态
+            setImageLoadStatus(prev => ({
+              ...prev,
+              [itemKey]: 'error'
+            }));
+            
+            setImagesReady(true);
+          };
+        } else {
+          // 没有备用图片，标记为错误状态
+          setImageLoadStatus(prev => ({
+            ...prev,
+            [itemKey]: 'error'
+          }));
+          
+          setImagesReady(true);
+        }
+      };
     });
   }, [items]);
 
   const grid = useMemo(() => {
-    console.log('计算 grid，参数:', { width, imagesReady, itemsLength: items.length, baseColumns });
+    console.log('计算 grid，参数:', { width, imagesReady, itemsLength: items.length, baseColumns, loadedCount: Object.keys(imageLoadStatus).filter(k => imageLoadStatus[k]).length });
     if (!width || width <= 0 || !imagesReady) {
       console.log('grid 计算条件不满足，返回空数组');
       return [];
@@ -392,19 +503,46 @@ const Masonry = ({
     
     console.log(`最终结果: 列数=${columns}，列宽=${columnWidth}px，容器宽度=${width}px`);
     
+    // 生成稳定的随机高度的辅助函数（基于 itemKey）
+    // 基数 400px，幅度 ±100px，步长 50px
+    // 结果：300, 350, 400, 450, 500
+    const getRandomPlaceholderHeight = (itemKey) => {
+      // 使用简单的哈希函数将 itemKey 转换为 0-4 的索引
+      const hash = String(itemKey).split('').reduce((acc, char) => {
+        return ((acc << 5) - acc) + char.charCodeAt(0);
+      }, 0);
+      const index = Math.abs(hash) % 5; // 0-4 的索引
+      const baseHeight = 400; // 基数
+      const offset = (index - 2) * 50; // -100, -50, 0, 50, 100
+      return baseHeight + offset;
+    };
+
     const colHeights = new Array(columns).fill(0);
 
+    // 处理所有图片项（包括加载中、已加载、加载失败）
     return items.map((child, index) => {
+      const itemKey = child.id || index;
+      const loadStatus = imageLoadStatus[itemKey];
+      
       const col = colHeights.indexOf(Math.min(...colHeights));
       const x = col * (columnWidth + gap);
       
-      // 获取该 item 实际使用的图片源
-      const itemKey = child.id || index;
-      const actualSrc = imageSources[itemKey] || child.fallbackImg || child.img;
-      // 使用动态加载的图片尺寸，如果没有则使用默认值
-      const imgData = imageDimensions[actualSrc] || { width: 400, height: 300 };
-      const aspectRatio = imgData.width / imgData.height;
-      const height = columnWidth / aspectRatio;
+      // 根据加载状态决定尺寸
+      let height, imgData;
+      if (loadStatus === true) {
+        // 已加载：使用实际图片尺寸
+        const actualSrc = imageSources[itemKey] || child.fallbackImg || child.img;
+        imgData = imageDimensions[actualSrc] || { width: 400, height: 300 };
+        const aspectRatio = imgData.width / imgData.height;
+        height = columnWidth / aspectRatio;
+      } else {
+        // 加载中或加载失败：使用随机默认高度
+        const randomHeight = getRandomPlaceholderHeight(itemKey);
+        imgData = { width: 400, height: randomHeight };
+        const aspectRatio = imgData.width / imgData.height;
+        height = columnWidth / aspectRatio;
+      }
+      
       const y = colHeights[col];
 
       colHeights[col] += height + gap;
@@ -418,37 +556,48 @@ const Masonry = ({
         h: height,
         originalWidth: imgData.width,
         originalHeight: imgData.height,
-        // 保存实际使用的图片源
-        actualImgSrc: actualSrc
+        // 保存实际使用的图片源（如果已加载）
+        actualImgSrc: loadStatus === true ? (imageSources[itemKey] || child.fallbackImg || child.img) : null,
+        // 保存加载状态
+        loadStatus: loadStatus === undefined ? 'loading' : loadStatus
       };
     });
-  }, [baseColumns, items, width, imagesReady, imageDimensions, imageSources, maxColumnWidth]);
+  }, [baseColumns, items, width, imagesReady, imageDimensions, imageSources, imageLoadStatus, maxColumnWidth]);
   
   console.log('计算出的 grid:', grid);
 
   const hasMounted = useRef(false);
 
   useLayoutEffect(() => {
-    if (!imagesReady) return;
+    if (!imagesReady || grid.length === 0) return;
 
-    grid.forEach((item, index) => {
+    // 为每个新加载的图片应用入场动画
+    grid.forEach((item) => {
       const selector = `[data-key="${item.id}"]`;
-
-      if (!hasMounted.current) {
-        gsap.fromTo(
-          selector,
-          {
-            opacity: 0,
-            ...(blurToFocus && { filter: 'blur(10px)' })
-          },
-          {
-            opacity: 1,
-            ...(blurToFocus && { filter: 'blur(0px)' }),
-            duration: 0.8,
-            ease: 'power3.out',
-            delay: index * stagger
-          }
-        );
+      const element = document.querySelector(selector);
+      
+      if (element) {
+        // 检查这个元素是否已经动画过（通过检查 data-animated 属性）
+        if (!element.dataset.animated) {
+          // 标记为已动画，避免重复动画
+          element.dataset.animated = 'true';
+          
+          // 应用入场动画
+          gsap.fromTo(
+            selector,
+            {
+              opacity: 0,
+              ...(blurToFocus && { filter: 'blur(10px)' })
+            },
+            {
+              opacity: 1,
+              ...(blurToFocus && { filter: 'blur(0px)' }),
+              duration: 0.8,
+              ease: 'power3.out',
+              delay: 0 // 每个图片加载完成后立即显示，不再使用 index * stagger
+            }
+          );
+        }
       }
     });
 
@@ -499,7 +648,154 @@ const Masonry = ({
   const shouldCenter = useMemo(() => {
     return actualWidth < width && actualWidth > 0;
   }, [actualWidth, width]);
-  
+
+  // 同步 refs，以便在回调中使用最新值
+  useEffect(() => {
+    gridRef.current = grid;
+    shouldCenterRef.current = shouldCenter;
+    actualWidthRef.current = actualWidth;
+    widthRef.current = width;
+  }, [grid, shouldCenter, actualWidth, width]);
+
+  // 图片点击处理 - 使用 useCallback 优化性能（必须在 grid 定义之后）
+  const handleImageClick = useCallback((imageId, event) => {
+    if (!isWebDevice) return; // 移动端不处理
+    
+    event.stopPropagation(); // 阻止事件冒泡
+    event.preventDefault(); // 阻止默认行为
+    
+    // 使用 ref 获取最新的 grid 值
+    const currentGrid = gridRef.current;
+    const currentShouldCenter = shouldCenterRef.current;
+    const currentActualWidth = actualWidthRef.current;
+    const currentWidth = widthRef.current;
+    
+    if (expandedImageId === imageId) {
+      // 点击已放大的图片，缩小
+      // 找到对应的 DOM 元素并执行缩小动画
+      const element = document.querySelector(`[data-key="${imageId}"]`);
+      if (element) {
+        const item = items.find(item => (item.id || items.indexOf(item)) === imageId);
+        if (item) {
+          const itemKey = item.id || items.indexOf(item);
+          const gridItem = currentGrid.find(g => g.id === itemKey);
+          if (gridItem) {
+            // 计算原始位置
+            const originalX = currentShouldCenter ? gridItem.x + (currentWidth - currentActualWidth) / 2 : gridItem.x;
+            const originalY = gridItem.y;
+            
+            // 执行缩小动画
+            gsap.to(element, {
+              left: originalX,
+              top: originalY,
+              width: gridItem.w,
+              height: gridItem.h,
+              duration: 0.4,
+              ease: 'power2.out',
+              onComplete: () => {
+                setExpandedImageId(null);
+                setExpandedImagePosition(null);
+              }
+            });
+          } else {
+            setExpandedImageId(null);
+            setExpandedImagePosition(null);
+          }
+        } else {
+          setExpandedImageId(null);
+          setExpandedImagePosition(null);
+        }
+      } else {
+        setExpandedImageId(null);
+        setExpandedImagePosition(null);
+      }
+    } else {
+      // 点击其他图片，放大新图片
+      // 找到对应的 DOM 元素并执行放大动画
+      const element = document.querySelector(`[data-key="${imageId}"]`);
+      if (element) {
+        const item = items.find(item => (item.id || items.indexOf(item)) === imageId);
+        if (item) {
+          const itemKey = item.id || items.indexOf(item);
+          const gridItem = currentGrid.find(g => g.id === itemKey);
+          if (gridItem) {
+            // 获取原始位置和尺寸
+            const originalX = currentShouldCenter ? gridItem.x + (currentWidth - currentActualWidth) / 2 : gridItem.x;
+            const originalY = gridItem.y;
+            
+            // 计算放大后的尺寸和位置
+            const expandedSize = getExpandedImageSize(imageId);
+            const centerX = window.innerWidth / 2 - expandedSize.w / 2;
+            const centerY = window.innerHeight / 2 - expandedSize.h / 2;
+            
+            // 先设置状态，然后执行动画
+            setExpandedImageId(imageId);
+            setExpandedImagePosition({ x: centerX, y: centerY });
+            
+            // 使用 GSAP 执行放大动画
+            // 先设置初始状态
+            gsap.set(element, {
+              position: 'fixed',
+              left: originalX,
+              top: originalY,
+              width: gridItem.w,
+              height: gridItem.h,
+              zIndex: 50
+            });
+            
+            // 执行动画到放大状态
+            gsap.to(element, {
+              left: centerX,
+              top: centerY,
+              width: expandedSize.w,
+              height: expandedSize.h,
+              duration: 0.4,
+              ease: 'power2.out'
+            });
+          }
+        }
+      }
+    }
+  }, [isWebDevice, expandedImageId, getExpandedImageSize, items]);
+
+  // 容器点击处理 - 点击空白区域缩小图片
+  const handleContainerClick = useCallback((event) => {
+    // 只有当点击的是容器本身（不是子元素）时才缩小图片
+    if (isWebDevice && expandedImageId && event.target === event.currentTarget) {
+      // 找到对应的 DOM 元素并执行缩小动画
+      const element = document.querySelector(`[data-key="${expandedImageId}"]`);
+      if (element) {
+        const item = items.find(item => (item.id || items.indexOf(item)) === expandedImageId);
+        if (item) {
+          const itemKey = item.id || items.indexOf(item);
+          const gridItem = gridRef.current.find(g => g.id === itemKey);
+          if (gridItem) {
+            // 计算原始位置
+            const originalX = shouldCenterRef.current ? gridItem.x + (widthRef.current - actualWidthRef.current) / 2 : gridItem.x;
+            const originalY = gridItem.y;
+            
+            // 执行缩小动画
+            gsap.to(element, {
+              left: originalX,
+              top: originalY,
+              width: gridItem.w,
+              height: gridItem.h,
+              duration: 0.4,
+              ease: 'power2.out',
+              onComplete: () => {
+                setExpandedImageId(null);
+                setExpandedImagePosition(null);
+              }
+            });
+            return;
+          }
+        }
+      }
+      // 如果没有找到元素或 gridItem，直接关闭
+      setExpandedImageId(null);
+      setExpandedImagePosition(null);
+    }
+  }, [isWebDevice, expandedImageId, items]);
 
   return (
     <div 
@@ -519,91 +815,156 @@ const Masonry = ({
         />
       )}
       
-      {grid.map(item => (
+      {grid.map(item => {
+        // 计算放大后的尺寸（如果当前图片被放大）
+        const isExpanded = expandedImageId === item.id && expandedImagePosition && isWebDevice;
+        const expandedSize = isExpanded ? getExpandedImageSize(item.id) : null;
+        
+        return (
         <div
+          key={item.id}
           data-key={item.id}
-          className={expandedImageId === item.id && expandedImagePosition ? "fixed" : "absolute"}
           style={{ 
+            position: isExpanded ? 'fixed' : 'absolute', // 放大图片使用 fixed，不随页面滚动
             willChange: 'transform, opacity',
-            left: expandedImageId === item.id && expandedImagePosition 
+            left: isExpanded
               ? expandedImagePosition.x 
               : (shouldCenter ? item.x + (width - actualWidth) / 2 : item.x),
-            top: expandedImageId === item.id && expandedImagePosition 
+            top: isExpanded
               ? expandedImagePosition.y 
               : item.y,
-            width: item.w,
-            height: item.h,
-            zIndex: expandedImageId === item.id ? 50 : 1, // 提高放大图片的层级
+            width: isExpanded ? expandedSize.w : item.w,
+            height: isExpanded ? expandedSize.h : item.h,
+            zIndex: isExpanded ? 50 : 1, // 提高放大图片的层级
             transform: 'translateZ(0)', // 启用硬件加速
             backfaceVisibility: 'hidden' // 优化渲染性能
           }}
           onMouseEnter={e => {
-            handleMouseEnter(item.id, e.currentTarget);
+            if (!isExpanded) {
+              handleMouseEnter(item.id, e.currentTarget);
+            }
           }}
           onMouseLeave={e => {
-            handleMouseLeave(item.id, e.currentTarget);
+            if (!isExpanded) {
+              handleMouseLeave(item.id, e.currentTarget);
+            }
           }}
         >
           <div 
-            className="relative w-full h-full rounded-[8px] overflow-hidden border border-stroke border-[0.5px] cursor-pointer"
+            className="relative w-full h-full rounded-[8px] bg-press overflow-hidden cursor-pointer"
             style={{ 
-              boxShadow: expandedImageId === item.id && isWebDevice 
+              boxShadow: isExpanded
                 ? '0px 8px 24px 0px rgba(0,0,0,0.15)' 
                 : '0px 4px 12px 0px rgba(0,0,0,0.08)',
-              transform: expandedImageId === item.id && isWebDevice ? 'scale(2)' : 'scale(1)',
-              transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              transform: 'scale(1)', // 不再使用 scale 变换，直接改变尺寸
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', // 平滑过渡
               loading: 'lazy',
               maxWidth: '100%',
               maxHeight: '100%',
-              width: shouldFillWidth ? '100%' : undefined,
-              willChange: 'transform, box-shadow', // 提示浏览器优化这些属性
-              transformOrigin: 'center center' // 确保缩放从中心开始
+              width: shouldFillWidth && !isExpanded ? '100%' : undefined,
+              willChange: isExpanded ? 'width, height, box-shadow' : 'transform, box-shadow',
+              transformOrigin: 'center center'
             }}
-            onClick={(e) => handleImageClick(item.id, e)}
+            onClick={(e) => {
+              // 只有已加载的图片才能点击放大
+              if (item.loadStatus === true) {
+                handleImageClick(item.id, e);
+              }
+            }}
           >
-            <img
-              src={item.actualImgSrc || item.fallbackImg || item.img}
-              alt={item.title || item.tittle || ''}
-              className="w-full h-full overflow-hidden"
-              style={{ 
-                width: '100%', 
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center',
-                transform: 'translateZ(0)', // 启用硬件加速
-                backfaceVisibility: 'hidden', // 优化渲染性能
-                imageRendering: 'optimizeQuality' // 优化图片渲染质量
-              }}
-              onError={(e) => {
-                // 如果当前图片加载失败，尝试切换到备用图片源
-                const currentSrc = e.target.src;
-                const itemKey = item.id || items.findIndex(i => i === item);
-                
-                // 如果当前是本地图片，尝试切换到CDN
-                if (currentSrc === item.fallbackImg && item.img) {
-                  e.target.src = item.img;
-                  // 更新图片源状态
-                  setImageSources(prev => ({
-                    ...prev,
-                    [itemKey]: item.img
-                  }));
-                }
-                // 如果当前是CDN图片且本地图片存在，尝试使用本地图片（虽然不应该发生，但作为最后的兜底）
-                else if (currentSrc === item.img && item.fallbackImg) {
-                  e.target.src = item.fallbackImg;
-                  setImageSources(prev => ({
-                    ...prev,
-                    [itemKey]: item.fallbackImg
-                  }));
-                }
-              }}
-            />
-            {colorShiftOnHover && (
-              <div className="color-overlay absolute inset-0 rounded-[10px] bg-gradient-to-tr from-pink-500/50 to-sky-500/50 opacity-0 pointer-events-none z-100" />
+            {/* 根据加载状态显示不同内容 */}
+            {item.loadStatus === true ? (
+              // 已加载：显示实际图片
+              <>
+                <img
+                  src={item.actualImgSrc || item.fallbackImg || item.img}
+                  alt={item.title || item.tittle || ''}
+                  className="w-full h-full overflow-hidden rounded-[8px] "
+                  style={{ 
+                    width: '100%', 
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                    transform: 'translateZ(0)', // 启用硬件加速
+                    backfaceVisibility: 'hidden', // 优化渲染性能
+                    imageRendering: 'optimizeQuality' // 优化图片渲染质量
+                  }}
+                  onError={(e) => {
+                    // 如果当前图片加载失败，尝试切换到备用图片源
+                    const currentSrc = e.target.src;
+                    const itemKey = item.id || items.findIndex(i => i === item);
+                    
+                    // 如果当前是本地图片，尝试切换到CDN
+                    if (currentSrc === item.fallbackImg && item.img) {
+                      e.target.src = item.img;
+                      // 更新图片源状态
+                      setImageSources(prev => ({
+                        ...prev,
+                        [itemKey]: item.img
+                      }));
+                    }
+                    // 如果当前是CDN图片且本地图片存在，尝试使用本地图片（虽然不应该发生，但作为最后的兜底）
+                    else if (currentSrc === item.img && item.fallbackImg) {
+                      e.target.src = item.fallbackImg;
+                      setImageSources(prev => ({
+                        ...prev,
+                        [itemKey]: item.fallbackImg
+                      }));
+                    } else {
+                      // 所有图片源都加载失败，标记为错误状态
+                      setImageLoadStatus(prev => ({
+                        ...prev,
+                        [itemKey]: 'error'
+                      }));
+                    }
+                  }}
+                />
+                {colorShiftOnHover && !isExpanded && (
+                  <div className="color-overlay absolute inset-0 rounded-[10px] bg-gradient-to-tr from-pink-500/50 to-sky-500/50 opacity-0 pointer-events-none z-100" />
+                )}
+              </>
+            ) : item.loadStatus === 'error' ? (
+              // 加载失败：显示错误占位符
+              <div 
+                className={`absolute inset-0 flex items-center justify-center bg-press`}
+              >
+                <svg width="36" height="36" viewBox="0 0 24 24" className="text-disabled">
+                  <path  
+                    d="M20.9672 8.47255C21.2585 8.17807 21.7333 8.1755 22.0278 8.46681C22.3223 8.75811 22.3248 9.23298 22.0335 9.52745C21.3553 10.2131 20.6425 10.8156 19.8957 11.3347L22.4627 13.9016C22.7556 14.1945 22.7556 14.6694 22.4627 14.9623C22.1698 15.2552 21.6949 15.2552 21.402 14.9623L18.5825 12.1428C17.5839 12.6816 16.531 13.0853 15.425 13.3533L16.3894 16.9526C16.4966 17.3527 16.2592 17.764 15.8591 17.8712C15.459 17.9784 15.0477 17.741 14.9405 17.3409L13.9454 13.6269C13.3128 13.7089 12.6644 13.75 12.0004 13.75C11.3363 13.75 10.6879 13.7089 10.0553 13.6269L9.06011 17.3409C8.95291 17.741 8.54166 17.9784 8.14156 17.8712C7.74146 17.764 7.50401 17.3527 7.61121 16.9526L8.57566 13.3533C7.46966 13.0853 6.41676 12.6816 5.41817 12.1428L2.59869 14.9623C2.3058 15.2552 1.83093 15.2552 1.53803 14.9623C1.24514 14.6694 1.24514 14.1945 1.53803 13.9016L4.10497 11.3347C3.3582 10.8156 2.64538 10.2131 1.96715 9.52745C1.67584 9.23298 1.67841 8.75811 1.97289 8.46681C2.26736 8.1755 2.74223 8.17807 3.03353 8.47255C5.5312 10.9974 8.50611 12.25 12.0004 12.25C15.4946 12.25 18.4695 10.9974 20.9672 8.47255Z" 
+                    fill="currentColor"/>
+                </svg>
+
+              </div>
+            ) : (
+              // 加载中：显示加载占位符
+              <div 
+                className={`absolute inset-0 flex items-center justify-center `}
+              >
+                <svg
+                  width="36" height="36"
+                  viewBox="0 0 24 24"
+                  className="text-disabled size-8 animate-spin"
+                  style={{
+                    animation: 'spin-masonry-loader 0.9s linear infinite'
+                  }}
+                >
+                  <style>{`
+                    @keyframes spin-masonry-loader {
+                      0% { transform: rotate(0deg);}
+                      100% { transform: rotate(360deg);}
+                    }
+                  `}</style>
+                  <path
+                    d="M12.1566 3.00001C12.6763 3.00871 13.0931 3.43243 13.0931 3.95217C13.0931 4.47192 12.6763 4.89564 12.1566 4.90422L12.1503 4.9043L12.1409 4.90436L12.1312 4.9043C8.1383 4.90966 4.90429 8.148 4.90429 12.1409C4.90429 16.1374 8.1442 19.3774 12.1409 19.3774C15.5503 19.3774 18.4535 17.0075 19.1951 13.757C19.3047 13.2769 19.7109 12.9026 20.2034 12.9026C20.7667 12.9026 21.2142 13.3865 21.1039 13.939C20.2612 18.1602 16.5409 21.2818 12.1409 21.2818C7.09252 21.2818 3 17.1892 3 12.1409C3 7.09252 7.09252 3 12.1409 3L12.1566 3.00001Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </div>
             )}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
