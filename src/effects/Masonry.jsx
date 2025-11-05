@@ -39,27 +39,63 @@ const useMeasure = () => {
   return [ref, size];
 };
 
-const preloadImages = async urls => {
+/**
+ * 预加载图片，优先使用本地图片，失败时回退到CDN
+ * @param {Array} items - 包含 img 和 fallbackImg 的图片项数组
+ * @returns {Promise<Array>} 图片数据数组
+ */
+const preloadImages = async items => {
   if (typeof window === 'undefined') {
-    return urls.map(src => ({ src, width: 400, height: 300 }));
+    return items.map(item => ({ 
+      src: item.fallbackImg || item.img, 
+      width: 400, 
+      height: 300 
+    }));
   }
   
   const imageData = await Promise.all(
-    urls.map(
-      src =>
+    items.map(
+      item =>
         new Promise(resolve => {
+          // 优先使用本地图片（fallbackImg），其次使用CDN（img）
+          const primarySrc = item.fallbackImg || item.img;
+          const fallbackSrc = item.fallbackImg ? item.img : null;
+          
           const img = new Image();
-          img.src = src;
+          
+          // 先尝试加载本地图片
+          img.src = primarySrc;
+          
           img.onload = () => resolve({
-            src,
+            src: primarySrc,
             width: img.naturalWidth,
             height: img.naturalHeight
           });
-          img.onerror = () => resolve({
-            src,
-            width: 400, // 默认宽度
-            height: 300 // 默认高度
-          });
+          
+          img.onerror = () => {
+            // 如果本地图片加载失败且有CDN备用，尝试CDN
+            if (fallbackSrc) {
+              const fallbackImg = new Image();
+              fallbackImg.src = fallbackSrc;
+              fallbackImg.onload = () => resolve({
+                src: fallbackSrc,
+                width: fallbackImg.naturalWidth,
+                height: fallbackImg.naturalHeight
+              });
+              fallbackImg.onerror = () => resolve({
+                src: primarySrc, // 使用原始源，即使加载失败
+                width: 400, // 默认宽度
+                height: 300 // 默认高度
+              });
+            } else {
+              // 没有备用图片，返回默认值
+              resolve({
+                src: primarySrc,
+                width: 400, // 默认宽度
+                height: 300 // 默认高度
+              });
+            }
+          };
         })
     )
   );
@@ -99,6 +135,8 @@ const Masonry = ({
   const [containerRef, { width }] = useMeasure();
   const [imagesReady, setImagesReady] = useState(false);
   const [imageDimensions, setImageDimensions] = useState({});
+  // 跟踪每个图片项实际使用的图片源（优先本地，失败时使用CDN）
+  const [imageSources, setImageSources] = useState({});
 
   // 设备检测 - 判断是否为Web端
   useEffect(() => {
@@ -124,7 +162,10 @@ const Masonry = ({
     // 使用 items 和 imageDimensions 来计算尺寸
     const item = items.find(item => (item.id || items.indexOf(item)) === imageId);
     if (item) {
-      const imgData = imageDimensions[item.img] || { width: 400, height: 300 };
+      // 获取该 item 实际使用的图片源
+      const itemKey = item.id || items.indexOf(item);
+      const actualSrc = imageSources[itemKey] || item.fallbackImg || item.img;
+      const imgData = imageDimensions[actualSrc] || { width: 400, height: 300 };
       const aspectRatio = imgData.width / imgData.height;
       const columnWidth = Math.min(maxColumnWidth, (width - 16) / Math.ceil(width / maxColumnWidth));
       const height = columnWidth / aspectRatio;
@@ -132,7 +173,7 @@ const Masonry = ({
     }
     // 如果找不到，使用默认尺寸
     return { w: 300, h: 200 };
-  }, [items, imageDimensions, maxColumnWidth, width]);
+  }, [items, imageDimensions, imageSources, maxColumnWidth, width]);
 
   // 键盘快捷键支持 - 使用防抖来避免快速按键问题
   useEffect(() => {
@@ -298,12 +339,24 @@ const Masonry = ({
       return;
     }
     
-    preloadImages(items.map(i => i.img)).then(imageData => {
+    // 使用更新后的 preloadImages，传入完整 items 以支持优先本地图片
+    preloadImages(items).then(imageData => {
       console.log('图片预加载完成:', imageData);
       const dimensions = {};
-      imageData.forEach(({ src, width, height }) => {
-        dimensions[src] = { width, height };
+      const sources = {};
+      
+      // 为每个 item 建立图片源映射
+      items.forEach((item, index) => {
+        const imgData = imageData[index];
+        // 使用 item 的唯一标识（id 或 index）
+        const itemKey = item.id || index;
+        // 存储该 item 实际使用的图片源
+        sources[itemKey] = imgData.src;
+        // 存储图片尺寸（使用实际使用的图片源作为 key）
+        dimensions[imgData.src] = { width: imgData.width, height: imgData.height };
       });
+      
+      setImageSources(sources);
       setImageDimensions(dimensions);
       setImagesReady(true);
     });
@@ -345,8 +398,11 @@ const Masonry = ({
       const col = colHeights.indexOf(Math.min(...colHeights));
       const x = col * (columnWidth + gap);
       
+      // 获取该 item 实际使用的图片源
+      const itemKey = child.id || index;
+      const actualSrc = imageSources[itemKey] || child.fallbackImg || child.img;
       // 使用动态加载的图片尺寸，如果没有则使用默认值
-      const imgData = imageDimensions[child.img] || { width: 400, height: 300 };
+      const imgData = imageDimensions[actualSrc] || { width: 400, height: 300 };
       const aspectRatio = imgData.width / imgData.height;
       const height = columnWidth / aspectRatio;
       const y = colHeights[col];
@@ -361,10 +417,12 @@ const Masonry = ({
         w: columnWidth, 
         h: height,
         originalWidth: imgData.width,
-        originalHeight: imgData.height
+        originalHeight: imgData.height,
+        // 保存实际使用的图片源
+        actualImgSrc: actualSrc
       };
     });
-  }, [baseColumns, items, width, imagesReady, imageDimensions, maxColumnWidth]);
+  }, [baseColumns, items, width, imagesReady, imageDimensions, imageSources, maxColumnWidth]);
   
   console.log('计算出的 grid:', grid);
 
@@ -504,8 +562,8 @@ const Masonry = ({
             onClick={(e) => handleImageClick(item.id, e)}
           >
             <img
-              src={item.img}
-              alt={item.title || ''}
+              src={item.actualImgSrc || item.fallbackImg || item.img}
+              alt={item.title || item.tittle || ''}
               className="w-full h-full overflow-hidden"
               style={{ 
                 width: '100%', 
@@ -515,6 +573,29 @@ const Masonry = ({
                 transform: 'translateZ(0)', // 启用硬件加速
                 backfaceVisibility: 'hidden', // 优化渲染性能
                 imageRendering: 'optimizeQuality' // 优化图片渲染质量
+              }}
+              onError={(e) => {
+                // 如果当前图片加载失败，尝试切换到备用图片源
+                const currentSrc = e.target.src;
+                const itemKey = item.id || items.findIndex(i => i === item);
+                
+                // 如果当前是本地图片，尝试切换到CDN
+                if (currentSrc === item.fallbackImg && item.img) {
+                  e.target.src = item.img;
+                  // 更新图片源状态
+                  setImageSources(prev => ({
+                    ...prev,
+                    [itemKey]: item.img
+                  }));
+                }
+                // 如果当前是CDN图片且本地图片存在，尝试使用本地图片（虽然不应该发生，但作为最后的兜底）
+                else if (currentSrc === item.img && item.fallbackImg) {
+                  e.target.src = item.fallbackImg;
+                  setImageSources(prev => ({
+                    ...prev,
+                    [itemKey]: item.fallbackImg
+                  }));
+                }
               }}
             />
             {colorShiftOnHover && (
