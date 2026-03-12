@@ -165,7 +165,8 @@ const DotGrid = ({
           const g = Math.round(baseRgb.g + (activeRgb.g - baseRgb.g) * t);
           const b = Math.round(baseRgb.b + (activeRgb.b - baseRgb.b) * t);
           const a = baseRgb.a + (activeRgb.a - baseRgb.a) * t;
-          const boostedAlpha = Math.min(1, a + highlightBoost);
+          const boost = Math.max(0, Math.min(1, highlightBoost));
+          const boostedAlpha = a + (1 - a) * boost;
           style = `rgba(${r},${g},${b},${boostedAlpha})`;
         }
 
