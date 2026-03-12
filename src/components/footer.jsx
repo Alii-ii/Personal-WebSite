@@ -42,7 +42,7 @@ const copyToClipboard = async (text, t) => {
  * Footer 组件 - 页面底部区域
  * 包含个人信息、链接和社交图标
  */
-const Footer = ({ onUnderlinedClick, isGallery = false }) => {
+const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = true }) => {
   // 获取语言上下文
   const { t } = useLanguage();
   // 获取路由对象
@@ -152,22 +152,24 @@ const Footer = ({ onUnderlinedClick, isGallery = false }) => {
             )}
             
             {isGallery ? (
-              // Gallery 页面：只显示投稿文案，不循环
-              <CyclingDecryptedText
-                texts={[t('lastPostDays')]} // 只传入一个文案
-                cycleInterval={0} // 不循环
-                className="text-[48px] md:text-[56px] leading-[100%] mb-2"
-                onUnderlinedClick={handleUnderlinedClick}
-                underlineOpacity={50}
-                hoverOpacity={80}
-                decryptedProps={{
-                  speed: 40,
-                  maxIterations: 6,
-                  sequential: true,
-                  revealDirection: 'start',
-                  useOriginalCharsOnly: true
-                }}
-              />
+              showGallerySubtitle ? (
+                // Gallery 页面：只显示投稿文案，不循环
+                <CyclingDecryptedText
+                  texts={[t('lastPostDays')]} // 只传入一个文案
+                  cycleInterval={0} // 不循环
+                  className="text-[48px] md:text-[56px] leading-[100%] mb-2"
+                  onUnderlinedClick={handleUnderlinedClick}
+                  underlineOpacity={50}
+                  hoverOpacity={80}
+                  decryptedProps={{
+                    speed: 40,
+                    maxIterations: 6,
+                    sequential: true,
+                    revealDirection: 'start',
+                    useOriginalCharsOnly: true
+                  }}
+                />
+              ) : null
             ) : (
               // 首页：正常循环显示文案
               <CyclingDecryptedText
@@ -235,93 +237,101 @@ const Footer = ({ onUnderlinedClick, isGallery = false }) => {
         flex={false}
         className="h-full flex items-start md:items-end justify-start md:items-end"
       >
-        <div className="flex flex-col items-start md:items-end gap-1 md:gap-6 z-10"> 
-
-          {/* 强调入口 */}
-          <div className="flex flex-row md:flex-col items-center md:items-end justify-start gap-6 pt-4 md:pt-0">
-            <TextLink
-                href="https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024?node-id=0-1&t=5jnQ7E3zqn3Wpan5-1"
-                title={t('portfolioTooltip')}
-            > {t('resume')} </TextLink>
-
-            <TextLink
-                href="https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024?node-id=0-1&t=5jnQ7E3zqn3Wpan5-1"
-                title={t('portfolioTooltip')}
-            > {t('portfolio')} </TextLink>
-
-            <TextLink
-                href="https://www.miyoushe.com/zzz/accountCenter/postList?id=196941437"
-                title={t('mainSiteTooltip')}
-            > {t('mainSite')} </TextLink>
+        {isGallery ? (
+          // 二级页默认简化
+          <div className="flex flex-col items-start md:items-end gap-1 md:gap-6 z-10">
+            <div className="flex flex-row-reverse md:flex-row items-center justify-start md:justify-center gap-2 md:gap-3 py-2 md:py-0">
+              <ThemeToggle />
+              <LanguageToggle />
+            </div>
           </div>
+        ) : (
+          <div className="flex flex-col items-start md:items-end gap-1 md:gap-6 z-10"> 
+            {/* 强调入口 */}
+            <div className="flex flex-row md:flex-col items-center md:items-end justify-start gap-6 pt-4 md:pt-0">
+              <TextLink
+                  href="/resume"
+                  title={t('resumeTooltip')}
+                  target="_self"
+              > {t('resume')} </TextLink>
 
-          {/* 底部行 */}
-          <div className="flex flex-row-reverse md:flex-row items-center justify-start md:justify-center gap-2 md:gap-3 py-2 md:py-0">
+              <TextLink
+                  href="https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024?node-id=0-1&t=5jnQ7E3zqn3Wpan5-1"
+                  title={t('portfolioTooltip')}
+              > {t('portfolio')} </TextLink>
 
-            {/* 小按钮组 */}
-            <div className="flex flex-row gap-0.5 md:gap-1">
-              {/* Bilibili 跳转按钮 */}
-              <IconTextButton
-                  text=""
-                  icon={<BilibiliIcon />}
-                  variant="ghost"
-                  size="md"
-                  tooltip={t('bilibiliTooltip')}
-                  onClick={() => {
-                      window.open('https://space.bilibili.com/38773851/favlist?fid=702542351&ftype=create', '_blank'); // 替换为你的B站主页链接
-                      console.log(t('jumpToBilibili'));
-                  }}
-              />
-              {/* 微信号复制按钮 */}
-              <IconTextButton
-                  key={`wechat-${copyStates.wechat}`}
-                  text=""
-                  icon={<ChatsIcon />}
-                  variant="ghost"
-                  size="md"
-                  tooltip={copyStates.wechat ? t('wechatCopied') : t('wechatTooltip')}
-                  forceTooltipOpen={tooltipStates.wechat}
-                  onClick={async () => {
-                      console.log(t('clickWechatCopy'));
-                      const success = await copyToClipboard('_Alii_', t);
-                      console.log(t('copyResult') + ':', success);
-                      if (success) {
-                          handleCopySuccess('wechat');
-                          console.log(t('wechatCopiedToClipboard'));
-                      }
-                  }}
-              />
-              {/* 邮箱复制按钮 */}
-              <IconTextButton
-                  key={`email-${copyStates.email}`}
-                  text=""
-                  icon={<MailIcon />}
-                  variant="ghost"
-                  size="md"
-                  tooltip={copyStates.email ? t('emailCopied') : t('emailTooltip')}
-                  forceTooltipOpen={tooltipStates.email}
-                  onClick={async () => {
-                      console.log(t('clickEmailCopy'));
-                      const success = await copyToClipboard('alii.wong@foxmail.com', t);
-                      console.log(t('copyResult') + ':', success);
-                      if (success) {
-                          handleCopySuccess('email');
-                          console.log(t('emailCopiedToClipboard'));
-                      }
-                  }}
-              />
+              <TextLink
+                  href="https://www.miyoushe.com/zzz/accountCenter/postList?id=196941437"
+                  title={t('mainSiteTooltip')}
+              > {t('mainSite')} </TextLink>
             </div>
 
-            {/* 切换组 */}
-            <ThemeToggle /> 
-            <LanguageToggle /> 
-          </div>
+            {/* 底部行 */}
+            <div className="flex flex-row-reverse md:flex-row items-center justify-start md:justify-center gap-2 md:gap-3 py-2 md:py-0">
 
-        </div>
+              {/* 小按钮组 */}
+              <div className="flex flex-row gap-0.5 md:gap-1">
+                {/* Bilibili 跳转按钮 */}
+                <IconTextButton
+                    text=""
+                    icon={<BilibiliIcon />}
+                    variant="ghost"
+                    size="md"
+                    tooltip={t('bilibiliTooltip')}
+                    onClick={() => {
+                        window.open('https://space.bilibili.com/38773851/favlist?fid=702542351&ftype=create', '_blank'); // 替换为你的B站主页链接
+                        console.log(t('jumpToBilibili'));
+                    }}
+                />
+                {/* 微信号复制按钮 */}
+                <IconTextButton
+                    key={`wechat-${copyStates.wechat}`}
+                    text=""
+                    icon={<ChatsIcon />}
+                    variant="ghost"
+                    size="md"
+                    tooltip={copyStates.wechat ? t('wechatCopied') : t('wechatTooltip')}
+                    forceTooltipOpen={tooltipStates.wechat}
+                    onClick={async () => {
+                        console.log(t('clickWechatCopy'));
+                        const success = await copyToClipboard('_Alii_', t);
+                        console.log(t('copyResult') + ':', success);
+                        if (success) {
+                            handleCopySuccess('wechat');
+                            console.log(t('wechatCopiedToClipboard'));
+                        }
+                    }}
+                />
+                {/* 邮箱复制按钮 */}
+                <IconTextButton
+                    key={`email-${copyStates.email}`}
+                    text=""
+                    icon={<MailIcon />}
+                    variant="ghost"
+                    size="md"
+                    tooltip={copyStates.email ? t('emailCopied') : t('emailTooltip')}
+                    forceTooltipOpen={tooltipStates.email}
+                    onClick={async () => {
+                        console.log(t('clickEmailCopy'));
+                        const success = await copyToClipboard('alii.wong@foxmail.com', t);
+                        console.log(t('copyResult') + ':', success);
+                        if (success) {
+                            handleCopySuccess('email');
+                            console.log(t('emailCopiedToClipboard'));
+                        }
+                    }}
+                />
+              </div>
+
+              {/* 切换组 */}
+              <ThemeToggle /> 
+              <LanguageToggle /> 
+            </div>
+          </div>
+        )}
       </AnimatedContent>
     </footer>
   );
 };
 
 export default Footer;
-    

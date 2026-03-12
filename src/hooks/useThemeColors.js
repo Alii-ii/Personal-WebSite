@@ -18,10 +18,10 @@ export const useThemeColors = () => {
       const isDark = document.documentElement.classList.contains('dark');
       
       if (isDark) {
-        // 深色主题颜色 - 使用品牌色作为激活色，更明显
+        // 深色主题颜色 - 使用白色token作为激活色，更明显
         setColors({
           baseColor: '#313B4C',
-          activeColor: '#36d2be' // 使用品牌色，在深色背景下更突出
+          activeColor: 'hsl(var(--neutral-fg-main))' // 白色token，高亮更明显
         });
       } else {
         // 浅色主题颜色
