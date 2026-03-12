@@ -60,6 +60,7 @@ const DotGrid = ({
   gap = 32,
   baseColor = '#5227FF',
   activeColor = '#5227FF',
+  highlightBoost = 0.15,
   proximity = 150,
   speedTrigger = 100,
   shockRadius = 250,
@@ -164,7 +165,7 @@ const DotGrid = ({
           const g = Math.round(baseRgb.g + (activeRgb.g - baseRgb.g) * t);
           const b = Math.round(baseRgb.b + (activeRgb.b - baseRgb.b) * t);
           const a = baseRgb.a + (activeRgb.a - baseRgb.a) * t;
-          const boostedAlpha = Math.min(1, a + 0.15);
+          const boostedAlpha = Math.min(1, a + highlightBoost);
           style = `rgba(${r},${g},${b},${boostedAlpha})`;
         }
 
@@ -180,7 +181,7 @@ const DotGrid = ({
 
     draw();
     return () => cancelAnimationFrame(rafId);
-  }, [proximity, baseColor, activeRgb, baseRgb, circlePath]);
+  }, [proximity, baseColor, activeRgb, baseRgb, circlePath, highlightBoost]);
 
   useEffect(() => {
     buildGrid();

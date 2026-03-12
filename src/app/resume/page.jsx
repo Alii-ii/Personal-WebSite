@@ -204,6 +204,7 @@ export default function ResumePage() {
           gap={18}
           baseColor={baseColor}
           activeColor={activeColor}
+          highlightBoost={0.05}
           proximity={120}
           speedTrigger={80}
           shockRadius={200}
