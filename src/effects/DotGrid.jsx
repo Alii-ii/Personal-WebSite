@@ -17,18 +17,19 @@ const throttle = (func, limit) => {
 };
 
 function hexToRgb(hex) {
-  const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
-  if (!m) return { r: 0, g: 0, b: 0 };
+  const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i);
+  if (!m) return { r: 0, g: 0, b: 0, a: 1 };
   return {
     r: parseInt(m[1], 16),
     g: parseInt(m[2], 16),
-    b: parseInt(m[3], 16)
+    b: parseInt(m[3], 16),
+    a: m[4] ? parseInt(m[4], 16) / 255 : 1
   };
 }
 
 // 支持 CSS 变量的颜色解析
 function parseColor(color) {
-  if (typeof window === 'undefined') return { r: 0, g: 0, b: 0 };
+  if (typeof window === 'undefined') return { r: 0, g: 0, b: 0, a: 1 };
   
   // 如果是 CSS 变量，创建临时元素来获取计算后的值
   if (color.includes('var(') || color.includes('hsl(')) {
@@ -38,13 +39,14 @@ function parseColor(color) {
     const computedColor = window.getComputedStyle(tempEl).color;
     document.body.removeChild(tempEl);
     
-    // 解析 rgb(r, g, b) 格式
-    const rgbMatch = computedColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    // 解析 rgb/rgba(r, g, b, a) 格式
+    const rgbMatch = computedColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-9.]+))?\)/);
     if (rgbMatch) {
       return {
         r: parseInt(rgbMatch[1]),
         g: parseInt(rgbMatch[2]),
-        b: parseInt(rgbMatch[3])
+        b: parseInt(rgbMatch[3]),
+        a: rgbMatch[4] ? parseFloat(rgbMatch[4]) : 1
       };
     }
   }
@@ -58,6 +60,7 @@ const DotGrid = ({
   gap = 32,
   baseColor = '#5227FF',
   activeColor = '#5227FF',
+  highlightBoost = 0.15,
   proximity = 150,
   speedTrigger = 100,
   shockRadius = 250,
@@ -161,7 +164,9 @@ const DotGrid = ({
           const r = Math.round(baseRgb.r + (activeRgb.r - baseRgb.r) * t);
           const g = Math.round(baseRgb.g + (activeRgb.g - baseRgb.g) * t);
           const b = Math.round(baseRgb.b + (activeRgb.b - baseRgb.b) * t);
-          style = `rgb(${r},${g},${b})`;
+          const a = baseRgb.a + (activeRgb.a - baseRgb.a) * t;
+          const boostedAlpha = Math.min(1, a + highlightBoost);
+          style = `rgba(${r},${g},${b},${boostedAlpha})`;
         }
 
         ctx.save();
@@ -176,7 +181,7 @@ const DotGrid = ({
 
     draw();
     return () => cancelAnimationFrame(rafId);
-  }, [proximity, baseColor, activeRgb, baseRgb, circlePath]);
+  }, [proximity, baseColor, activeRgb, baseRgb, circlePath, highlightBoost]);
 
   useEffect(() => {
     buildGrid();
