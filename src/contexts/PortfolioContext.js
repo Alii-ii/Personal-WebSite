@@ -119,6 +119,25 @@ const masonryConfig = {
   colorShiftOnHover: true
 };
 
+// 固定 seed，确保 SSR/CSR 的图片顺序一致，避免 hydration mismatch
+const PORTFOLIO_SHUFFLE_SEED = 'portfolio-order-v1';
+
+const createSeededRandom = (seedText) => {
+  let seed = 2166136261;
+  for (let i = 0; i < seedText.length; i++) {
+    seed ^= seedText.charCodeAt(i);
+    seed = Math.imul(seed, 16777619);
+  }
+
+  return () => {
+    seed += 0x6D2B79F5;
+    let t = seed;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+};
+
 /**
  * 获取作品集数据
  * 每个项目包含 img (CDN链接) 和 fallbackImg (本地图片路径)
@@ -129,10 +148,11 @@ const masonryConfig = {
 export const getPortfolioItems = () => {
   // 创建数组副本，避免修改原始数组
   const shuffledItems = [...portfolioItems];
+  const random = createSeededRandom(PORTFOLIO_SHUFFLE_SEED);
   
-  // 使用 Fisher-Yates 洗牌算法进行随机排序
+  // 使用固定 seed 的 Fisher-Yates 洗牌，保证首屏顺序稳定
   for (let i = shuffledItems.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(random() * (i + 1));
     [shuffledItems[i], shuffledItems[j]] = [shuffledItems[j], shuffledItems[i]];
   }
   

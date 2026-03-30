@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Footer from '@/components/footer';
 import DotGrid from '@/effects/DotGrid';
 import AnimatedContent from '@/effects/AnimatedContent';
 import Masonry from '@/effects/Masonry';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { getPortfolioItems, getMasonryConfig, getPortfolioImagesFromSupabase, testSupabaseConnection } from '@/contexts/PortfolioContext';
-import Link from 'next/link';
+import { getPortfolioItems, getMasonryConfig } from '@/contexts/PortfolioContext';
 
 /**
  * Gallery 页面 - 作品集展示
@@ -16,51 +15,11 @@ import Link from 'next/link';
 export default function Gallery() {
   const { baseColor, activeColor } = useThemeColors();
   
-  // 作品集数据状态 - 初始化为静态数据
-  const [portfolioItems, setPortfolioItems] = useState(getPortfolioItems());
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // 备注：已移除 Supabase 读取逻辑，作品集仅使用静态数据
+  const [portfolioItems] = useState(getPortfolioItems());
   
   // 获取 Masonry 配置
   const masonryConfig = getMasonryConfig();
-  
-  // 从 Supabase 获取图片数据
-  useEffect(() => {
-    const loadImages = async () => {
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        console.log('开始测试 Supabase 连接...');
-        const connectionTest = await testSupabaseConnection();
-        
-        if (!connectionTest) {
-          console.warn('Supabase 连接失败，保持使用静态数据');
-          setIsLoading(false);
-          return;
-        }
-        
-        console.log('Supabase 连接成功，开始获取图片...');
-        const images = await getPortfolioImagesFromSupabase('images', '');
-        
-        if (images.length > 0) {
-          console.log(`成功获取 ${images.length} 张图片，更新作品集数据`);
-          setPortfolioItems(images);
-        } else {
-          console.warn('未获取到图片，保持使用静态数据');
-        }
-      } catch (err) {
-        console.error('获取图片时发生错误:', err);
-        setError(err.message);
-        // 发生错误时保持使用静态数据
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    // 页面加载时获取图片
-    loadImages();
-  }, []);
   
   // 处理下划线文本点击事件
   const handleUnderlinedClick = (text) => {

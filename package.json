@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/get-last-commit-date.js && next build",
+    "build:clean": "rm -rf .next out && npm run build",
     "start": "next start",
     "update-date": "node scripts/get-last-commit-date.js",
-    "export": "next build && next export"
+    "export": "node scripts/get-last-commit-date.js && next build && next export"
   },
   "packageManager": "pnpm@8.15.0",
   "dependencies": {
