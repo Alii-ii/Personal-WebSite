@@ -51,7 +51,7 @@ export default function RootLayout({ children }) {
         {/* 主要内容区域 */}
         <div
           id="initial-content"
-          className="opacity-0 transition-opacity duration-300 motion-reduce:transition-none"
+          className="opacity-100 transition-opacity duration-300 motion-reduce:transition-none"
         >
           <LanguageProvider>
             <TooltipProvider>
@@ -71,9 +71,11 @@ export default function RootLayout({ children }) {
                 var pulseRaf = null;
 
                 if (contentEl) {
-                  // 初始状态已经是 opacity-0，无需修改 class
-                  // 仅通过内联 style 确保隐藏
+                  // 默认保持 React 声明为可见，避免 hydration 晚到时把内容重新隐藏
+                  // 仅在加载遮罩存在期间由脚本临时控制可见性
                   contentEl.style.opacity = '0';
+                  contentEl.classList.remove('opacity-100');
+                  contentEl.classList.add('opacity-0');
                 }
 
                 var getPreferredTheme = function () {
