@@ -51,8 +51,7 @@ export default function RootLayout({ children }) {
         {/* 主要内容区域 */}
         <div
           id="initial-content"
-          className="opacity-0 transition-opacity duration-300 motion-reduce:transition-none"
-          style={{ opacity: 0 }}
+          className="opacity-100 transition-opacity duration-300 motion-reduce:transition-none"
         >
           <LanguageProvider>
             <TooltipProvider>
@@ -70,6 +69,14 @@ export default function RootLayout({ children }) {
                 var loadingTextEl = document.getElementById('initial-loading-text');
                 var contentEl = document.getElementById('initial-content');
                 var pulseRaf = null;
+
+                if (contentEl) {
+                  // 默认保持 React 声明为可见，避免 hydration 晚到时把内容重新隐藏
+                  // 仅在加载遮罩存在期间由脚本临时控制可见性
+                  contentEl.style.opacity = '0';
+                  contentEl.classList.remove('opacity-100');
+                  contentEl.classList.add('opacity-0');
+                }
 
                 var getPreferredTheme = function () {
                   try {
