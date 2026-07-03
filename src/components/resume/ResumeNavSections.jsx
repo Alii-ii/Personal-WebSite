@@ -1,5 +1,7 @@
 "use client";
 
+import AnimatedContent from '@/effects/AnimatedContent';
+
 /**
  * 履历导航+内容区组件
  * 基于 sections 配置，左侧渲染滚动锚点，右侧渲染 section+h2 结构
@@ -13,7 +15,7 @@ export default function ResumeNavSections({
   sidebar,
 }) {
   return (
-    <div className="w-full max-w-[1280px] flex flex-col md:flex-row gap-10 md:gap-[100px]">
+    <div className="w-full max-w-[960px] flex flex-col md:flex-row gap-10 md:gap-[64px]">
       {/* 左侧导航 */}
       <aside className="w-full md:w-[240px] flex flex-col gap-8 sticky top-[80px] self-start">
         {sidebar}
@@ -35,17 +37,26 @@ export default function ResumeNavSections({
 
       {/* 右侧内容区 */}
       <main className="flex-1 flex flex-col gap-10 md:gap-12">
-        {sections.map(({ id, title, content }) => (
-          <section
+        {sections.map(({ id, title, content }, index) => (
+          <AnimatedContent
             key={id}
-            id={id}
-            className="flex flex-col gap-6 scroll-mt-[80px]"
+            direction="vertical"
+            reverse={false}
+            distance={24}
+            duration={0.5}
+            delay={index * 0.04}
+            threshold={0.05}
           >
-            <h2 className="font-Ding text-[28px] md:text-[32px] leading-[1.5] tracking-[-1.6px] text-main opacity-80">
-              {title}
-            </h2>
-            {content}
-          </section>
+            <section
+              id={id}
+              className="flex flex-col gap-6 scroll-mt-[80px] text-[16px] md:text-[18px]"
+            >
+              <h2 className="font-Ding text-[28px] md:text-[32px] leading-[1.5] tracking-[-1.6px] text-main opacity-80 mt-4">
+                {title}
+              </h2>
+              {content}
+            </section>
+          </AnimatedContent>
         ))}
       </main>
     </div>

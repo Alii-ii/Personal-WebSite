@@ -52,7 +52,6 @@ export default function RootLayout({ children }) {
         <div
           id="initial-content"
           className="opacity-0 transition-opacity duration-300 motion-reduce:transition-none"
-          style={{ opacity: 0 }}
         >
           <LanguageProvider>
             <TooltipProvider>
@@ -70,6 +69,12 @@ export default function RootLayout({ children }) {
                 var loadingTextEl = document.getElementById('initial-loading-text');
                 var contentEl = document.getElementById('initial-content');
                 var pulseRaf = null;
+
+                if (contentEl) {
+                  // 初始状态已经是 opacity-0，无需修改 class
+                  // 仅通过内联 style 确保隐藏
+                  contentEl.style.opacity = '0';
+                }
 
                 var getPreferredTheme = function () {
                   try {

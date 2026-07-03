@@ -14,8 +14,7 @@ try {
   buildTime = buildInfo.buildTime;
   lastCommitDate = buildInfo.lastCommitDate;
 } catch (error) {
-  // 如果文件不存在，使用默认值
-  console.warn('构建信息文件不存在，使用默认日期');
+  // 如果文件不存在，使用默认值（静默回退，避免开发时重复刷屏）
 }
 
 const formatDate = (date) => {
@@ -55,22 +54,6 @@ export function getLastCommitDate() {
     // 在客户端，我们无法直接访问Git，所以返回一个默认值
     // 或者可以尝试从API获取
     return '2025.1.1'; // 默认值
-  }
-  
-  // 在服务端，尝试使用child_process（仅在Node.js环境中）
-  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-    try {
-      const { execSync } = require('child_process');
-      const lastCommitDate = execSync('git log -1 --format=%ci', { 
-        encoding: 'utf8',
-        cwd: process.cwd()
-      }).trim();
-      
-      const date = new Date(lastCommitDate);
-      return formatDate(date);
-    } catch (error) {
-      console.warn('无法获取Git信息:', error.message);
-    }
   }
   
   // 最后的回退方案

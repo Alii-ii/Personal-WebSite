@@ -4,11 +4,11 @@
  */
 export default function ResumeEducationItem({ time, content }) {
   return (
-    <div className="flex flex-col gap-3 min-w-[200px] flex-1 opacity-70">
+    <div className="flex flex-col gap-3 min-w-[180px] flex-1 opacity-70">
       <p className="font-regular text-[18px] md:text-[20px] leading-none text-tertiary">
         {time}
       </p>
-      <div className="font-Ding text-[20px] md:text-[24px] leading-[1.3] text-main">
+      <div className="font-Ding text-[18px] md:text-[20px] leading-[1.3] text-main">
         {content}
       </div>
     </div>

@@ -5,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 // 语言切换组件
 const LanguageToggle = () => {
-  const { language, toggleLanguage, getLanguageDisplayName } = useLanguage();
+  const { language, toggleLanguage, getLanguageDisplayName, mounted } = useLanguage();
 
   // 添加键盘快捷键监听
   useEffect(() => {
@@ -67,7 +67,7 @@ const LanguageToggle = () => {
 
       {/* toggle */}
       <div
-        className={`absolute top-0.5 size-6 rounded-[4px] transition-all z-0 duration-200 bg-card ${language === "zh" ? "left-0.5" : "left-[28px]"}`}
+        className={`absolute top-0.5 size-6 rounded-[4px] z-0 bg-card ${mounted ? "transition-all duration-200" : ""} ${language === "zh" || !mounted ? "left-0.5" : "left-[28px]"}`}
       ></div>
     </div>
   );

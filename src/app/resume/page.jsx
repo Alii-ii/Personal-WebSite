@@ -1,12 +1,100 @@
 "use client";
 
+import { useState } from 'react';
 import Footer from '@/components/footer';
-import ResumeEducationItem from '@/components/ResumeEducationItem';
-import ResumeExperienceItem from '@/components/ResumeExperienceItem';
-import ResumeNavSections from '@/components/ResumeNavSections';
+import IconTextButton from '@/components/icon-text-botton';
+import ResumeAbilityItem from '@/components/resume/ResumeAbilityItem';
+import ResumeEducationItem from '@/components/resume/ResumeEducationItem';
+import ResumeExperienceItem from '@/components/resume/ResumeExperienceItem';
+import ResumeNavSections from '@/components/resume/ResumeNavSections';
 import DotGrid from '@/effects/DotGrid';
-import AnimatedContent from '@/effects/AnimatedContent';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { MailIcon, ChatsIcon, FigmaIcon } from '@/public/icons';
+
+/** 复制文本到剪贴板 */
+const copyToClipboard = async (text) => {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+    }
+    return true;
+  } catch (err) {
+    console.error('复制失败', err);
+    return false;
+  }
+};
+
+/** Sidebar 联系方式按钮组 */
+function SidebarContactButtons() {
+  const [copyStates, setCopyStates] = useState({ wechat: false, email: false });
+  const [tooltipStates, setTooltipStates] = useState({ wechat: false, email: false });
+  const [figmaHovered, setFigmaHovered] = useState(false);
+
+  const handleCopySuccess = (type) => {
+    setCopyStates(prev => ({ ...prev, [type]: true }));
+    setTooltipStates(prev => ({ ...prev, [type]: true }));
+    setTimeout(() => {
+      setCopyStates(prev => ({ ...prev, [type]: false }));
+      setTooltipStates(prev => ({ ...prev, [type]: false }));
+    }, 1000);
+  };
+
+  return (
+    <div className="mt-4 flex flex-wrap gap-0.5">
+      <IconTextButton
+        key={`wechat-${copyStates.wechat}`}
+        text=""
+        icon={<ChatsIcon />}
+        variant="ghost"
+        size="md"
+        tooltip={copyStates.wechat ? '已复制 ✓' : '复制微信号'}
+        forceTooltipOpen={tooltipStates.wechat}
+        onClick={async () => {
+          const success = await copyToClipboard('13632359551');
+          if (success) handleCopySuccess('wechat');
+        }}
+      />
+      <IconTextButton
+        key={`email-${copyStates.email}`}
+        text=""
+        icon={<MailIcon />}
+        variant="ghost"
+        size="md"
+        tooltip={copyStates.email ? '已复制 ✓' : '复制邮箱'}
+        forceTooltipOpen={tooltipStates.email}
+        onClick={async () => {
+          const success = await copyToClipboard('alii.wong@foxmail.com');
+          if (success) handleCopySuccess('email');
+        }}
+      />
+      <div
+        onMouseEnter={() => setFigmaHovered(true)}
+        onMouseLeave={() => setFigmaHovered(false)}
+        className="figma-icon-wrapper"
+        style={{ filter: figmaHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
+      >
+        <IconTextButton
+          text=""
+          icon={<FigmaIcon />}
+          variant="ghost"
+          size="md"
+          tooltip="Figma Portfolio"
+          onClick={() => { window.open('https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024', '_blank'); }}
+        />
+      </div>
+    </div>
+  );
+}
 
 /** 履历区块配置：id、标题、内容 */
 const RESUME_SECTIONS = [
@@ -20,7 +108,7 @@ const RESUME_SECTIONS = [
           content={
             <>
               <p>腾讯CDC校企合作</p>
-              <p>服务设计(微专业)</p>
+              <p>服务设计 微专业</p>
             </>
           }
         />
@@ -29,7 +117,7 @@ const RESUME_SECTIONS = [
           content={
             <>
               <p>深圳大学</p>
-              <p>视觉传达(双学位)</p>
+              <p>视觉传达 双学位</p>
             </>
           }
         />
@@ -38,7 +126,7 @@ const RESUME_SECTIONS = [
           content={
             <>
               <p>深圳大学</p>
-              <p>市场营销(本科)</p>
+              <p>市场营销 本科</p>
             </>
           }
         />
@@ -51,73 +139,112 @@ const RESUME_SECTIONS = [
     content: (
       <ResumeExperienceItem
         position="体验设计"
-        company="美团-基础研发平台设计中心"
-        time="2024.6 – 至今"
+        tags={['Web', 'Desktop']}
+        company="美团·基研**设计中心"
+        time="2024.6 – 至今(2年)"
+        summary="业务团队 ~100 人, 工程师文化驱动、快速迭代, 接近创业团队氛围。"
         description={
           <>
             <ul className="list-disc pl-5">
               <li>
-                (Vibe Coding Tool) NoCode 从0到2 全局产品设计&前端开发：
+                <span className="font-bold">(AI生成应用) NoCode：0 → 2.x 全链路产品设计</span>
                 <br />
-                ① 基于业务规划和快速的迭代节奏, 定义并维护合理的信息架构 & 核心交互路径
+                ① 基于业务规划和快速的迭代节奏, 定义并维护合理的<span className="text-green-stroke">信息架构 & 核心交互路径</span>, 季度追踪并维护各模块的体验合理性, 推动优化提案(部分代码提交)
                 <br />
-                ② 参与上线产品前端开发, 组件化交付、自助设计验收、推动微交互优化落地
+                ② 覆盖<span className="text-green-stroke"> 10+ 核心模块</span>: 部署/版本/可视化编辑/数据库/权限/域名/Git导入/团队管理等, 历经 对外发布/移动端适配/国际化适配 等产品阶段
+                <br />
+                ③ 为解决"页面精调效率低下"的痛点, 以调研+提案推动 Design Mode <span className="text-green-stroke">原创模块 0-1 上线</span>, 验证可视化编辑器业务价值, 被多个自家产品调用
               </li>
             </ul>
             <ul className="list-disc pl-5">
               <li>
-                (AI IDE) MCopilot → CapPaw 整体优化：提炼 AI native IDE 交互路径、整体改版重构、
-                沉淀核心控件规范+跨主题通用配色方案
+                <span className="font-bold">(AI Coding Agent) CatDesk、CatPaw：模块级 Feature 设计</span>
+                <br />
+                ① CatDesk: Agent Teams / Dynamic Workflow / 全局快捷操作 及各种交互优化
+                <br />
+                ② CatPaw IDE: inline Chat / Diff & Accept 节点 / Spec Mode / Dark Mode 等
               </li>
             </ul>
             <ul className="list-disc pl-5">
-              <li>设计部 AI Coding 学科建设: 活动网站开发、编写FAQ、演示分享、筹办兴趣小组</li>
+              <li>
+                <span className="font-bold">内部工程实践：</span>
+                <br />
+                ① 在 <span className="text-green-stroke">多产品、多仓、多环境</span> 的真实代码仓库中与工程师协作, 自建分支 → 改动调试 → 自测提交 → 跟版上线, merge PR 30+
+                <br />
+                ② 独立/合作支持 2 个运营性网站开发: 设计部 AI Coding 作品征集、PDE 成长中心
+                <br />
+                ③ 独立开发"类 Cursor"在线文档编辑器, 探索复杂交互+真实技术逻辑的实现上限
+              </li>
+            </ul>
+            <ul className="list-disc pl-5">
+              <li>
+                <span className="font-bold">课程与内部分享：</span>直播 UV 峰值700+、均值200+, 文档 PV 2300+, 多篇入选精选文章
+                <br />
+                《AI Coding 入门概览》《工程化设计思维》《Spec Coding 与工程师协作艺术》等
+              </li>
             </ul>
           </>
         }
       />
     ),
   },
+  // {
+  //   id: 'abilities',
+  //   title: '核心能力',
+  //   content: (
+  //     <div className="flex flex-col gap-4">
+  //       <ResumeAbilityItem
+  //         icon="🛠"
+  //         title="Craft & Build"
+  //         subtitle="0-1 产品构建"
+  //         description="擅长在没有标准答案的场景定义产品方案。NoCode 平台从概念到上线全程主导，独立完成 10+ 核心模块的产品设计（内外月活峰值 10W+）；CatDesk Agent Teams 在行业无参照时建立交互范式。代码能力服务于设计落地——在真实多仓多环境中与 RD 协作，提交 Production Ready 的 UI/UX 优化代码。Side Project VibeWriting（AI 文档工作台）实现设计稿与代码 100% 对齐，已上线 inline diff + inline chat 交互，原生支持 CLI 及 Agent 使用场景。"
+  //       />
+  //       <ResumeAbilityItem
+  //         icon="🧠"
+  //         title="逻辑与抽象"
+  //         subtitle="复杂系统建模"
+  //         description="代码组件化治理思维、设计稿极度代码友好；擅长给复杂业务&技术逻辑建模和可视化（权限系统、多状态工作流、版本管理）。自学能力强，能快速进入新技术领域理解底层逻辑。"
+  //       />
+  //       <ResumeAbilityItem
+  //         icon="🚀"
+  //         title="Ownership"
+  //         subtitle="全环节闭环"
+  //         description="主动且全环节闭环：从需求定义→方案设计→原型交付→前端开发→设计验收。角色边界开放，更适配小团队、快速迭代节奏。Web 端 + 桌面端多环境调试开发能力。"
+  //       />
+  //     </div>
+  //   ),
+  // },
   {
     id: 'internship',
     title: '实习经历',
     content: (
       <ResumeExperienceItem
         position="交互设计"
+        tags={['Mobile', 'Web']}
         company="深圳思为科技有限公司"
         time="2022.7 – 1年6个月"
-        summary="设计团队归属于 E轮融资房地产营销SaaS企业，服务于大型房企卖房获客场景。"
+        summary="设计团队归属于 E轮融资 房地产营销 SaaS 企业，服务 大型房企 卖房获客 场景。"
         description={
           <>
             <ul className="list-disc pl-5">
               <li>
-                0-1产品形态探索：
+                <span className="font-bold">0-1 产品形态探索：</span>
                 <br />
-                ① <span className="text-green-stroke">深圳保障性租赁住房 C端租房 App体验设计</span>：
-                3人对接团队中的 UX 角色，通过业务拆解、用户访谈、竞品分析，探索契合合作方和本团队优势的租房产品形态，
-                做出差异化设计洞察，以调研结果支持团队沟通决策，以MVP提案支持汇报&合作。
+                ① <span className="text-green-stroke">深圳保租房 C端 App 体验设计</span>：3人团队 UX 角色，以设计提案支持协作沟通
                 <br />
-                ② <span className="text-green-stroke">介入购房旅程的 ChatGPT 应用探索</span>：
-                结合购房者与置业顾问"触达-转化"的信息交互链路，初步构建"主动对话+找房卡+标签系统"的AI客服解决方案。
+                ② <span className="text-green-stroke">购房咨询场景的 ChatGPT 应用探索</span>："主动对话+找房卡+标签系统" AI 客服方案
               </li>
             </ul>
             <ul className="list-disc pl-5">
               <li>
-                日常设计需求：
+                <span className="font-bold">重构 & 维护设计系统：</span>Sketch → Figma
                 <br />
-                ① <span className="text-green-stroke">移动端+网页工作台 KOL个人站 组件化设计</span>：
-                内容付费场景的通用可配组件设计。
-                <br />
-                ② <span className="text-green-stroke">移动端 营销数据助手 改版迭代</span>：复杂数据字段的图表呈现与交互设计。
-                <br />
-                ③ <span className="text-green-stroke">CRM标品App 分支功能设计支持</span>：含抖音授权、个人名片模块。
+                独立完成移动端/Web端组件库的更新工作, 简化冗余组件、Token 语义化
               </li>
             </ul>
             <ul className="list-disc pl-5">
               <li>
-                <span className="font-bold">维护设计系统</span>：结合业务更新与 figma design token 特性，
-                整合旧版本 sketch 组件库，简化重构冗余组件、语义化命名，提高团队组件库的易用性和一致性，
-                并推动前端资产与规范的更新落地。
+                <span className="font-bold">日常设计需求：</span>C端 App 个人主页 / 数据分析 等模块
               </li>
             </ul>
           </>
@@ -131,58 +258,25 @@ const RESUME_SECTIONS = [
     content: (
       <div className="flex flex-col gap-8">
         <ResumeExperienceItem
-          position="体验设计"
-          company="深大学生事务中心 在线服务体验改版"
-          time="2021.10 – 4个月"
-          summary="【已落地】从校网难用的生活体验提出问题，以用研和走查的方法定义问题，用产品思维和设计能力构建解决方案，通过沟通与协作加入了学校部门、让想法落地。"
-          description={
-            <>
-              <ul className="list-disc pl-5">
-                <li>
-                  <span className="font-bold">用户研究</span>：以<span className="text-green-stroke">可用性体验、组织焦点小组、投放问卷</span>的方法，
-                  了解不同类型同学对在线校园服务的了解程度、使用痛点及需求预期。
-                </li>
-              </ul>
-              <ul className="list-disc pl-5">
-                <li>
-                  <span className="font-bold">业务梳理</span>：<span className="text-green-stroke">页面走查</span>将校网100+功能服务收集聚类，
-                  对校内类似的产品与组织进行<span className="text-green-stroke">竞品分析</span>，对服务供给侧的市场空缺形成如移动端支持、在线课程表等真实有效的机会洞察。
-                </li>
-              </ul>
-              <ul className="list-disc pl-5">
-                <li>
-                  <span className="font-bold">产品设计</span>：<span className="text-green-stroke">优化网站信息架构、简化操作路径</span>，
-                  构建移动端校网访问方案。
-                </li>
-              </ul>
-            </>
-          }
+          position=""
+          tags={['Mobile']}
+          company="深圳大学学生事务中心 移动端"
+          time="2021.10"
+          summary="【已上线】整合校网100+功能服务, 向学校部门提案, 推动移动端网站服务 0-1 落地。"
         />
         <ResumeExperienceItem
-          position="UX/UI + 品牌设计"
-          company="赛事组队-赛逢伯乐YourMatch"
-          time="2021.4 – 7个月"
-          summary={
-            <>
-              【已落地】从参赛难找好队友萌生创业想法，如今成为
-              <span className="text-green-stroke">3k+公众号关注的校园服务组织</span>。
-            </>
-          }
-          description={
-            <>
-              <ul className="list-disc pl-5">
-                <li>
-                  <span className="font-bold">产品设计</span>：参与团队讨论，构建并完善在线组队功能的交互逻辑和使用流程，
-                  独立完成移动端产品设计，交付视觉定义、交互页面地图和组件规范。
-                </li>
-              </ul>
-              <ul className="list-disc pl-5">
-                <li>
-                  <span className="font-bold">品牌&IP设计</span>：独立负责含标志、IP形象及延展物的全套品牌设计，并跟进印刷落地。
-                </li>
-              </ul>
-            </>
-          }
+          position=""
+          tags={['Mobile']}
+          company="一袋临食 OneDrop"
+          time="2021.7"
+          summary="【已上线】设计合伙人, 临期食品 O2O 创业项目，本地生活服务 全流程界面设计。"
+        />
+        <ResumeExperienceItem
+          position=""
+          tags={['Mobile']}
+          company="赛逢伯乐 YourMatch"
+          time="2021.4"
+          summary="【已上线】设计合伙人, 校内交友组队资讯平台，3k+ 公众号关注的校园服务团队。"
         />
       </div>
     ),
@@ -203,29 +297,20 @@ export default function ResumePage() {
           dotSize={3}
           gap={18}
           baseColor={baseColor}
-          activeColor={activeColor}
-          highlightBoost={0.05}
-          proximity={120}
-          speedTrigger={80}
-          shockRadius={200}
-          shockStrength={3}
-          maxSpeed={2000}
+          activeColor={baseColor}
+          highlightBoost={0}
+          proximity={0}
+          speedTrigger={Infinity}
+          shockRadius={0}
+          shockStrength={0}
+          maxSpeed={0}
           resistance={800}
           returnDuration={1.2}
           className="opacity-70"
         />
       </div>
 
-      <AnimatedContent
-        direction="vertical"
-        reverse={false}
-        distance={80}
-        duration={1.2}
-        delay={0.4}
-        immediate={true}
-        flex={true}
-        className="flex-1 w-full"
-      >
+      <div className="flex-1 w-full">
         <div className="relative z-10 w-full flex justify-center px-6 md:px-16 py-12 md:py-[80px]">
 
           <ResumeNavSections
@@ -238,13 +323,17 @@ export default function ResumePage() {
                 <p className="font-Ding text-[20px] md:text-[24px] leading-none text-main opacity-80">
                   Alii / 阿礼
                 </p>
+                <p className="font-regular text-[14px] md:text-[16px] leading-[1.6] text-tertiary mt-2">
+                  AI 工具产品设计师，擅长在 0-1 场景构建产品方案并以代码交付
+                </p>
+                <SidebarContactButtons />
               </div>
             }
           />
         </div>
-      </AnimatedContent>
+      </div>
 
-      <Footer isGallery={true} showGallerySubtitle={false} />
+      <Footer isGallery={true} showGallerySubtitle={false} className="pt-0" maskHeight="160px" />
     </div>
   );
 }

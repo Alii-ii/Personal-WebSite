@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 // 主题切换组件
 const ThemeToggle = () => {
   const [theme, setTheme] = useState("light");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     // 检查本地存储或系统偏好
@@ -17,6 +18,7 @@ const ThemeToggle = () => {
 
     setTheme(initialTheme);
     applyTheme(initialTheme);
+    setMounted(true);
   }, []);
 
   // 添加键盘快捷键监听
@@ -102,7 +104,7 @@ const ThemeToggle = () => {
 
       {/* toggle */}
       <div
-        className={`absolute top-0.5 size-6 rounded-[4px] transition-all z-0 duration-200 bg-card ${theme === "light" ? "left-0.5" : "left-[28px]"}`}
+        className={`absolute top-0.5 size-6 rounded-[4px] z-0 bg-card ${mounted ? "transition-all duration-200" : ""} ${theme === "light" || !mounted ? "left-0.5" : "left-[28px]"}`}
       ></div>
     </div>
   );

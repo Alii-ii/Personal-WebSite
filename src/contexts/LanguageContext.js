@@ -79,6 +79,7 @@ const LanguageContext = createContext();
 // 语言提供者组件
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState('zh');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     // 检测用户默认语言偏好
@@ -112,10 +113,10 @@ export const LanguageProvider = ({ children }) => {
     };
     
     const initialLanguage = detectUserLanguage();
-    console.log(`检测到用户语言偏好: ${initialLanguage} (浏览器语言: ${navigator.language})`);
-    
+
     setLanguage(initialLanguage);
     applyLanguage(initialLanguage);
+    setMounted(true);
   }, []);
 
   // 应用语言设置
@@ -159,7 +160,8 @@ export const LanguageProvider = ({ children }) => {
     toggleLanguage,
     t,
     getLanguageDisplayName,
-    getLanguageCode
+    getLanguageCode,
+    mounted
   };
 
   return (
