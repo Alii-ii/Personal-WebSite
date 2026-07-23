@@ -114,11 +114,10 @@ const AnimatedContent = ({
       ref={ref}
       className={`${className} ${wrapperClassName}`}
       style={{
-        // 初始状态：确保内容在动画开始前完全隐藏
-        opacity: animateOpacity ? initialOpacity : 1,
-        transform: `translate${direction === 'horizontal' ? 'X' : 'Y'}(${reverse ? -distance : distance}px) scale(${scale})`,
-        // 防止内容在动画设置前显示
-        visibility: 'hidden',
+        // 先渲染可见的静态内容；动画仅在客户端 effect 成功挂载后接管，避免脚本异常时整页保持白屏。
+        opacity: 1,
+        transform: 'none',
+        visibility: 'visible',
         // 根据flex属性决定是否使用flex布局
         display: flex ? 'flex' : 'block',
         ...(flex && { flex: 1, width: '100%' })
