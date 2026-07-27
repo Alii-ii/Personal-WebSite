@@ -10,7 +10,8 @@
     "update-date": "node scripts/get-last-commit-date.js",
     "export": "node scripts/get-last-commit-date.js && next build && next export",
     "compress:images": "node scripts/compress-images.mjs",
-    "publish:gallery": "node scripts/publish-gallery.mjs"
+    "publish:gallery": "node scripts/publish-gallery.mjs",
+    "subset:fonts": "node scripts/subset-fonts.mjs"
   },
   "packageManager": "pnpm@8.15.0",
   "dependencies": {
