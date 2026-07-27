@@ -33,7 +33,7 @@ export default function Gallery() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col relative bg-hover pb-32 md:pb-40">
+    <div className="min-h-screen w-full flex flex-col relative bg-bg pb-32 md:pb-40">
 
       {/* 背景点阵效果 */}
       <div className="absolute inset-0 z-0">

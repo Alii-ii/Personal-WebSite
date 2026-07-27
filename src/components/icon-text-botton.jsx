@@ -120,10 +120,8 @@ const IconTextButton = ({
       >
         {/* 左侧图标 */}
         {icon && (
-          <span className={cn("flex-shrink-0", iconSizes[size])}>
-            {React.cloneElement(icon, {
-              className: cn("w-full h-full opacity-80", icon.props?.className),
-            })}
+          <span className={cn("flex-shrink-0 opacity-80", iconSizes[size])}>
+            {icon}
           </span>
         )}
 
@@ -132,13 +130,8 @@ const IconTextButton = ({
 
         {/* 右侧图标 */}
         {rightIcon && (
-          <span className={cn("flex-shrink-0", iconSizes[size])}>
-            {React.cloneElement(rightIcon, {
-              className: cn(
-                "w-full h-full opacity-80",
-                rightIcon.props?.className,
-              ),
-            })}
+          <span className={cn("flex-shrink-0 opacity-80", iconSizes[size])}>
+            {rightIcon}
           </span>
         )}
       </button>
@@ -152,7 +145,7 @@ const IconTextButton = ({
 
   // 有提示文案时，包装 Tooltip
   return (
-    <Tooltip key={tooltip} delayDuration={200} open={forceTooltipOpen ? true : undefined}>
+    <Tooltip delayDuration={200} open={forceTooltipOpen ? true : undefined}>
       <TooltipTrigger asChild>{renderButton()}</TooltipTrigger>
 
       <TooltipContent side={tooltipSide} className="z-[9999]">

@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Supabase 配置
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://lvttrekvsfvpwjhipuwz.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2dHRyZWt2c2Z2cHdqaGlwdXd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0OTExNzcsImV4cCI6MjA3MzA2NzE3N30.dZV7o7AcLcqKjRcQVdf-yD_el9hhUSjZmy5H8eFzoJQ';
+// Supabase 配置（共享项目：个站 + VibeWriting）
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://iebesloxnjjrbrwkyhpu.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_ZkRiJ65_9cx7yrK6LtPSMA_njKVdfch';
 
 // 创建 Supabase 客户端
 export const supabase = createClient(supabaseUrl, supabaseKey);

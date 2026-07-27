@@ -9,7 +9,8 @@ import ResumeExperienceItem from '@/components/resume/ResumeExperienceItem';
 import ResumeNavSections from '@/components/resume/ResumeNavSections';
 import DotGrid from '@/effects/DotGrid';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { MailIcon, ChatsIcon, FigmaIcon } from '@/public/icons';
+import { MailIcon, ChatsIcon, CheckIcon, FigmaIcon } from '@/public/icons';
+import { ActionSwapIcon } from '@/components/motion/action-swap';
 
 /** 复制文本到剪贴板 */
 const copyToClipboard = async (text) => {
@@ -52,9 +53,12 @@ function SidebarContactButtons() {
   return (
     <div className="mt-4 flex flex-wrap gap-0.5">
       <IconTextButton
-        key={`wechat-${copyStates.wechat}`}
         text=""
-        icon={<ChatsIcon />}
+        icon={
+          <ActionSwapIcon value={copyStates.wechat ? 'copied' : 'idle'} animation="blur">
+            {copyStates.wechat ? <CheckIcon /> : <ChatsIcon />}
+          </ActionSwapIcon>
+        }
         variant="ghost"
         size="md"
         tooltip={copyStates.wechat ? '已复制 ✓' : '复制微信号'}
@@ -65,9 +69,12 @@ function SidebarContactButtons() {
         }}
       />
       <IconTextButton
-        key={`email-${copyStates.email}`}
         text=""
-        icon={<MailIcon />}
+        icon={
+          <ActionSwapIcon value={copyStates.email ? 'copied' : 'idle'} animation="blur">
+            {copyStates.email ? <CheckIcon /> : <MailIcon />}
+          </ActionSwapIcon>
+        }
         variant="ghost"
         size="md"
         tooltip={copyStates.email ? '已复制 ✓' : '复制邮箱'}

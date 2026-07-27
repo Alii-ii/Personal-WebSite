@@ -8,7 +8,9 @@
     "build:clean": "rm -rf .next out && npm run build",
     "start": "next start",
     "update-date": "node scripts/get-last-commit-date.js",
-    "export": "node scripts/get-last-commit-date.js && next build && next export"
+    "export": "node scripts/get-last-commit-date.js && next build && next export",
+    "compress:images": "node scripts/compress-images.mjs",
+    "publish:gallery": "node scripts/publish-gallery.mjs"
   },
   "packageManager": "pnpm@8.15.0",
   "dependencies": {
@@ -17,7 +19,10 @@
     "clsx": "2.1.1",
     "framer-motion": "^12.23.12",
     "gsap": "3.13.0",
+    "lucide-react": "^1.27.0",
+    "motion": "^12.42.2",
     "next": "15.3.3",
+    "next-themes": "^0.4.6",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "tailwind-merge": "3.3.1"
@@ -25,6 +30,7 @@
   "devDependencies": {
     "autoprefixer": "10.4.16",
     "postcss": "8.4.32",
+    "sharp": "^0.35.3",
     "tailwindcss": "3.4.0"
   },
   "resolutions": {

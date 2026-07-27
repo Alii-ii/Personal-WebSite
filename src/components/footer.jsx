@@ -6,7 +6,8 @@ import TextLink from '@/components/TextLink';
 import IconTextButton from '@/components/icon-text-botton';
 import AnimatedContent from '@/effects/AnimatedContent';
 import CyclingDecryptedText from '@/components/CyclingDecryptedText';
-import { MailIcon, ChatsIcon, BilibiliIcon } from '@/public/icons';
+import { MailIcon, ChatsIcon, CheckIcon, BilibiliIcon, FigmaIcon } from '@/public/icons';
+import { ActionSwapIcon } from '@/components/motion/action-swap';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
@@ -83,6 +84,10 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
     wechat: false,
     email: false
   });
+
+  // 图标 hover 状态（默认灰度，hover 显示原色）
+  const [bilibiliHovered, setBilibiliHovered] = useState(false);
+  const [figmaHovered, setFigmaHovered] = useState(false);
 
   // 处理复制成功后的状态更新
   const handleCopySuccess = (type) => {
@@ -167,7 +172,7 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
         flex={false}
         className="footer__left h-full flex items-start justify-start"
       >
-        <div className="footer__left-content flex flex-col items-start justify-center gap-4 md:pb-4 font-Ding z-10 select-none">
+        <div className={`footer__left-content flex flex-col items-start justify-center gap-4 ${isGallery ? '' : 'md:pb-4'} font-Ding z-10 select-none`}>
           {isGallery ? (
             // Gallery 页面：显示返回按钮
             <button
@@ -221,8 +226,8 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
         </div>
       </AnimatedContent>
 
-      {/* 中区：版权信息 */}
-      <CopyrightFade t={t} />
+      {/* 中区：版权信息（仅首页显示） */}
+      {!isGallery && <CopyrightFade t={t} />}
 
       {/* 右区：操作/链接 */}
       <AnimatedContent
@@ -273,20 +278,45 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
               
               {/* 小按钮组 */}
               <div className="footer__right-icons flex flex-row gap-0.5 md:gap-1">
+                <div
+                  onMouseEnter={() => setBilibiliHovered(true)}
+                  onMouseLeave={() => setBilibiliHovered(false)}
+                  style={{ filter: bilibiliHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
+                >
+                  <IconTextButton
+                    text=""
+                    icon={<BilibiliIcon />}
+                    variant="ghost"
+                    size="md"
+                    tooltip={t('bilibiliTooltip')}
+                    onClick={() => {
+                      window.open('https://space.bilibili.com/38773851/favlist?fid=702542351&ftype=create', '_blank');
+                    }}
+                  />
+                </div>
+                <div
+                  onMouseEnter={() => setFigmaHovered(true)}
+                  onMouseLeave={() => setFigmaHovered(false)}
+                  style={{ filter: figmaHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
+                >
+                  <IconTextButton
+                    text=""
+                    icon={<FigmaIcon />}
+                    variant="ghost"
+                    size="md"
+                    tooltip="Figma Portfolio"
+                    onClick={() => {
+                      window.open('https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024', '_blank');
+                    }}
+                  />
+                </div>
                 <IconTextButton
                   text=""
-                  icon={<BilibiliIcon />}
-                  variant="ghost"
-                  size="md"
-                  tooltip={t('bilibiliTooltip')}
-                  onClick={() => {
-                    window.open('https://space.bilibili.com/38773851/favlist?fid=702542351&ftype=create', '_blank');
-                  }}
-                />
-                <IconTextButton
-                  key={`wechat-${copyStates.wechat}`}
-                  text=""
-                  icon={<ChatsIcon />}
+                  icon={
+                    <ActionSwapIcon value={copyStates.wechat ? 'copied' : 'idle'} animation="blur">
+                      {copyStates.wechat ? <CheckIcon /> : <ChatsIcon />}
+                    </ActionSwapIcon>
+                  }
                   variant="ghost"
                   size="md"
                   tooltip={copyStates.wechat ? t('wechatCopied') : t('wechatTooltip')}
@@ -297,9 +327,12 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
                   }}
                 />
                 <IconTextButton
-                  key={`email-${copyStates.email}`}
                   text=""
-                  icon={<MailIcon />}
+                  icon={
+                    <ActionSwapIcon value={copyStates.email ? 'copied' : 'idle'} animation="blur">
+                      {copyStates.email ? <CheckIcon /> : <MailIcon />}
+                    </ActionSwapIcon>
+                  }
                   variant="ghost"
                   size="md"
                   tooltip={copyStates.email ? t('emailCopied') : t('emailTooltip')}

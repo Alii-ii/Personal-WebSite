@@ -1,6 +1,7 @@
 import "./globals.css";
 import { TooltipProvider } from "@/components/tooltip";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import ClientProviders from "@/components/ClientProviders";
 
 export const metadata = {
   title: "Alii Wong",
@@ -16,7 +17,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
       <body className="font-alibaba-regular antialiased m-0 p-0">
         {/* 加载动画区域 */}
         <div
@@ -53,11 +54,13 @@ export default function RootLayout({ children }) {
           id="initial-content"
           className="opacity-0 transition-opacity duration-300 motion-reduce:transition-none"
         >
-          <LanguageProvider>
-            <TooltipProvider>
-              {children}
-            </TooltipProvider>
-          </LanguageProvider>
+          <ClientProviders>
+            <LanguageProvider>
+              <TooltipProvider>
+                {children}
+              </TooltipProvider>
+            </LanguageProvider>
+          </ClientProviders>
         </div>
 
         {/* 加载动画脚本 */}
