@@ -15,6 +15,7 @@
 - **安全边界**：通过 Supabase RLS（Row Level Security）控制权限，而非服务端中间层
 - **已有基础设施**：Supabase 项目（`iebesloxnjjrbrwkyhpu.supabase.co`），与 VibeWriting 共享，业务表通过 `site_` 前缀隔离
 - **不展示头像**：UI 上不展示用户头像，不需要默认头像生成逻辑
+- **双登录通路**：访客走匿名登录，站长走邮箱登录（隐藏入口）
 
 ---
 
@@ -22,30 +23,50 @@
 
 WHEN 访客首次尝试评论且无已有 Auth session, THE SYSTEM SHALL 通过 Supabase Auth 匿名登录创建身份，引导用户输入昵称后写入 `site_profiles` 表。
 
-#### Scenario 1.1: 首次评论 - 创建身份
+#### Scenario 1.1: 首次评论 - 创建身份（访客）
 - GIVEN 访客未有 Supabase Auth session
 - WHEN 访客输入昵称并确认
-- THEN 系统调用 `signInAnonymously()` 获得 Auth session
+- THEN 系统检查昵称唯一性（查询 `site_profiles` 是否已存在）
+- AND 若昵称可用，调用 `signInAnonymously()` 获得 Auth session
 - AND 向 `site_profiles` 表插入 `{ id, nickname, avatar_seed }`
 - AND Supabase Client 自动将 session 存入 localStorage
 
-#### Scenario 1.2: 回访 - 自动恢复身份
+#### Scenario 1.2: 首次评论 - 昵称已被占用
+- GIVEN 访客输入的昵称已被其他用户使用
+- WHEN 访客确认昵称
+- THEN 系统提示"该昵称已被使用"，不创建 Auth session
+
+#### Scenario 1.3: 回访 - 自动恢复身份
 - GIVEN 访客 localStorage 中有有效的 Supabase Auth session
 - WHEN 访客再次访问个站
 - THEN Supabase Client 自动恢复 session（内置行为）
 - AND Hook 初始化时自动查询 `site_profiles` 获取昵称
 - AND 跳过昵称输入，直接恢复评论能力
 
-#### Scenario 1.3: 回访 - session 过期
+#### Scenario 1.4: 回访 - session 过期
 - GIVEN 访客 localStorage 中的 Auth session 已过期或被清除
 - WHEN 访客再次尝试评论
 - THEN 系统重新弹出昵称输入，走首次评论流程（创建新的匿名身份）
 
-#### Scenario 1.4: 昵称修改
+#### Scenario 1.5: 昵称修改
 - GIVEN 访客已有身份
 - WHEN 访客主动点击修改昵称
-- THEN 系统更新 Supabase 中对应记录的 nickname 字段
+- THEN 系统检查新昵称唯一性（排除自己）
+- AND 若可用，更新 `site_profiles` 中对应记录的 nickname 字段
 - AND 本地状态同步更新
+
+#### Scenario 1.6: 站长登录
+- GIVEN 站长在页面上连按 3 次 Cmd（Mac）或 Ctrl（Windows）
+- WHEN 触发隐藏登录
+- THEN 系统自动以预置邮箱密码调用 `signInWithPassword()` 登录
+- AND 查询 `site_profiles` 获取站长 profile（昵称 "Alii"）
+- AND Console 输出登录状态
+
+#### Scenario 1.7: 站长登出
+- GIVEN 站长已登录
+- WHEN 连按 3 次 Shift
+- THEN 系统调用 `signOut()` 清除 session
+- AND Console 输出登出状态
 
 ---
 
@@ -142,17 +163,19 @@ WHEN 访客在评论相关界面操作, THE SYSTEM SHALL 提供流畅的交互�
 
 - **反垃圾（初期简化）**：同一用户每分钟最多 5 条评论，客户端限流
 - **评论长度**：单条评论最多 500 字符
+- **昵称唯一**：nickname 字段有 UNIQUE 约束，应用层查重 + 数据库兜底
 - **不做嵌套回复**：初期只做平铺评论，不做 @回复 或线程嵌套
 - **不做评论编辑**：初期只支持删除，不支持编辑已发评论
 - **不展示头像**：UI 上不展示用户头像
-- **移动端评论**：Gallery 维度的评论在移动端可用，单作品评论暂不在移动端支持（因为移动端无作品放大功能）
+- **站长入口隐藏**：邮箱登录/登出通过隐藏快捷键触发，无任何可见 UI
+- **移动端评论**：Gallery 维度的评论在移动端可用，单作品评论暂不在移动端支持
 - **管理后台**：初期不做管理后台，如需删除不当评论通过 Supabase Dashboard 手动操作
 
 ### 置信度评估
 
 | 需求 | 置信度 | 说明 |
 |------|--------|------|
-| 弱登录身份系统 | 95% | 已实现并测试通过：signInAnonymously → profile 创建 → session 恢复 |
+| 弱登录身份系统 | 95% | 已实现并测试通过：匿名登录 + 邮箱登录双通路 + 昵称查重 |
 | 评论数据模型与读写 | 98% | 已实现并测试通过：CRUD + JOIN + 乐观更新 + 客户端限流 |
 | RLS 安全策略 | 98% | 已配置并测试通过：公开可读、auth.uid() 鉴权写入/删除 |
 | 评论 UI 交互 | 待定 | 等 Figma 设计稿完成后实现 |
