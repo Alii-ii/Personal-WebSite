@@ -18,6 +18,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        {/* 字体 preload：提前发起请求，避免等 CSS 解析后才加载 */}
+        <link rel="preload" href="/fonts/AlibabaPuHuiTi-2-55-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/AlibabaPuHuiTi-2-45-Light.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/DingTalk-JinBuTi.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+      </head>
       <body className="font-alibaba-regular antialiased m-0 p-0">
         {/* 加载动画区域 */}
         <div
