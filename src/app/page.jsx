@@ -75,7 +75,7 @@ export default function Home() {
                   }}
                 >
                   <img
-                    src="/images/A.png"
+                    src="/images/A.webp"
                     alt="A面"
                     className="size-full opacity-90 transition-transform duration-200 ease-out hover:scale-105 active:scale-95"
                     style={{
@@ -108,7 +108,7 @@ export default function Home() {
                   }}
                 >
                   <img
-                    src="/images/B.png"
+                    src="/images/B.webp"
                     alt="B面"
                     className="size-full transition-transform duration-200 ease-out hover:scale-105 active:scale-95"
                     style={{
