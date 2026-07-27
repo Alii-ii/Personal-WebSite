@@ -49,4 +49,4 @@
 | 无 SSR-only API 调用（如 getServerSideProps） | 自动化 | P0 | ✅ PASS |
 | RLS 策略正确：匿名用户无法批量导出 profiles | 人工-逻辑 | P1 | ✅ RLS 已验证 |
 | Supabase publishable key 未暴露敏感权限 | 人工-逻辑 | P1 | ✅ 仅公开读写权限 |
-| nickname UNIQUE 约束防止重名 | 自动化 | P1 | ⏳ 等 DB migration |
+| nickname UNIQUE 约束防止重名 | 自动化 | P1 | ✅ 已执行 |

@@ -12,9 +12,9 @@
     - [x] 1.5 为 `site_profiles` 表配置 RLS 策略（公开可读、仅自己可写）
     - [x] 1.6 为 `site_comments` 表配置 RLS 策略（公开可读、已认证可写、仅自己可删）
     - [x] 1.7 在 Supabase Dashboard 开启 Anonymous Sign-In
-    - [ ] 1.8 为 `site_profiles.nickname` 添加 UNIQUE 约束
-    - [ ] 1.9 在 Supabase Dashboard 创建站长邮箱账号（alii.wong@foxmail.com）
-    - [ ] 1.10 为站长账号预置 profile（nickname: 'Alii'）
+    - [x] 1.8 为 `site_profiles.nickname` 添加 UNIQUE 约束
+    - [x] 1.9 在 Supabase Dashboard 创建站长邮箱账号（alii.wong@foxmail.com）
+    - [x] 1.10 为站长账号预置 profile（nickname: 'Alii'）
 
 ### Hook 层 Tasks
 

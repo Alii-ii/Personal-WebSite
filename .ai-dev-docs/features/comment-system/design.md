@@ -318,4 +318,4 @@ src/
 | `src/app/gallery/page.jsx` | 修改 | ⏳ 等 Figma 设计稿 |
 | `src/effects/Masonry.jsx` | 修改 | ⏳ 等 Figma 设计稿 |
 | Supabase Dashboard | 操作 | ✅ 建表+RLS+匿名登录已完成 |
-| Supabase Dashboard | 操作 | ⏳ 站长邮箱账号创建+profile预置+UNIQUE约束 |
+| Supabase Dashboard | 操作 | ✅ 站长邮箱账号+profile预置+UNIQUE约束 |
