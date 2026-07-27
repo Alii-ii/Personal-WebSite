@@ -107,8 +107,8 @@ const RESUME_SECTIONS = [
           time="2022.2 - 2023.2"
           content={
             <>
-              <p>腾讯CDC校企合作</p>
-              <p>服务设计 微专业</p>
+              <p><span className="font-bold">服务设计</span> 微专业</p>
+              <p className="font-regular text-[14px] md:text-[16px] text-tertiary">腾讯 CDC 校企合作</p>
             </>
           }
         />
@@ -116,8 +116,8 @@ const RESUME_SECTIONS = [
           time="2020.9 - 2024.6"
           content={
             <>
-              <p>深圳大学</p>
-              <p>视觉传达 双学位</p>
+              <p><span className="font-bold">视觉传达</span> 双学位</p>
+              <p className="font-regular text-[14px] md:text-[16px] text-tertiary">深圳大学</p>
             </>
           }
         />
@@ -125,8 +125,8 @@ const RESUME_SECTIONS = [
           time="2019.9 - 2024.6"
           content={
             <>
-              <p>深圳大学</p>
-              <p>市场营销 本科</p>
+              <p><span className="font-bold">市场营销</span> 本科</p>
+              <p className="font-regular text-[14px] md:text-[16px] text-tertiary">深圳大学</p>
             </>
           }
         />
@@ -139,48 +139,70 @@ const RESUME_SECTIONS = [
     content: (
       <ResumeExperienceItem
         position="体验设计"
-        tags={['Web', 'Desktop']}
-        company="美团·基研**设计中心"
-        time="2024.6 – 至今(2年)"
-        summary="业务团队 ~100 人, 工程师文化驱动、快速迭代, 接近创业团队氛围。"
+        tags={[]}
+        company="美团·基础研发平台设计中心"
+        time="2024.6 – 至今(2年+)"
+        summary="业务团队 ~100 人，工程师文化驱动、迭代节奏快、创业团队氛围。"
         description={
           <>
+            {/* 主产品设计 | NoCode */}
+            <div className="flex items-center gap-2 mt-1 mb-0.5">
+              <span className="px-2 py-0.5 text-[12px] font-regular rounded border border-tertiary/30 text-tertiary bg-tertiary/5 whitespace-nowrap">主产品设计</span>
+              <span className="font-bold text-main opacity-80">(对话生成应用) NoCode</span>
+              <span className="px-2 py-0.5 text-[12px] font-regular rounded border border-green-stroke/40 text-green-stroke bg-green-stroke/5 whitespace-nowrap">Web</span>
+            </div>
             <ul className="list-disc pl-5">
               <li>
-                <span className="font-bold">(AI生成应用) NoCode：0 → 2.x 全链路产品设计</span>
-                <br />
-                ① 基于业务规划和快速的迭代节奏, 定义并维护合理的<span className="text-green-stroke">信息架构 & 核心交互路径</span>, 季度追踪并维护各模块的体验合理性, 推动优化提案(部分代码提交)
-                <br />
-                ② 覆盖<span className="text-green-stroke"> 10+ 核心模块</span>: 部署/版本/可视化编辑/数据库/权限/域名/Git导入/团队管理等, 历经 对外发布/移动端适配/国际化适配 等产品阶段
-                <br />
-                ③ 为解决"页面精调效率低下"的痛点, 以调研+提案推动 Design Mode <span className="text-green-stroke">原创模块 0-1 上线</span>, 验证可视化编辑器业务价值, 被多个自家产品调用
+                <span className="font-bold">0 → 2.x 全链路产品设计：</span>
+                随着迭代定义并维护合理的<span className="text-green-stroke">信息架构 & 交互路径</span>，负责 10+ 核心模块设计(部署/版本/可视化编辑/数据库/权限/域名/Git导入等)，历经 对外发布、移动端适配、国际化适配 等产品阶段
+              </li>
+              <li>
+                <span className="font-bold">主导 Design Mode 原创模块 0-1 上线：</span>
+                针对"前端精调不便"痛点，验证可视化代码编辑器业务价值，被多个自家产品复用
               </li>
             </ul>
+
+            {/* 产品设计 1/2 | AI Coding Agent 产品线 */}
+            <div className="flex items-center gap-2 mt-3 mb-0.5">
+              <span className="px-2 py-0.5 text-[12px] font-regular rounded border border-tertiary/30 text-tertiary bg-tertiary/5 whitespace-nowrap">产品设计 1/2</span>
+              <span className="font-bold text-main opacity-80">AI Coding Agent 产品线</span>
+              <span className="px-2 py-0.5 text-[12px] font-regular rounded border border-green-stroke/40 text-green-stroke bg-green-stroke/5 whitespace-nowrap">Desktop</span>
+            </div>
+            <ul className="list-disc pl-5">
+              <li><span className="font-bold">CatDesk ADE：</span>Agent Teams / Dynamic Workflow / 全局快捷操作 及各交互优化</li>
+              <li><span className="font-bold">CatPaw IDE：</span>inline Chat / Diff & Accept 节点 / Spec Mode / Dark Mode 等</li>
+            </ul>
+
+            {/* 设计工程师 | 内部工程实践 */}
+            <div className="flex items-center gap-2 mt-3 mb-0.5">
+              <span className="px-2 py-0.5 text-[12px] font-regular rounded border border-tertiary/30 text-tertiary bg-tertiary/5 whitespace-nowrap">设计工程师</span>
+              <span className="font-bold text-main opacity-80">内部工程实践</span>
+            </div>
             <ul className="list-disc pl-5">
               <li>
-                <span className="font-bold">(AI Coding Agent) CatDesk、CatPaw：模块级 Feature 设计</span>
-                <br />
-                ① CatDesk: Agent Teams / Dynamic Workflow / 全局快捷操作 及各种交互优化
-                <br />
-                ② CatPaw IDE: inline Chat / Diff & Accept 节点 / Spec Mode / Dark Mode 等
+                <span className="font-bold">多产品/多仓/多环境</span> 中通过真实 PR 推进交付：在既有功能框架上优化样式/交互，抽象并复用前台组件，自建分支 → 改动调试 → 自测+PR → CR+QA → 跟版上线(30+)
+              </li>
+              <li>
+                <span className="font-bold">运营性网站开发：</span>(独立)设计部 AI Coding 作品征集、(合作)PDE 成长中心
+              </li>
+              <li>
+                <span className="font-bold">独立产品开发 Cursor for Documentation：</span>探索复杂交互+真实技术逻辑的实现上限
               </li>
             </ul>
+
+            {/* 课程讲师 | 课程分享与组织建设 */}
+            <div className="flex items-center gap-2 mt-3 mb-0.5">
+              <span className="px-2 py-0.5 text-[12px] font-regular rounded border border-tertiary/30 text-tertiary bg-tertiary/5 whitespace-nowrap">课程讲师</span>
+              <span className="font-bold text-main opacity-80">课程分享与组织建设</span>
+            </div>
             <ul className="list-disc pl-5">
               <li>
-                <span className="font-bold">内部工程实践：</span>
-                <br />
-                ① 在 <span className="text-green-stroke">多产品、多仓、多环境</span> 的真实代码仓库中与工程师协作, 自建分支 → 改动调试 → 自测提交 → 跟版上线, merge PR 30+
-                <br />
-                ② 独立/合作支持 2 个运营性网站开发: 设计部 AI Coding 作品征集、PDE 成长中心
-                <br />
-                ③ 独立开发"类 Cursor"在线文档编辑器, 探索复杂交互+真实技术逻辑的实现上限
-              </li>
-            </ul>
-            <ul className="list-disc pl-5">
-              <li>
-                <span className="font-bold">课程与内部分享：</span>直播 UV 峰值700+、均值200+, 文档 PV 2300+, 多篇入选精选文章
+                <span className="font-bold">课程/文章分享：</span>直播 UV 峰值 700+ / 均值 200+ / 文档 PV 2300+
                 <br />
                 《AI Coding 入门概览》《工程化设计思维》《Spec Coding 与工程师协作艺术》等
+              </li>
+              <li>
+                发起 & 运营 "设计师 AI Coding 兴趣小组" 覆盖 40%+ 内部设计师(共 600+人)
               </li>
             </ul>
           </>
@@ -220,7 +242,7 @@ const RESUME_SECTIONS = [
     content: (
       <ResumeExperienceItem
         position="交互设计"
-        tags={['Mobile', 'Web']}
+        tags={['Mobile']}
         company="深圳思为科技有限公司"
         time="2022.7 – 1年6个月"
         summary="设计团队归属于 E轮融资 房地产营销 SaaS 企业，服务 大型房企 卖房获客 场景。"

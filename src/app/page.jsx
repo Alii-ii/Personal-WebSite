@@ -67,21 +67,23 @@ export default function Home() {
               padding={80}
               wrapperClassName="cursor-pointer"
             >
-              <div
-                className="size-64 flex items-center justify-center"
-                style={{
-                  transform: 'rotate(-15deg)',
-                }}
-              >
-                <img
-                  src="/images/A.png"
-                  alt="A面"
-                  className="size-full opacity-90"
+              <Link href="/resume">
+                <div
+                  className="size-64 flex items-center justify-center"
                   style={{
-                    filter: 'drop-shadow(0 4px 40px rgba(91,103,215,0.18))'
+                    transform: 'rotate(-15deg)',
                   }}
-                />
-              </div>
+                >
+                  <img
+                    src="/images/A.png"
+                    alt="A面"
+                    className="size-full opacity-90 transition-transform duration-200 ease-out hover:scale-105 active:scale-95"
+                    style={{
+                      filter: 'drop-shadow(0 4px 40px rgba(91,103,215,0.18))'
+                    }}
+                  />
+                </div>
+              </Link>
             </Magnet>
 
             {/* 中间过渡文字和箭头 */}
@@ -98,21 +100,23 @@ export default function Home() {
               padding={80}
               wrapperClassName="cursor-pointer"
             >
-              <div
-                className="size-64 flex items-center justify-center"
-                style={{
-                  transform: 'rotate(15deg)',
-                }}
-              >
-                <img
-                  src="/images/B.png"
-                  alt="B面"
-                  className="size-full "
+              <Link href="/gallery">
+                <div
+                  className="size-64 flex items-center justify-center"
                   style={{
-                    filter: 'drop-shadow(0 4px 40px rgba(91,103,215,0.18))'
+                    transform: 'rotate(15deg)',
                   }}
-                />
-              </div>
+                >
+                  <img
+                    src="/images/B.png"
+                    alt="B面"
+                    className="size-full transition-transform duration-200 ease-out hover:scale-105 active:scale-95"
+                    style={{
+                      filter: 'drop-shadow(0 4px 40px rgba(91,103,215,0.18))'
+                    }}
+                  />
+                </div>
+              </Link>
             </Magnet>
           </div>
         </div>
