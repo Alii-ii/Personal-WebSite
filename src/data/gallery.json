@@ -1,0 +1,23 @@
+{
+  "_comment": "Gallery 图片索引。img 字段指向本地 webp（由 scripts/compress-images.mjs 生成）。后续用 scripts/publish-gallery.mjs 新增图片时会自动 append 到 items。如需切到 CDN，把 img 改成 https://cdn.alii.work/<name>.webp 即可。",
+  "items": [
+    { "id": 1, "img": "/images/gallery/webp/20250910-180822.webp", "title": "猫猫", "description": "这是第一个作品的描述" },
+    { "id": 2, "img": "/images/gallery/webp/20250910-180838.webp", "title": "玲" },
+    { "id": 3, "img": "/images/gallery/webp/20250910-183944.webp", "title": "薇薇安" },
+    { "id": 4, "img": "/images/gallery/webp/20250910-180757.webp", "title": "11号/社长/雅" },
+    { "id": 5, "img": "/images/gallery/webp/20250910-183952.webp", "title": "甘雨" },
+    { "id": 6, "img": "/images/gallery/webp/20250910-180743.webp", "title": "艾莲/玲/猫猫" },
+    { "id": 7, "img": "/images/gallery/webp/20250910-183948.webp", "title": "兄妹拜年" },
+    { "id": 8, "img": "/images/gallery/webp/20250910-183958.webp", "title": "一斗" },
+    { "id": 9, "img": "/images/gallery/webp/20250910-184010.webp", "title": "青衣(竖)" },
+    { "id": 10, "img": "/images/gallery/webp/20250910-184003.webp", "title": "花火" },
+    { "id": 11, "img": "/images/gallery/webp/20250910-184014.webp", "title": "简" },
+    { "id": 12, "img": "/images/gallery/webp/20250910-184006.webp", "title": "帽帽猫" },
+    { "id": 13, "img": "/images/gallery/webp/20250910-191655.webp", "title": "千织" },
+    { "id": 14, "img": "/images/gallery/webp/20250910-191725.webp", "title": "某电系常驻异常" },
+    { "id": 15, "img": "/images/gallery/webp/cover.webp", "title": "孚孚" },
+    { "id": 16, "img": "/images/gallery/webp/20250910-191659.webp", "title": "白术" },
+    { "id": 17, "img": "/images/gallery/webp/20250910-191708.webp", "title": "安比" },
+    { "id": 18, "img": "/images/gallery/webp/20250910-191722.webp", "title": "11号" }
+  ]
+}

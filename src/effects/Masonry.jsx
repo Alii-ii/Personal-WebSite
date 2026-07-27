@@ -40,14 +40,14 @@ const useMeasure = () => {
 };
 
 /**
- * 预加载图片，优先使用本地图片，失败时回退到CDN
- * @param {Array} items - 包含 img 和 fallbackImg 的图片项数组
+ * 预加载图片并获取尺寸
+ * @param {Array} items - 包含 img 的图片项数组
  * @returns {Promise<Array>} 图片数据数组
  */
 const preloadImages = async items => {
   if (typeof window === 'undefined') {
     return items.map(item => ({ 
-      src: item.fallbackImg || item.img, 
+      src: item.img, 
       width: 400, 
       height: 300 
     }));
@@ -57,45 +57,20 @@ const preloadImages = async items => {
     items.map(
       item =>
         new Promise(resolve => {
-          // 优先使用本地图片（fallbackImg），其次使用CDN（img）
-          const primarySrc = item.fallbackImg || item.img;
-          const fallbackSrc = item.fallbackImg ? item.img : null;
-          
           const img = new Image();
-          
-          // 先尝试加载本地图片
-          img.src = primarySrc;
+          img.src = item.img;
           
           img.onload = () => resolve({
-            src: primarySrc,
+            src: item.img,
             width: img.naturalWidth,
             height: img.naturalHeight
           });
           
-          img.onerror = () => {
-            // 如果本地图片加载失败且有CDN备用，尝试CDN
-            if (fallbackSrc) {
-              const fallbackImg = new Image();
-              fallbackImg.src = fallbackSrc;
-              fallbackImg.onload = () => resolve({
-                src: fallbackSrc,
-                width: fallbackImg.naturalWidth,
-                height: fallbackImg.naturalHeight
-              });
-              fallbackImg.onerror = () => resolve({
-                src: primarySrc, // 使用原始源，即使加载失败
-                width: 400, // 默认宽度
-                height: 300 // 默认高度
-              });
-            } else {
-              // 没有备用图片，返回默认值
-              resolve({
-                src: primarySrc,
-                width: 400, // 默认宽度
-                height: 300 // 默认高度
-              });
-            }
-          };
+          img.onerror = () => resolve({
+            src: item.img,
+            width: 400,
+            height: 300
+          });
         })
     )
   );
@@ -135,7 +110,7 @@ const Masonry = ({
   const [containerRef, { width }] = useMeasure();
   const [imagesReady, setImagesReady] = useState(false);
   const [imageDimensions, setImageDimensions] = useState({});
-  // 跟踪每个图片项实际使用的图片源（优先本地，失败时使用CDN）
+  // 跟踪每个图片项实际使用的图片源
   const [imageSources, setImageSources] = useState({});
   // 跟踪每个图片项的加载状态：true=已加载, false=加载中, 'error'=加载失败
   const [imageLoadStatus, setImageLoadStatus] = useState({});
@@ -161,7 +136,7 @@ const Masonry = ({
     if (item) {
       // 获取该 item 实际使用的图片源
       const itemKey = item.id || items.indexOf(item);
-      const actualSrc = imageSources[itemKey] || item.fallbackImg || item.img;
+      const actualSrc = imageSources[itemKey] || item.img;
       const imgData = imageDimensions[actualSrc] || { width: 400, height: 300 };
       const aspectRatio = imgData.width / imgData.height;
       const columnWidth = Math.min(maxColumnWidth, (width - 16) / Math.ceil(width / maxColumnWidth));
@@ -181,7 +156,7 @@ const Masonry = ({
 
     // 获取原始图片尺寸
     const itemKey = item.id || items.indexOf(item);
-    const actualSrc = imageSources[itemKey] || item.fallbackImg || item.img;
+    const actualSrc = imageSources[itemKey] || item.img;
     const imgData = imageDimensions[actualSrc] || { width: 400, height: 300 };
     const aspectRatio = imgData.width / imgData.height;
 
@@ -383,19 +358,12 @@ const Masonry = ({
         [itemKey]: 'loading'
       }));
       
-      // 优先使用本地图片（fallbackImg），其次使用CDN（img）
-      const primarySrc = item.fallbackImg || item.img;
-      const fallbackSrc = item.fallbackImg ? item.img : null;
-      
       const img = new Image();
-      
-      // 先尝试加载本地图片
-      img.src = primarySrc;
+      img.src = item.img;
       
       img.onload = () => {
-        // 图片加载成功，立即更新状态并显示
         const imgData = {
-          src: primarySrc,
+          src: item.img,
           width: img.naturalWidth,
           height: img.naturalHeight
         };
@@ -415,60 +383,16 @@ const Masonry = ({
           [itemKey]: true
         }));
         
-        // 如果这是第一张图片，标记 imagesReady 为 true，允许开始计算布局
         setImagesReady(true);
       };
       
       img.onerror = () => {
-        // 如果本地图片加载失败且有CDN备用，尝试CDN
-        if (fallbackSrc) {
-          const fallbackImg = new Image();
-          fallbackImg.src = fallbackSrc;
-          
-          fallbackImg.onload = () => {
-            // CDN 图片加载成功
-            const imgData = {
-              src: fallbackSrc,
-              width: fallbackImg.naturalWidth,
-              height: fallbackImg.naturalHeight
-            };
-            
-            setImageSources(prev => ({
-              ...prev,
-              [itemKey]: imgData.src
-            }));
-            
-            setImageDimensions(prev => ({
-              ...prev,
-              [imgData.src]: { width: imgData.width, height: imgData.height }
-            }));
-            
-            setImageLoadStatus(prev => ({
-              ...prev,
-              [itemKey]: true
-            }));
-            
-            setImagesReady(true);
-          };
-          
-          fallbackImg.onerror = () => {
-            // CDN 也加载失败，标记为错误状态
-            setImageLoadStatus(prev => ({
-              ...prev,
-              [itemKey]: 'error'
-            }));
-            
-            setImagesReady(true);
-          };
-        } else {
-          // 没有备用图片，标记为错误状态
-          setImageLoadStatus(prev => ({
-            ...prev,
-            [itemKey]: 'error'
-          }));
-          
-          setImagesReady(true);
-        }
+        setImageLoadStatus(prev => ({
+          ...prev,
+          [itemKey]: 'error'
+        }));
+        
+        setImagesReady(true);
       };
     });
   }, [items]);
@@ -531,7 +455,7 @@ const Masonry = ({
       let height, imgData;
       if (loadStatus === true) {
         // 已加载：使用实际图片尺寸
-        const actualSrc = imageSources[itemKey] || child.fallbackImg || child.img;
+        const actualSrc = imageSources[itemKey] || child.img;
         imgData = imageDimensions[actualSrc] || { width: 400, height: 300 };
         const aspectRatio = imgData.width / imgData.height;
         height = columnWidth / aspectRatio;
@@ -557,7 +481,7 @@ const Masonry = ({
         originalWidth: imgData.width,
         originalHeight: imgData.height,
         // 保存实际使用的图片源（如果已加载）
-        actualImgSrc: loadStatus === true ? (imageSources[itemKey] || child.fallbackImg || child.img) : null,
+        actualImgSrc: loadStatus === true ? (imageSources[itemKey] || child.img) : null,
         // 保存加载状态
         loadStatus: loadStatus === undefined ? 'loading' : loadStatus
       };
@@ -858,7 +782,6 @@ const Masonry = ({
                 : '0px 4px 12px 0px rgba(0,0,0,0.08)',
               transform: 'scale(1)', // 不再使用 scale 变换，直接改变尺寸
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', // 平滑过渡
-              loading: 'lazy',
               maxWidth: '100%',
               maxHeight: '100%',
               width: shouldFillWidth && !isExpanded ? '100%' : undefined,
@@ -877,8 +800,10 @@ const Masonry = ({
               // 已加载：显示实际图片
               <>
                 <img
-                  src={item.actualImgSrc || item.fallbackImg || item.img}
+                  src={item.actualImgSrc || item.img}
                   alt={item.title || item.tittle || ''}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full overflow-hidden rounded-[8px] "
                   style={{ 
                     width: '100%', 
@@ -890,33 +815,11 @@ const Masonry = ({
                     imageRendering: 'optimizeQuality' // 优化图片渲染质量
                   }}
                   onError={(e) => {
-                    // 如果当前图片加载失败，尝试切换到备用图片源
-                    const currentSrc = e.target.src;
                     const itemKey = item.id || items.findIndex(i => i === item);
-                    
-                    // 如果当前是本地图片，尝试切换到CDN
-                    if (currentSrc === item.fallbackImg && item.img) {
-                      e.target.src = item.img;
-                      // 更新图片源状态
-                      setImageSources(prev => ({
-                        ...prev,
-                        [itemKey]: item.img
-                      }));
-                    }
-                    // 如果当前是CDN图片且本地图片存在，尝试使用本地图片（虽然不应该发生，但作为最后的兜底）
-                    else if (currentSrc === item.img && item.fallbackImg) {
-                      e.target.src = item.fallbackImg;
-                      setImageSources(prev => ({
-                        ...prev,
-                        [itemKey]: item.fallbackImg
-                      }));
-                    } else {
-                      // 所有图片源都加载失败，标记为错误状态
-                      setImageLoadStatus(prev => ({
-                        ...prev,
-                        [itemKey]: 'error'
-                      }));
-                    }
+                    setImageLoadStatus(prev => ({
+                      ...prev,
+                      [itemKey]: 'error'
+                    }));
                   }}
                 />
                 {colorShiftOnHover && !isExpanded && (
