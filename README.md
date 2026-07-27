@@ -8,14 +8,14 @@
 - 🎨 **主题切换**：支持明暗主题切换
 - 📱 **响应式设计**：适配各种设备尺寸
 - ⚡ **现代化技术栈**：Next.js 14 + Tailwind CSS + React
-- 🚀 **自动部署**：GitHub + Vercel 自动部署
+- 🚀 **自动部署**：GitHub Actions + Cloudflare Pages 自动部署
 
 ## 🛠️ 技术栈
 
 - **框架**: Next.js 14 (App Router)
 - **样式**: Tailwind CSS
 - **语言**: JavaScript/JSX
-- **部署**: Vercel
+- **部署**: Cloudflare Pages
 - **版本控制**: Git + GitHub
 
 ## 🚀 快速开始
@@ -77,19 +77,23 @@ src/
 
 ## 🚀 部署
 
-### Vercel 自动部署
+### Cloudflare Pages 自动部署
 
-项目已配置 Vercel 自动部署：
+项目通过 GitHub Actions 自动部署到 Cloudflare Pages：
 
-1. **连接 GitHub**：在 [Vercel Dashboard](https://vercel.com/dashboard) 中导入 GitHub 仓库
-2. **自动部署**：每次推送到 `main` 分支时自动触发部署
-3. **预览部署**：Pull Request 会自动创建预览部署
+1. **构建**：推送到 `main` 分支时，GitHub Actions 执行 `npm run build` 生成静态产物到 `out/`
+2. **部署**：用 `wrangler pages deploy out` 推送到 Cloudflare Pages
+3. **预览**：Pull Request 会自动创建预览部署（`pr-<编号>` 分支）
+
+所需 GitHub Secrets：`CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` / `CLOUDFLARE_PAGES_PROJECT_NAME`
 
 ### 部署配置
 
 项目包含以下部署配置文件：
 
-- `vercel.json` - Vercel 部署配置
+- `cloudflare-build.sh` - Cloudflare 构建脚本
+- `_headers` - Cloudflare Pages 缓存与安全头
+- `.github/workflows/deploy.yml` - GitHub Actions 部署工作流
 - `.gitignore` - Git 忽略文件配置
 
 ## 📝 开发说明

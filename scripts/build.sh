@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 构建脚本 - 用于Vercel部署
+# 构建脚本 - 用于 Cloudflare Pages 部署
 echo "开始构建..."
 
 # 检查Git是否可用
