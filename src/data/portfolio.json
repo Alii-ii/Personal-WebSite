@@ -1190,6 +1190,270 @@
           "alt": "关键页面"
         }
       ]
+    },
+    {
+      "slug": "laolao-service-design",
+      "category": "product",
+      "title": {
+        "zh": "捞捞服务设计",
+        "en": "Lao Lao Service Design"
+      },
+      "period": "2024.1",
+      "summary": {
+        "zh": "",
+        "en": ""
+      },
+      "tabs": [
+        {
+          "key": "design",
+          "label": {
+            "zh": "页面原稿",
+            "en": "Design"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "laolao-service-design-01-laolao-01",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 01",
+            "en": "捞捞 01"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/01-laolao-01.webp",
+          "alt": "捞捞服务设计 - 捞捞 01",
+          "figmaNodeId": "83:27156"
+        },
+        {
+          "id": "laolao-service-design-02-laolao-02",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 02",
+            "en": "捞捞 02"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/02-laolao-02.webp",
+          "alt": "捞捞服务设计 - 捞捞 02",
+          "figmaNodeId": "83:27154"
+        },
+        {
+          "id": "laolao-service-design-03-laolao-03",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 03",
+            "en": "捞捞 03"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/03-laolao-03.webp",
+          "alt": "捞捞服务设计 - 捞捞 03",
+          "figmaNodeId": "83:27151"
+        },
+        {
+          "id": "laolao-service-design-04-laolao-04",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 04",
+            "en": "捞捞 04"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/04-laolao-04.webp",
+          "alt": "捞捞服务设计 - 捞捞 04",
+          "figmaNodeId": "83:27147"
+        },
+        {
+          "id": "laolao-service-design-05-laolao-05",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 05",
+            "en": "捞捞 05"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/05-laolao-05.webp",
+          "alt": "捞捞服务设计 - 捞捞 05",
+          "figmaNodeId": "83:27153"
+        },
+        {
+          "id": "laolao-service-design-06-laolao-06",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 06",
+            "en": "捞捞 06"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/06-laolao-06.webp",
+          "alt": "捞捞服务设计 - 捞捞 06",
+          "figmaNodeId": "83:27152"
+        },
+        {
+          "id": "laolao-service-design-07-laolao-07",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 07",
+            "en": "捞捞 07"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/07-laolao-07.webp",
+          "alt": "捞捞服务设计 - 捞捞 07",
+          "figmaNodeId": "83:27150"
+        },
+        {
+          "id": "laolao-service-design-08-laolao-08",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 08",
+            "en": "捞捞 08"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/08-laolao-08.webp",
+          "alt": "捞捞服务设计 - 捞捞 08",
+          "figmaNodeId": "83:27149"
+        },
+        {
+          "id": "laolao-service-design-09-laolao-09",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 09",
+            "en": "捞捞 09"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/09-laolao-09.webp",
+          "alt": "捞捞服务设计 - 捞捞 09",
+          "figmaNodeId": "83:27146"
+        },
+        {
+          "id": "laolao-service-design-10-laolao-10",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 10",
+            "en": "捞捞 10"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/10-laolao-10.webp",
+          "alt": "捞捞服务设计 - 捞捞 10",
+          "figmaNodeId": "83:27148"
+        },
+        {
+          "id": "laolao-service-design-11-laolao-11",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 11",
+            "en": "捞捞 11"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/11-laolao-11.webp",
+          "alt": "捞捞服务设计 - 捞捞 11",
+          "figmaNodeId": "83:27155"
+        },
+        {
+          "id": "laolao-service-design-12-laolao-12",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 12",
+            "en": "捞捞 12"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/12-laolao-12.webp",
+          "alt": "捞捞服务设计 - 捞捞 12",
+          "figmaNodeId": "83:27145"
+        },
+        {
+          "id": "laolao-service-design-13-laolao-13",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 13",
+            "en": "捞捞 13"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/13-laolao-13.webp",
+          "alt": "捞捞服务设计 - 捞捞 13",
+          "figmaNodeId": "83:27144"
+        },
+        {
+          "id": "laolao-service-design-14-laolao-14",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 14",
+            "en": "捞捞 14"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/14-laolao-14.webp",
+          "alt": "捞捞服务设计 - 捞捞 14",
+          "figmaNodeId": "83:27143"
+        },
+        {
+          "id": "laolao-service-design-15-laolao-15",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "捞捞 15",
+            "en": "捞捞 15"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/laolao-service-design/15-laolao-15.webp",
+          "alt": "捞捞服务设计 - 捞捞 15",
+          "figmaNodeId": "83:27142"
+        }
+      ]
     }
   ]
 }
