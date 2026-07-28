@@ -8,14 +8,16 @@
 
 ## 本次变更内容
 
-| 项 | 值 |
-| --- | --- |
-| Figma 源 | `【本科毕设】` node `739:47421`（file `OsMjuOsAZiPIMPK0ztUVR0`） |
-| 新增图片 | `public/images/portfolio/undergraduate-thesis/01-p-01.webp` … `16-p-16.webp`（16 个） |
-| 图片体积 | 25.68 MB(PNG@2x) → **1.42 MB(webp)**，平均 -94% |
-| 数据变更 | `src/data/portfolio.json` 新增 project `undergraduate-thesis`，16 个 image frame |
-| 新增路由 | `/portfolio/undergraduate-thesis/`（构建产物已生成，16 张图 0 broken） |
-| 新增脚本 | `scripts/sync-figma-frames.mjs` |
+| 项目 | Figma 节点 | 帧数 | 原始 → webp |
+| --- | --- | --- | --- |
+| `undergraduate-thesis` 本科毕设 | `739-47421` 【本科毕设】 | 16 | 25.68 MB → 1.42 MB |
+| `nocode-for-pro` | `2765-76016` 【美团项目】01 | 10 | 9.37 MB → 1.00 MB |
+| `chatgpt-home-buying` 购房 ChatGPT | `445-50333` 【实习项目】 | 9 | 5.72 MB → 720 KB |
+| `laolao-service-design` 捞捞服务设计 | `52-37269` 【服务设计】01 | 15 | 16.03 MB → 1.20 MB |
+
+- 数据清理：移除 `shenzhen-rental-housing`（其 2 帧合并入本科毕设），清除所有旧 `gallery/` 占位图引用
+- 新增脚本：`scripts/sync-figma-frames.mjs`（幂等、Figma 分批渲染、故障隔离）
+- 新增 npm script：`npm run sync:figma`
 
 ## 待办 1：部署静态站点（必做）
 
