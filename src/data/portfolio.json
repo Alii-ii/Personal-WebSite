@@ -1,0 +1,1195 @@
+{
+  "_comment": "作品集数据。categories 同时驱动 L2 左栏分类与 L3 菜单分组；projects[].frames 是唯一内容源，L2 把所有 frame 平铺成作品墙，L3 按 tab 横向展示。frame.type: image | prototype | rich。feed.w/h 决定 L2 瀑布流卡片尺寸，显式声明以避免图片预加载测量导致的首屏抖动。",
+  "categories": [
+    {
+      "key": "product",
+      "label": {
+        "zh": "产品项目",
+        "en": "Products"
+      }
+    },
+    {
+      "key": "writing",
+      "label": {
+        "zh": "文章随笔",
+        "en": "Writing"
+      }
+    },
+    {
+      "key": "side",
+      "label": {
+        "zh": "Side Project",
+        "en": "Side Project"
+      }
+    }
+  ],
+  "projects": [
+    {
+      "slug": "nocode-design-mode",
+      "category": "product",
+      "title": {
+        "zh": "NoCode Design Mode",
+        "en": "NoCode Design Mode"
+      },
+      "period": "2026.Q1",
+      "summary": {
+        "zh": "为非技术用户提供代码编辑器与模式切换能力，在约束下平衡体验修复与新能力边界。",
+        "en": "Code editor and mode switching for non-technical users, balancing UX fixes with new capability boundaries."
+      },
+      "tabs": [
+        {
+          "key": "strategy",
+          "label": {
+            "zh": "设计策略",
+            "en": "Strategy"
+          }
+        },
+        {
+          "key": "code",
+          "label": {
+            "zh": "代码实现",
+            "en": "Code"
+          }
+        },
+        {
+          "key": "design",
+          "label": {
+            "zh": "页面原稿",
+            "en": "Design"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "ndm-strategy-01",
+          "tab": "strategy",
+          "type": "rich",
+          "title": {
+            "zh": "策略一：信息边界",
+            "en": "Strategy 1: Information Boundary"
+          },
+          "feed": {
+            "w": 532,
+            "h": 340
+          },
+          "layout": "column",
+          "blocks": [
+            {
+              "type": "text",
+              "variant": "heading",
+              "content": {
+                "zh": "关键矛盾",
+                "en": "Key Tension"
+              }
+            },
+            {
+              "type": "text",
+              "variant": "display",
+              "content": {
+                "zh": "为降低门槛而设的简化，阻碍了对细节的把控",
+                "en": "Simplification for accessibility blocks fine-grained control"
+              }
+            },
+            {
+              "type": "text",
+              "variant": "body",
+              "content": {
+                "zh": "而专业的 IDE 不能成为普适解决方案",
+                "en": "Yet a professional IDE cannot be the universal answer"
+              }
+            },
+            {
+              "type": "text",
+              "variant": "caption",
+              "content": {
+                "zh": "*用研信源来自用户群和工单系统的持续输入",
+                "en": "*Research sourced from user groups and ticket system"
+              }
+            }
+          ]
+        },
+        {
+          "id": "ndm-strategy-02",
+          "tab": "strategy",
+          "type": "image",
+          "title": {
+            "zh": "策略二：行为边界",
+            "en": "Strategy 2: Behavior Boundary"
+          },
+          "feed": {
+            "w": 532,
+            "h": 426
+          },
+          "src": "/images/gallery/webp/20250910-180822.webp",
+          "alt": "行为边界策略图"
+        },
+        {
+          "id": "ndm-code-01",
+          "tab": "code",
+          "type": "prototype",
+          "title": {
+            "zh": "编辑器原型",
+            "en": "Editor Prototype"
+          },
+          "feed": {
+            "w": 532,
+            "h": 344
+          },
+          "html": "<div style=\"font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:24px;line-height:1.7;font-size:13px\"><div style=\"opacity:.5\">// design-mode.tsx</div><div><span style=\"color:#c678dd\">export function</span> <span style=\"color:#61afef\">DesignMode</span>() {</div><div>&nbsp;&nbsp;<span style=\"color:#c678dd\">const</span> [mode, setMode] = <span style=\"color:#61afef\">useState</span>(<span style=\"color:#98c379\">'visual'</span>);</div><div>&nbsp;&nbsp;<span style=\"color:#c678dd\">return</span> &lt;<span style=\"color:#e06c75\">Editor</span> mode={mode} /&gt;;</div><div>}</div></div>",
+          "alt": "代码原型"
+        },
+        {
+          "id": "ndm-design-01",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "页面原稿",
+            "en": "Design Draft"
+          },
+          "feed": {
+            "w": 532,
+            "h": 252
+          },
+          "src": "/images/gallery/webp/20250910-180838.webp",
+          "alt": "页面原稿"
+        }
+      ]
+    },
+    {
+      "slug": "nocode-for-pro",
+      "category": "product",
+      "title": {
+        "zh": "NoCode for Pro",
+        "en": "NoCode for Pro"
+      },
+      "period": "2025.H2",
+      "summary": {
+        "zh": "面向有技术背景产研角色的 NoCode 能力扩展，兼容从 Vibe Coding 到专业开发的成长曲线。",
+        "en": "Extending NoCode for technical roles, spanning the curve from Vibe Coding to professional development."
+      },
+      "tabs": [
+        {
+          "key": "strategy",
+          "label": {
+            "zh": "设计策略",
+            "en": "Strategy"
+          }
+        },
+        {
+          "key": "code",
+          "label": {
+            "zh": "代码实现",
+            "en": "Code"
+          }
+        },
+        {
+          "key": "design",
+          "label": {
+            "zh": "页面原稿",
+            "en": "Design"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "nocode-for-pro-01-p-01",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 01",
+            "en": "P 01"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-for-pro/01-p-01.webp",
+          "alt": "NoCode for Pro - P 01",
+          "figmaNodeId": "2792:189144"
+        },
+        {
+          "id": "nocode-for-pro-02-p-02",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 02",
+            "en": "P 02"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-for-pro/02-p-02.webp",
+          "alt": "【美团项目】01 - P 02",
+          "figmaNodeId": "2792:189145"
+        },
+        {
+          "id": "nocode-for-pro-03-p-03",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 03",
+            "en": "P 03"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-for-pro/03-p-03.webp",
+          "alt": "【美团项目】01 - P 03",
+          "figmaNodeId": "2792:189146"
+        },
+        {
+          "id": "nocode-for-pro-04-p-04",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 04",
+            "en": "P 04"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-for-pro/04-p-04.webp",
+          "alt": "【美团项目】01 - P 04",
+          "figmaNodeId": "2807:257221"
+        },
+        {
+          "id": "nocode-for-pro-05-p-05",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 05",
+            "en": "P 05"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-for-pro/05-p-05.webp",
+          "alt": "【美团项目】01 - P 05",
+          "figmaNodeId": "2792:189147"
+        },
+        {
+          "id": "nocode-for-pro-06-p-06",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 06",
+            "en": "P 06"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-for-pro/06-p-06.webp",
+          "alt": "【美团项目】01 - P 06",
+          "figmaNodeId": "2792:189148"
+        },
+        {
+          "id": "nocode-for-pro-07-p-07",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 07",
+            "en": "P 07"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-for-pro/07-p-07.webp",
+          "alt": "【美团项目】01 - P 07",
+          "figmaNodeId": "2792:189149"
+        },
+        {
+          "id": "nocode-for-pro-08-p-08",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 08",
+            "en": "P 08"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-for-pro/08-p-08.webp",
+          "alt": "【美团项目】01 - P 08",
+          "figmaNodeId": "2815:61700"
+        },
+        {
+          "id": "nocode-for-pro-09-p-09",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 09",
+            "en": "P 09"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-for-pro/09-p-09.webp",
+          "alt": "【美团项目】01 - P 09",
+          "figmaNodeId": "2792:189150"
+        },
+        {
+          "id": "nocode-for-pro-10-p-10",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 10",
+            "en": "P 10"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-for-pro/10-p-10.webp",
+          "alt": "【美团项目】01 - P 10",
+          "figmaNodeId": "2792:189151"
+        },
+        {
+          "id": "nfp-strategy-01",
+          "tab": "strategy",
+          "type": "rich",
+          "title": {
+            "zh": "策略一：信息边界",
+            "en": "Strategy 1: Information Boundary"
+          },
+          "feed": {
+            "w": 532,
+            "h": 254
+          },
+          "layout": "grid",
+          "blocks": [
+            {
+              "type": "text",
+              "variant": "heading",
+              "content": {
+                "zh": "Vibe Coding",
+                "en": "Vibe Coding"
+              }
+            },
+            {
+              "type": "text",
+              "variant": "body",
+              "content": {
+                "zh": "对话为核心的简化页面",
+                "en": "Chat-centric simplified page"
+              }
+            },
+            {
+              "type": "text",
+              "variant": "heading",
+              "content": {
+                "zh": "专业开发",
+                "en": "Professional Dev"
+              }
+            },
+            {
+              "type": "text",
+              "variant": "body",
+              "content": {
+                "zh": "对话为辅助的 AI IDE",
+                "en": "AI IDE with chat as assist"
+              }
+            }
+          ]
+        },
+        {
+          "id": "nfp-code-01",
+          "tab": "code",
+          "type": "prototype",
+          "title": {
+            "zh": "终端交互原型",
+            "en": "Terminal Prototype"
+          },
+          "feed": {
+            "w": 532,
+            "h": 262
+          },
+          "html": "<div style=\"font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:24px;line-height:1.8;font-size:13px\"><div style=\"opacity:.5\">TERMINAL</div><div><span style=\"color:#98c379\">cameron@web1</span>:~ $ 0x -n init</div><div style=\"opacity:.7\">├ Title&nbsp;&nbsp;<span style=\"color:#61afef\">Colossal Cave Adventure</span></div><div style=\"opacity:.7\">├ Generate boilerplate&nbsp;&nbsp;<span style=\"color:#98c379\">Yes</span></div><div style=\"opacity:.7\">└ Deploy&nbsp;&nbsp;<span style=\"color:#e5c07b\">Automatic</span></div></div>",
+          "alt": "终端原型"
+        }
+      ]
+    },
+    {
+      "slug": "chatgpt-home-buying",
+      "category": "product",
+      "title": {
+        "zh": "购房场景 ChatGPT 应用探索",
+        "en": "ChatGPT for Home Buying"
+      },
+      "period": "2023.7",
+      "summary": {
+        "zh": "探索大模型在购房决策链路中的落地形态与边界。",
+        "en": "Exploring LLM applications and boundaries in the home-buying decision journey."
+      },
+      "tabs": [
+        {
+          "key": "strategy",
+          "label": {
+            "zh": "探索过程",
+            "en": "Exploration"
+          }
+        },
+        {
+          "key": "design",
+          "label": {
+            "zh": "页面原稿",
+            "en": "Design"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "chatgpt-home-buying-01-zhizhu-01",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "知住 01",
+            "en": "知住 01"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/chatgpt-home-buying/01-zhizhu-01.webp",
+          "alt": "【实习项目】 - 知住 01",
+          "figmaNodeId": "513:49983"
+        },
+        {
+          "id": "chatgpt-home-buying-02-zhizhu-02",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "知住 02",
+            "en": "知住 02"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/chatgpt-home-buying/02-zhizhu-02.webp",
+          "alt": "【实习项目】 - 知住 02",
+          "figmaNodeId": "513:49980"
+        },
+        {
+          "id": "chatgpt-home-buying-03-zhizhu-03",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "知住 03",
+            "en": "知住 03"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/chatgpt-home-buying/03-zhizhu-03.webp",
+          "alt": "【实习项目】 - 知住 03",
+          "figmaNodeId": "513:49979"
+        },
+        {
+          "id": "chatgpt-home-buying-04-zhizhu-04",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "知住 04",
+            "en": "知住 04"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/chatgpt-home-buying/04-zhizhu-04.webp",
+          "alt": "【实习项目】 - 知住 04",
+          "figmaNodeId": "513:49982"
+        },
+        {
+          "id": "chatgpt-home-buying-05-zhizhu-05",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "知住 05",
+            "en": "知住 05"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/chatgpt-home-buying/05-zhizhu-05.webp",
+          "alt": "【实习项目】 - 知住 05",
+          "figmaNodeId": "513:49981"
+        },
+        {
+          "id": "chatgpt-home-buying-06-zhizhu-07",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "知住 07",
+            "en": "知住 07"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/chatgpt-home-buying/06-zhizhu-07.webp",
+          "alt": "【实习项目】 - 知住 07",
+          "figmaNodeId": "513:49976"
+        },
+        {
+          "id": "chatgpt-home-buying-07-zhizhu-08",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "知住 08",
+            "en": "知住 08"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/chatgpt-home-buying/07-zhizhu-08.webp",
+          "alt": "【实习项目】 - 知住 08",
+          "figmaNodeId": "513:49977"
+        },
+        {
+          "id": "chatgpt-home-buying-08-zhizhu-09",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "知住 09",
+            "en": "知住 09"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/chatgpt-home-buying/08-zhizhu-09.webp",
+          "alt": "【实习项目】 - 知住 09",
+          "figmaNodeId": "513:49975"
+        },
+        {
+          "id": "chatgpt-home-buying-09-zhizhu-10",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "知住 10",
+            "en": "知住 10"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/chatgpt-home-buying/09-zhizhu-10.webp",
+          "alt": "【实习项目】 - 知住 10",
+          "figmaNodeId": "513:49978"
+        }
+      ]
+    },
+    {
+      "slug": "cursor-codex-granularity",
+      "category": "writing",
+      "title": {
+        "zh": "思考 | Cursor 和 Codex 的交互粒度差异与信任",
+        "en": "On Interaction Granularity: Cursor vs Codex"
+      },
+      "period": "2026.5",
+      "summary": {
+        "zh": "广度代理与精度控制的产品分化，以及信任如何随交互粒度变化。",
+        "en": "Breadth agents vs precision control, and how trust scales with interaction granularity."
+      },
+      "tabs": [
+        {
+          "key": "essay",
+          "label": {
+            "zh": "正文",
+            "en": "Essay"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "ccg-essay-01",
+          "tab": "essay",
+          "type": "rich",
+          "title": {
+            "zh": "交互粒度与信任",
+            "en": "Granularity and Trust"
+          },
+          "feed": {
+            "w": 532,
+            "h": 310
+          },
+          "layout": "column",
+          "blocks": [
+            {
+              "type": "text",
+              "variant": "display",
+              "content": {
+                "zh": "异步委托与同步校正，是两种不同的信任结构",
+                "en": "Async delegation and sync correction are two different trust structures"
+              }
+            },
+            {
+              "type": "text",
+              "variant": "body",
+              "content": {
+                "zh": "任务复杂度决定了应该把方向盘交出去多少。",
+                "en": "Task complexity determines how much of the wheel you hand over."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "design-engineer-workflow",
+      "category": "writing",
+      "title": {
+        "zh": "思考 | 个人向 Design Engineer 协作工作流",
+        "en": "A Personal Design Engineer Workflow"
+      },
+      "period": "2026.2",
+      "summary": {
+        "zh": "单人全栈的 P-D-E 生产力模型与控制工件设计。",
+        "en": "The solo full-stack P-D-E productivity model and control artifacts."
+      },
+      "tabs": [
+        {
+          "key": "essay",
+          "label": {
+            "zh": "正文",
+            "en": "Essay"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "dew-essay-01",
+          "tab": "essay",
+          "type": "rich",
+          "title": {
+            "zh": "三层控制工件",
+            "en": "Three-Layer Control Artifacts"
+          },
+          "feed": {
+            "w": 532,
+            "h": 288
+          },
+          "layout": "column",
+          "blocks": [
+            {
+              "type": "text",
+              "variant": "display",
+              "content": {
+                "zh": "prompt / spec / test 三层框架",
+                "en": "The prompt / spec / test framework"
+              }
+            },
+            {
+              "type": "text",
+              "variant": "body",
+              "content": {
+                "zh": "人的角色是任务编排者、验收者与关键决策者。",
+                "en": "The human is orchestrator, reviewer, and key decision maker."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "spec-coding-collaboration",
+      "category": "writing",
+      "title": {
+        "zh": "课程 | Spec Coding 与工程师协作艺术",
+        "en": "Course | Spec Coding & Collaboration"
+      },
+      "period": "2026.5",
+      "summary": {
+        "zh": "如何用规格文档驱动人机协作，减少返工。",
+        "en": "Driving human-AI collaboration with specs to reduce rework."
+      },
+      "tabs": [
+        {
+          "key": "course",
+          "label": {
+            "zh": "课程内容",
+            "en": "Content"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "scc-course-01",
+          "tab": "course",
+          "type": "image",
+          "title": {
+            "zh": "课程大纲",
+            "en": "Course Outline"
+          },
+          "feed": {
+            "w": 532,
+            "h": 324
+          },
+          "src": "/images/gallery/webp/20250910-184010.webp",
+          "alt": "课程大纲"
+        }
+      ]
+    },
+    {
+      "slug": "engineering-design-thinking",
+      "category": "writing",
+      "title": {
+        "zh": "课程 | 工程化设计思维",
+        "en": "Course | Engineering Design Thinking"
+      },
+      "period": "2026.4",
+      "summary": {
+        "zh": "设计师迁移到 AI Coding 的三层结构：空间结构 / 状态管理 / 工程化。",
+        "en": "Three layers for designers moving into AI Coding: spatial structure, state, engineering."
+      },
+      "tabs": [
+        {
+          "key": "course",
+          "label": {
+            "zh": "课程内容",
+            "en": "Content"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "edt-course-01",
+          "tab": "course",
+          "type": "image",
+          "title": {
+            "zh": "三层结构",
+            "en": "Three Layers"
+          },
+          "feed": {
+            "w": 532,
+            "h": 276
+          },
+          "src": "/images/gallery/webp/20250910-184014.webp",
+          "alt": "三层结构"
+        }
+      ]
+    },
+    {
+      "slug": "ai-coding-intro",
+      "category": "writing",
+      "title": {
+        "zh": "课程 | AI Coding 入门概览",
+        "en": "Course | Intro to AI Coding"
+      },
+      "period": "2025.5",
+      "summary": {
+        "zh": "AI Coding 的基本概念、工具全景与上手路径。",
+        "en": "Core concepts, tool landscape, and getting started with AI Coding."
+      },
+      "tabs": [
+        {
+          "key": "course",
+          "label": {
+            "zh": "课程内容",
+            "en": "Content"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "aci-course-01",
+          "tab": "course",
+          "type": "image",
+          "title": {
+            "zh": "工具全景",
+            "en": "Tool Landscape"
+          },
+          "feed": {
+            "w": 532,
+            "h": 300
+          },
+          "src": "/images/gallery/webp/20250910-191655.webp",
+          "alt": "工具全景"
+        }
+      ]
+    },
+    {
+      "slug": "vibewriting",
+      "category": "side",
+      "title": {
+        "zh": "VibeWriting",
+        "en": "VibeWriting"
+      },
+      "period": "2026.Q2",
+      "summary": {
+        "zh": "带知识库的文档产品，个人全栈开发：Milkdown + Supabase。",
+        "en": "A document product with knowledge base, solo full-stack: Milkdown + Supabase."
+      },
+      "tabs": [
+        {
+          "key": "design",
+          "label": {
+            "zh": "产品设计",
+            "en": "Design"
+          }
+        },
+        {
+          "key": "code",
+          "label": {
+            "zh": "代码实现",
+            "en": "Code"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "vw-design-01",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "编辑器界面",
+            "en": "Editor UI"
+          },
+          "feed": {
+            "w": 532,
+            "h": 332
+          },
+          "src": "/images/gallery/webp/20250910-191659.webp",
+          "alt": "编辑器界面"
+        },
+        {
+          "id": "vw-code-01",
+          "tab": "code",
+          "type": "prototype",
+          "title": {
+            "zh": "Inline Chat + Diff",
+            "en": "Inline Chat + Diff"
+          },
+          "feed": {
+            "w": 532,
+            "h": 258
+          },
+          "html": "<div style=\"font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:24px;line-height:1.7;font-size:13px\"><div style=\"opacity:.5\">// inline-chat.tsx</div><div><span style=\"color:#c678dd\">const</span> { diff } = <span style=\"color:#61afef\">useInlineChat</span>(doc);</div><div><span style=\"color:#c678dd\">return</span> &lt;<span style=\"color:#e06c75\">DiffView</span> patch={diff} /&gt;;</div></div>",
+          "alt": "Inline Chat 原型"
+        }
+      ]
+    },
+    {
+      "slug": "undergraduate-thesis",
+      "category": "product",
+      "title": {
+        "zh": "本科毕设",
+        "en": "Undergraduate Thesis"
+      },
+      "period": "2024.6",
+      "summary": {
+        "zh": "",
+        "en": ""
+      },
+      "tabs": [
+        {
+          "key": "design",
+          "label": {
+            "zh": "页面原稿",
+            "en": "Design"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "undergraduate-thesis-01-p-01",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 01",
+            "en": "P 01"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/01-p-01.webp",
+          "alt": "本科毕设 - P 01",
+          "figmaNodeId": "746:75153"
+        },
+        {
+          "id": "undergraduate-thesis-02-p-02",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 02",
+            "en": "P 02"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/02-p-02.webp",
+          "alt": "本科毕设 - P 02",
+          "figmaNodeId": "746:75160"
+        },
+        {
+          "id": "undergraduate-thesis-03-p-03",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 03",
+            "en": "P 03"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/03-p-03.webp",
+          "alt": "本科毕设 - P 03",
+          "figmaNodeId": "746:75157"
+        },
+        {
+          "id": "undergraduate-thesis-04-p-04",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 04",
+            "en": "P 04"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/04-p-04.webp",
+          "alt": "本科毕设 - P 04",
+          "figmaNodeId": "746:75161"
+        },
+        {
+          "id": "undergraduate-thesis-05-p-05",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 05",
+            "en": "P 05"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/05-p-05.webp",
+          "alt": "本科毕设 - P 05",
+          "figmaNodeId": "746:75150"
+        },
+        {
+          "id": "undergraduate-thesis-06-p-06",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 06",
+            "en": "P 06"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/06-p-06.webp",
+          "alt": "本科毕设 - P 06",
+          "figmaNodeId": "746:75155"
+        },
+        {
+          "id": "undergraduate-thesis-07-p-07",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 07",
+            "en": "P 07"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/07-p-07.webp",
+          "alt": "本科毕设 - P 07",
+          "figmaNodeId": "746:75154"
+        },
+        {
+          "id": "undergraduate-thesis-08-p-08",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 08",
+            "en": "P 08"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/08-p-08.webp",
+          "alt": "本科毕设 - P 08",
+          "figmaNodeId": "746:75149"
+        },
+        {
+          "id": "undergraduate-thesis-09-p-09",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 09",
+            "en": "P 09"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/09-p-09.webp",
+          "alt": "本科毕设 - P 09",
+          "figmaNodeId": "746:75151"
+        },
+        {
+          "id": "undergraduate-thesis-10-p-10",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 10",
+            "en": "P 10"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/10-p-10.webp",
+          "alt": "本科毕设 - P 10",
+          "figmaNodeId": "746:75148"
+        },
+        {
+          "id": "undergraduate-thesis-11-p-11",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 11",
+            "en": "P 11"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/11-p-11.webp",
+          "alt": "本科毕设 - P 11",
+          "figmaNodeId": "746:75156"
+        },
+        {
+          "id": "undergraduate-thesis-12-p-12",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 12",
+            "en": "P 12"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/12-p-12.webp",
+          "alt": "本科毕设 - P 12",
+          "figmaNodeId": "746:75147"
+        },
+        {
+          "id": "undergraduate-thesis-13-p-13",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 13",
+            "en": "P 13"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/13-p-13.webp",
+          "alt": "本科毕设 - P 13",
+          "figmaNodeId": "746:75159"
+        },
+        {
+          "id": "undergraduate-thesis-14-p-14",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 14",
+            "en": "P 14"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/14-p-14.webp",
+          "alt": "本科毕设 - P 14",
+          "figmaNodeId": "746:75146"
+        },
+        {
+          "id": "undergraduate-thesis-15-p-15",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 15",
+            "en": "P 15"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/15-p-15.webp",
+          "alt": "本科毕设 - P 15",
+          "figmaNodeId": "746:75158"
+        },
+        {
+          "id": "undergraduate-thesis-16-p-16",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "P 16",
+            "en": "P 16"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/undergraduate-thesis/16-p-16.webp",
+          "alt": "本科毕设 - P 16",
+          "figmaNodeId": "746:75152"
+        },
+        {
+          "id": "szrh-szrh-strategy-01",
+          "tab": "strategy",
+          "type": "image",
+          "title": {
+            "zh": "服务蓝图",
+            "en": "Service Blueprint"
+          },
+          "feed": {
+            "w": 532,
+            "h": 334
+          },
+          "src": "/images/gallery/webp/20250910-183958.webp",
+          "alt": "服务蓝图"
+        },
+        {
+          "id": "szrh-szrh-design-01",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "关键页面",
+            "en": "Key Screens"
+          },
+          "feed": {
+            "w": 532,
+            "h": 268
+          },
+          "src": "/images/gallery/webp/20250910-184003.webp",
+          "alt": "关键页面"
+        }
+      ]
+    }
+  ]
+}
