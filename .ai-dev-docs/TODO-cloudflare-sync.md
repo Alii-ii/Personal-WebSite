@@ -1,7 +1,8 @@
 # TODO：同步 Cloudflare（本次未执行，交由其他工具）
 
-> 状态：**待办**
+> 状态：**本地已完成，Cloudflare 侧待执行（见下方说明）**
 > 产出时间：2026-07-28
+> 更新：2026-07-29 — 本次 3 个项目均已 git commit，push 后 GitHub Actions 自动部署
 > 未执行原因：当前会话的 Cloudflare MCP 不可用，且本机未配置 `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`。
 > 本地侧（Figma 导出 → webp 压缩 → portfolio.json 写入 → 构建验证）已全部完成，**Cloudflare 侧一步未做**。
 
