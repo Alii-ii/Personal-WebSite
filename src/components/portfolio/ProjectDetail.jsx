@@ -132,9 +132,8 @@ const MenuButton = ({ onClick, active }) => (
  * 快捷键：ESC 返回 / ←→ 切换页面 / ↑↓ 切换项目 / C 评论
  *
  * @param {string} slug - 项目标识
- * @param {string} [initialFrameId] - 初始定位的 frame（来自 L2 下钻的 hash）
  */
-const ProjectDetail = ({ slug, initialFrameId }) => {
+const ProjectDetail = ({ slug }) => {
   const router = useRouter();
   const { language } = useLanguage();
 
@@ -142,6 +141,7 @@ const ProjectDetail = ({ slug, initialFrameId }) => {
   const groups = useMemo(() => getProjectsByCategory(), []);
   const neighbors = useMemo(() => getProjectNeighbors(slug), [slug]);
 
+  // 始终默认展示第一帧（与其他进入方式保持一致）
   const [activeTab, setActiveTab] = useState(project?.tabs?.[0]?.key ?? null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -298,17 +298,6 @@ const ProjectDetail = ({ slug, initialFrameId }) => {
     // imageRatios / stageH 必须在依赖里：帧尺寸由它们推导，
     // 尺寸变化后需重新测量才能保持居中
   }, [activeIndex, frames, imageRatios, stageH]);
-
-  // 从 L2 下钻进来时，定位到对应 frame（并切到它所属的 tab）
-  useEffect(() => {
-    if (!initialFrameId || !project) return;
-    const target = (project.frames || []).find((frame) => frame.id === initialFrameId);
-    if (!target) return;
-    setActiveTab(target.tab);
-    const list = (project.frames || []).filter((frame) => frame.tab === target.tab);
-    const index = list.findIndex((frame) => frame.id === initialFrameId);
-    if (index >= 0) setActiveIndex(index);
-  }, [initialFrameId, project]);
 
   // 切换 tab 时回到第一页
   const handleTabChange = useCallback((tabKey) => {

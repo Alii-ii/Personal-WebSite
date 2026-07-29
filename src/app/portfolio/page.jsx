@@ -50,7 +50,8 @@ export default function Portfolio() {
   // 点击卡片下钻到 L3，并通过 hash 定位到对应 frame
   const handleItemClick = useCallback(
     (item) => {
-      router.push(`/portfolio/${item.projectSlug}#${item.frameId}`);
+      // 不做 hash/frame 定位，L3 默认展示第一帧，避免定位偏移问题
+      router.push(`/portfolio/${item.projectSlug}`);
     },
     [router]
   );

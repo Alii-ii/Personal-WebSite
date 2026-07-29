@@ -102,7 +102,8 @@ const Masonry = ({
   hoverScale = 0.95,
   blurToFocus = true,
   colorShiftOnHover = false,
-  maxColumnWidth = 360  // 默认 360，允许外部覆盖
+  maxColumnWidth = 360,  // 默认 360，允许外部覆盖
+  onItemClick = null
 }) => {
   // 列宽限制由 prop 传入，默认 360px
   
@@ -774,7 +775,14 @@ const Masonry = ({
               transformOrigin: 'center center'
             }}
             onClick={(e) => {
-              // 只有已加载的图片才能点击放大
+              // L2 作品墙模式：如果外部提供点击回调，优先下发（用于跳转 L3）。
+              if (typeof onItemClick === 'function') {
+                e.stopPropagation();
+                onItemClick(item);
+                return;
+              }
+
+              // Gallery 模式：保留原有图片放大交互。
               if (item.loadStatus === true) {
                 handleImageClick(item.id, e);
               }
