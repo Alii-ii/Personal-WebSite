@@ -24,8 +24,8 @@ import sharp from 'sharp';
 const ROOT = process.cwd();
 const PORTFOLIO_JSON = join(ROOT, 'src/data/portfolio.json');
 const IMG_ROOT = 'public/images/portfolio';
-const MAX_WIDTH = 1600; // 与 scripts/compress-images.mjs 保持一致
-const QUALITY = 80;
+const MAX_WIDTH = 2560; // 2x 原图（3840px）下采样，retina 全屏无放大模糊
+const QUALITY = 92;   // 文字/线条密集幻灯片用 q80 振铃明显，q92+ 改善显著
 const FEED_W = 532; // portfolio.json 既有约定：作品墙卡片统一宽度
 const FRAME_TYPES = new Set(['FRAME', 'COMPONENT', 'INSTANCE', 'GROUP', 'SECTION']);
 
