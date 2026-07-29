@@ -2,6 +2,7 @@
 
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
+import GlobalEscapeBackShortcut from "@/components/GlobalEscapeBackShortcut";
 
 /**
  * 客户端 Provider 包装器
@@ -17,7 +18,11 @@ export default function ClientProviders({ children }) {
       disableTransitionOnChange={false}
       storageKey="theme"
     >
-      <AuthProvider>{children}</AuthProvider>
+      <AuthProvider>
+        {/* 统一挂载全局 Esc 返回，局部页面/弹层可先消费该按键。 */}
+        <GlobalEscapeBackShortcut />
+        {children}
+      </AuthProvider>
     </ThemeProvider>
   );
 }

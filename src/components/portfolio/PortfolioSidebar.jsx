@@ -1,9 +1,10 @@
 "use client";
 
+import CopyEmailButton from '@/components/CopyEmailButton';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
-import { MailIcon, ChatsIcon, BilibiliIcon, FigmaIcon, GlobeIcon } from '@/public/icons';
+import { ChatsIcon, BilibiliIcon, FigmaIcon } from '@/public/icons';
 
 /**
  * 侧栏分隔位（隐藏横线，仅保留原分割线占位的间距）
@@ -64,90 +65,78 @@ const PortfolioSidebar = ({
   const router = useRouter();
 
   return (
-    <aside className="w-full md:w-[352px] shrink-0 flex flex-col gap-4 px-6 md:px-16 pt-8 md:pt-20 pb-4 md:sticky md:top-0 md:self-start md:max-h-screen md:overflow-y-auto">
-      {/* 姓名 */}
-      <div className="flex flex-col gap-2">
-        <h1 className="font-Ding text-[40px] md:text-[64px] leading-[1] text-main">黄奕礼</h1>
-        <p className="font-Ding text-[20px] md:text-[24px] leading-[1] text-main">Alii / 阿礼</p>
-      </div>
+    <aside className="w-full md:w-[360px] shrink-0 self-start">
+      {/* 桌面端直接改为 fixed，并保留外层同宽占位，避免 sticky 被祖先布局影响 */}
+      <div className="flex flex-col gap-4 px-6 md:px-16 pt-8 md:pt-20 pb-4 md:fixed md:top-0 md:left-0 md:w-[352px] md:h-screen md:overflow-y-auto md:z-10">
+        {/* 姓名 */}
+        <div className="flex flex-col gap-2">
+          <h1 className="font-Ding text-[40px] md:text-[64px] leading-[1] text-main">黄奕礼</h1>
+          <p className="font-Ding text-[20px] md:text-[24px] leading-[1] text-main">Alii / 阿礼</p>
+        </div>
 
-      <Divider />
+        <Divider />
 
-      {/* 社交图标 */}
-      <div className="flex items-center gap-1.5">
-        <IconButton label="Figma" onClick={() => window.open('https://www.figma.com/@alii', '_blank')}>
-          <FigmaIcon className="w-4 h-4" />
-        </IconButton>
-        <IconButton label="Bilibili" onClick={() => window.open('https://space.bilibili.com', '_blank')}>
-          <BilibiliIcon className="w-4 h-4" />
-        </IconButton>
-        <IconButton label="Mail" onClick={() => window.open('mailto:772984045@qq.com')}>
-          <MailIcon className="w-4 h-4" />
-        </IconButton>
-        <div className="w-px h-3 bg-divider mx-1.5" />
-        <IconButton label="Chats">
-          <ChatsIcon className="w-4 h-4" />
-        </IconButton>
-        <IconButton label="Site" onClick={() => router.push('/')}>
-          <GlobeIcon className="w-4 h-4" />
-        </IconButton>
-      </div>
+        {/* 社交图标 */}
+        <div className="flex items-center gap-1.5">
 
-      <Divider />
+          <IconButton label="Figma" onClick={() => window.open('https://www.figma.com/@alii', '_blank')}>
+            <FigmaIcon className="w-4 h-4" />
+          </IconButton>
 
-      {/* 分类：点标题筛选（再点一次取消筛选），点箭头展开项目列表 */}
-      <nav className="flex flex-col gap-1">
-        {groups.map((group) => {
-          const isActive = activeCategory === group.key;
-          const isExpanded = !!expandedMap[group.key];
+          <IconButton label="Bilibili" onClick={() => window.open('https://space.bilibili.com', '_blank')}>
+            <BilibiliIcon className="w-4 h-4" />
+          </IconButton>
 
-          return (
-            <div key={group.key} className="flex flex-col">
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => onCategoryChange?.(isActive ? null : group.key)}
-                  className={`font-Ding text-[18px] leading-[26px] transition-colors duration-200 ${
-                    isActive ? 'text-main' : 'text-tertiary hover:text-secondary'
-                  }`}
-                >
-                  {pickLocale(group.label, language)}
-                </button>
-                <button
-                  type="button"
-                  aria-label="toggle"
-                  aria-expanded={isExpanded}
-                  onClick={() => onToggleExpand?.(group.key)}
-                  className="w-5 h-5 flex items-center justify-center"
-                >
-                  <ArrowIcon expanded={isExpanded} />
-                </button>
-              </div>
+          <IconButton label="Chats">
+            <ChatsIcon className="w-4 h-4" />
+          </IconButton>
 
-              {/* 展开后列出该分类下的项目，可直达 L3 */}
-              {isExpanded ? (
-                <div className="flex flex-col gap-0.5 pl-1 pt-1 pb-1">
+          <CopyEmailButton appearance="sidebar" />
+        </div>
+
+        <Divider />
+
+        {/* 分类：点标题筛选（再点一次取消筛选），点箭头展开项目列表 */}
+        <nav className="flex flex-col gap-1">
+          {groups.map((group) => {
+            const isActive = activeCategory === group.key;
+
+            return (
+              <div key={group.key} className="flex flex-col ml-[-6px]">
+                {/* 分类标题:没有多类型，暂时隐藏 */}
+                {/* <div className="px-2.5 pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => onCategoryChange?.(isActive ? null : group.key)}
+                    className="font-regular text-[14px] leading-[24px] text-tertiary transition-colors duration-150 hover:text-secondary"
+                  >
+                    {pickLocale(group.label, language)}
+                  </button>
+                </div> */}
+
+                {/* 项目列表：对齐 L3 menu */}
+                <div className="flex flex-col gap-1 pb-1">
                   {group.projects.map((project) => (
                     <button
                       key={project.slug}
                       type="button"
                       onClick={() => router.push(`/portfolio/${project.slug}`)}
-                      className="group flex items-baseline gap-2 text-left py-0.5"
+                      className="w-full flex flex-row items-start gap-1 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 hover:bg-hover"
                     >
-                      <span className="font-regular text-[13px] leading-[20px] text-secondary group-hover:text-main transition-colors duration-200 truncate">
+                      <span className="w-fit font-regular text-[14px] leading-[24px] text-main truncate">
                         {pickLocale(project.title, language)}
                       </span>
-                      <span className="font-regular text-[12px] leading-[18px] text-disabled shrink-0">
+                      <span className="font-regular text-[14px] leading-[24px] text-tertiary opacity-50">
                         {project.period}
                       </span>
                     </button>
                   ))}
                 </div>
-              ) : null}
-            </div>
-          );
-        })}
-      </nav>
+              </div>
+            );
+          })}
+        </nav>
+      </div>
     </aside>
   );
 };

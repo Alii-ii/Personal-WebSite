@@ -27,6 +27,7 @@
     {
       "slug": "nocode-for-pro",
       "category": "product",
+      "order": 1,
       "title": {
         "zh": "NoCode for Pro",
         "en": "NoCode for Pro"
@@ -220,54 +221,8 @@
           "alt": "【美团项目】01 - P 10",
           "figmaNodeId": "2792:189151"
         },
-        {
-          "id": "nfp-strategy-01",
-          "tab": "strategy",
-          "type": "rich",
-          "title": {
-            "zh": "策略一：信息边界",
-            "en": "Strategy 1: Information Boundary"
-          },
-          "feed": {
-            "w": 532,
-            "h": 254
-          },
-          "layout": "grid",
-          "blocks": [
-            {
-              "type": "text",
-              "variant": "heading",
-              "content": {
-                "zh": "Vibe Coding",
-                "en": "Vibe Coding"
-              }
-            },
-            {
-              "type": "text",
-              "variant": "body",
-              "content": {
-                "zh": "对话为核心的简化页面",
-                "en": "Chat-centric simplified page"
-              }
-            },
-            {
-              "type": "text",
-              "variant": "heading",
-              "content": {
-                "zh": "专业开发",
-                "en": "Professional Dev"
-              }
-            },
-            {
-              "type": "text",
-              "variant": "body",
-              "content": {
-                "zh": "对话为辅助的 AI IDE",
-                "en": "AI IDE with chat as assist"
-              }
-            }
-          ]
-        },
+
+
         {
           "id": "nfp-code-01",
           "tab": "code",
@@ -288,6 +243,7 @@
     {
       "slug": "chatgpt-home-buying",
       "category": "product",
+      "order": 3,
       "title": {
         "zh": "购房场景 ChatGPT 应用探索",
         "en": "ChatGPT for Home Buying"
@@ -456,6 +412,7 @@
     {
       "slug": "undergraduate-thesis",
       "category": "product",
+      "order": 2,
       "title": {
         "zh": "本科毕设",
         "en": "Undergraduate Thesis"
@@ -745,32 +702,18 @@
           },
           "src": "/images/gallery/webp/20250910-183958.webp",
           "alt": "服务蓝图"
-        },
-        {
-          "id": "szrh-szrh-design-01",
-          "tab": "design",
-          "type": "image",
-          "title": {
-            "zh": "关键页面",
-            "en": "Key Screens"
-          },
-          "feed": {
-            "w": 532,
-            "h": 547
-          },
-          "src": "/images/gallery/webp/20250910-184003.webp",
-          "alt": "关键页面"
         }
       ]
     },
     {
       "slug": "laolao-service-design",
       "category": "product",
+      "order": 4,
       "title": {
         "zh": "捞捞服务设计",
         "en": "Lao Lao Service Design"
       },
-      "period": "2024.1",
+      "period": "2022.7",
       "summary": {
         "zh": "",
         "en": ""

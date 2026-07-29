@@ -82,26 +82,26 @@ export default function Portfolio() {
         />
       </div>
 
-      {/* 主要内容区域：左侧固定栏 + 右侧作品墙 */}
-      <AnimatedContent
-        direction="vertical"
-        reverse={false}
-        distance={80}
-        duration={1.2}
-        delay={0.6}
-        immediate={true}
-        flex={true}
-        className="flex-1 w-full"
-      >
-        <div className="w-full flex-1 flex flex-col md:flex-row items-start relative z-10">
-          <PortfolioSidebar
-            groups={groups}
-            activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
-            expandedMap={expandedMap}
-            onToggleExpand={handleToggleExpand}
-          />
+      {/* 主要内容区域：sticky 侧栏不要放进带 transform 的动画容器里，否则浏览器可能失效 */}
+      <div className="w-full flex-1 flex flex-col md:flex-row items-start relative z-10">
+        <PortfolioSidebar
+          groups={groups}
+          activeCategory={activeCategory}
+          onCategoryChange={setActiveCategory}
+          expandedMap={expandedMap}
+          onToggleExpand={handleToggleExpand}
+        />
 
+        <AnimatedContent
+          direction="vertical"
+          reverse={false}
+          distance={80}
+          duration={1.2}
+          delay={0.6}
+          immediate={true}
+          flex={true}
+          className="w-full flex-1"
+        >
           {/* 不设 overflow，交给文档流滚动，左栏 sticky 才能生效 */}
           <div className="w-full flex-1 px-6 md:pr-4 md:pl-0 py-4 md:py-4 flex items-start">
             <Masonry
@@ -115,10 +115,16 @@ export default function Portfolio() {
               hoverScale={0.98}
             />
           </div>
-        </div>
-      </AnimatedContent>
+        </AnimatedContent>
+      </div>
 
-      <Footer isGallery={true} showGallerySubtitle={false} backHref="/" />
+      <Footer
+        isGallery={true}
+        showGallerySubtitle={false}
+        backHref="/"
+        maskHeight="240px"
+        togglesSide="left"
+      />
 
       <style jsx global>{`
         .portfolio-scrollbar-hidden {

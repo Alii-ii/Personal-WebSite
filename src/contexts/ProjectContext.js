@@ -61,10 +61,19 @@ export const getProjects = () => projects;
  */
 export const getProjectsByCategory = () =>
   categories
-    .map((category) => ({
-      ...category,
-      projects: projects.filter((project) => project.category === category.key),
-    }))
+    .map((category) => {
+      const grouped = projects.filter((project) => project.category === category.key);
+      const ordered = [...grouped].sort((a, b) => {
+        const ao = Number.isFinite(a.order) ? a.order : Number.MAX_SAFE_INTEGER;
+        const bo = Number.isFinite(b.order) ? b.order : Number.MAX_SAFE_INTEGER;
+        return ao - bo;
+      });
+
+      return {
+        ...category,
+        projects: ordered,
+      };
+    })
     .filter((group) => group.projects.length > 0);
 
 /**

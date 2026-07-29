@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
+import CopyEmailButton from '@/components/CopyEmailButton';
 import TextLink from '@/components/TextLink';
 import IconTextButton from '@/components/icon-text-botton';
 import AnimatedContent from '@/effects/AnimatedContent';
 import CyclingDecryptedText from '@/components/CyclingDecryptedText';
-import { MailIcon, ChatsIcon, CheckIcon, BilibiliIcon, FigmaIcon } from '@/public/icons';
+import { ChatsIcon, CheckIcon, BilibiliIcon, FigmaIcon } from '@/public/icons';
 import { ActionSwapIcon } from '@/components/motion/action-swap';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -67,7 +68,14 @@ const CopyrightFade = ({ t }) => {
  * Footer 组件 - 页面底部区域
  * 包含个人信息、链接和社交图标
  */
-const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = true, className = '', maskHeight = '480px' }) => {
+const Footer = ({
+  onUnderlinedClick,
+  isGallery = false,
+  showGallerySubtitle = true,
+  className = '',
+  maskHeight = '480px',
+  togglesSide = 'right', // 仅影响 isGallery 模式下 ThemeToggle/LanguageToggle 的位置
+}) => {
   // 获取语言上下文
   const { t } = useLanguage();
   // 获取路由对象
@@ -75,14 +83,12 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
   
   // 复制状态管理
   const [copyStates, setCopyStates] = useState({
-    wechat: false,
-    email: false
+    wechat: false
   });
 
   // Tooltip 显示状态管理
   const [tooltipStates, setTooltipStates] = useState({
-    wechat: false,
-    email: false
+    wechat: false
   });
 
   // 图标 hover 状态（默认灰度，hover 显示原色）
@@ -176,16 +182,30 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
       >
         <div className={`footer__left-content flex flex-col items-start justify-center gap-4 ${isGallery ? '' : 'md:pb-4'} font-Ding z-10 select-none`}>
           {isGallery ? (
-            // Gallery 页面：显示返回按钮
-            <button
-              onClick={() => router.push('/')}
-              className="footer__back-btn text-secondary text-[48px] md:text-[56px] leading-[80%] hover:opacity-80 transition-opacity duration-200 cursor-pointer"
-              title="返回首页"
-            >
-              ←
-            </button>
+            togglesSide === 'left' ? (
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => router.push('/')}
+                  className="footer__back-btn text-secondary text-[32px] md:text-[32px] leading-[80%] hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+                  title="返回首页"
+                >
+                  ←
+                </button>
+                <div className="flex items-center gap-2 md:gap-3 py-2 md:py-0 select-none font-regular text-secondary">
+                  <ThemeToggle />
+                  <LanguageToggle />
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => router.push('/')}
+                className="footer__back-btn text-secondary text-[48px] md:text-[56px] leading-[80%] hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+                title="返回首页"
+              >
+                ←
+              </button>
+            )
           ) : (
-            // 首页：显示 Alii 文案
             <span className="footer__brand text-secondary text-[108px] md:text-[120px] leading-[80%]">Alii</span>
           )}
           {isGallery ? (
@@ -245,10 +265,12 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
         {isGallery ? (
           // 二级页极简区块
           <div className="footer__right-gallery flex flex-col items-start md:items-end gap-1 md:gap-6 z-10">
-            <div className="footer__right-toggles flex flex-row-reverse md:flex-row items-center justify-start md:justify-center gap-2 md:gap-3 py-2 md:py-0">
-              <ThemeToggle />
-              <LanguageToggle />
-            </div>
+            {togglesSide !== 'left' ? (
+              <div className="footer__right-toggles flex flex-row-reverse md:flex-row items-center justify-start md:justify-center gap-2 md:gap-3 py-2 md:py-0">
+                <ThemeToggle />
+                <LanguageToggle />
+              </div>
+            ) : null}
           </div>
         ) : (
           <div className="footer__right-main flex flex-col items-start md:items-end gap-1 md:gap-6 z-10">
@@ -329,22 +351,7 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
                     if (success) handleCopySuccess('wechat');
                   }}
                 />
-                <IconTextButton
-                  text=""
-                  icon={
-                    <ActionSwapIcon value={copyStates.email ? 'copied' : 'idle'} animation="blur">
-                      {copyStates.email ? <CheckIcon /> : <MailIcon />}
-                    </ActionSwapIcon>
-                  }
-                  variant="ghost"
-                  size="md"
-                  tooltip={copyStates.email ? t('emailCopied') : t('emailTooltip')}
-                  forceTooltipOpen={tooltipStates.email}
-                  onClick={async () => {
-                    const success = await copyToClipboard('alii.wong@foxmail.com', t);
-                    if (success) handleCopySuccess('email');
-                  }}
-                />
+                <CopyEmailButton />
               </div>
 
               {/* 切换区 */}

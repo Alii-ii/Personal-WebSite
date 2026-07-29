@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
 import FrameRenderer from '@/components/portfolio/FrameRenderer';
@@ -117,10 +117,12 @@ const MenuButton = ({ onClick, active }) => (
       active ? 'bg-hover text-main' : 'text-secondary hover:bg-hover hover:text-main'
     }`}
   >
-    <svg width="21" height="21" viewBox="0 0 21 21">
+    {/* 菜单 icon：替换为外部提供的版本 */}
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
-        d="M3.5 5.25h14a.75.75 0 0 1 0 1.5h-14a.75.75 0 0 1 0-1.5Zm0 4.5h14a.75.75 0 0 1 0 1.5h-14a.75.75 0 0 1 0-1.5Zm0 4.5h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1 0-1.5Z"
+        d="M4.22218 4.44434C4.59037 4.44434 4.88885 4.74281 4.88885 5.111C4.88885 5.47919 4.59037 5.77767 4.22218 5.77767H3.33329C2.9651 5.77767 2.66663 5.47919 2.66663 5.111C2.66663 4.74281 2.9651 4.44434 3.33329 4.44434H4.22218ZM18 4.44434C18.3681 4.44434 18.6666 4.74281 18.6666 5.111C18.6666 5.47919 18.3681 5.77767 18 5.77767H7.33329C6.9651 5.77767 6.66663 5.47919 6.66663 5.111C6.66663 4.74281 6.9651 4.44434 7.33329 4.44434H18ZM4.22218 9.99989C4.59037 9.99989 4.88885 10.2984 4.88885 10.6666C4.88885 11.0347 4.59037 11.3332 4.22218 11.3332H3.33329C2.9651 11.3332 2.66663 11.0347 2.66663 10.6666C2.66663 10.2984 2.9651 9.99989 3.33329 9.99989H4.22218ZM6.66663 10.6666C6.66663 10.2984 6.9651 9.99989 7.33329 9.99989H18C18.3681 9.99989 18.6666 10.2984 18.6666 10.6666C18.6666 11.0347 18.3681 11.3332 18 11.3332H7.33329C6.9651 11.3332 6.66663 11.0347 6.66663 10.6666ZM4.22218 15.5554C4.59037 15.5554 4.88885 15.8539 4.88885 16.2221C4.88885 16.5903 4.59037 16.8888 4.22218 16.8888H3.33329C2.9651 16.8888 2.66663 16.5903 2.66663 16.2221C2.66663 15.8539 2.9651 15.5554 3.33329 15.5554H4.22218ZM6.66663 16.2221C6.66663 15.8539 6.9651 15.5554 7.33329 15.5554H18C18.3681 15.5554 18.6666 15.8539 18.6666 16.2221C18.6666 16.5903 18.3681 16.8888 18 16.8888H7.33329C6.9651 16.8888 6.66663 16.5903 6.66663 16.2221Z"
         fill="currentColor"
+        fillOpacity="0.65"
       />
     </svg>
   </button>
@@ -132,20 +134,51 @@ const MenuButton = ({ onClick, active }) => (
  * 快捷键：ESC 返回 / ←→ 切换页面 / ↑↓ 切换项目 / C 评论
  *
  * @param {string} slug - 项目标识
+ * @param {string | null} initialFrameId - 首次进入时要定位的帧 id
  */
-const ProjectDetail = ({ slug }) => {
+const ProjectDetail = ({ slug, initialFrameId = null }) => {
   const router = useRouter();
   const { language } = useLanguage();
+  const searchParams = useSearchParams();
+  const enterDir = searchParams.get('enterDir'); // 'next' | 'prev'
 
   const project = useMemo(() => getProjectBySlug(slug), [slug]);
   const groups = useMemo(() => getProjectsByCategory(), []);
   const neighbors = useMemo(() => getProjectNeighbors(slug), [slug]);
 
-  // 始终默认展示第一帧（与其他进入方式保持一致）
-  const [activeTab, setActiveTab] = useState(project?.tabs?.[0]?.key ?? null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  // 首次进入时若带了 frameId，则优先定位到该帧所在 tab 与页码；
+  // 否则回退到项目默认首个 tab 的第一页。
+  const initialSelection = useMemo(() => {
+    if (!project) return { tabKey: null, index: 0 };
+
+    const defaultTabKey = project.tabs?.[0]?.key ?? null;
+    const allFrames = project.frames || [];
+    const targetFrame = initialFrameId
+      ? allFrames.find((frame) => frame.id === initialFrameId)
+      : null;
+    const tabKey = targetFrame?.tab ?? defaultTabKey;
+    const scopedFrames = tabKey ? allFrames.filter((frame) => frame.tab === tabKey) : allFrames;
+    const index = targetFrame
+      ? Math.max(
+          0,
+          scopedFrames.findIndex((frame) => frame.id === targetFrame.id),
+        )
+      : 0;
+
+    return { tabKey, index };
+  }, [project, initialFrameId]);
+
+  const [activeTab, setActiveTab] = useState(initialSelection.tabKey);
+  const [activeIndex, setActiveIndex] = useState(initialSelection.index);
   const [menuOpen, setMenuOpen] = useState(false);
   const [commentOpen, setCommentOpen] = useState(false);
+
+  // 当 slug 或 hash(frameId) 变化但组件未重挂载时，
+  // 需要把 activeTab / activeIndex 重置到正确定位，否则会出现页码错乱/空白页。
+  useEffect(() => {
+    setActiveTab(initialSelection.tabKey);
+    setActiveIndex(initialSelection.index);
+  }, [initialSelection.tabKey, initialSelection.index]);
 
   // 当前 tab 下的 frame 列表
   const frames = useMemo(() => {
@@ -183,6 +216,8 @@ const ProjectDetail = ({ slug }) => {
   const pcSlideRefs = useRef([]);
   const mobileSlideRefs = useRef([]);
   const [trackOffset, setTrackOffset] = useState(0);
+  const [disableTrackTransition, setDisableTrackTransition] = useState(false);
+  const enterAnimationAppliedRef = useRef(false);
 
   // 拖拽中的实时位移量，measure 需要读它来还原「未拖拽」基准
   const dragOffsetRef = useRef(0);
@@ -271,6 +306,25 @@ const ProjectDetail = ({ slug }) => {
       }
 
       const next = viewport.clientWidth / 2 - (offsetInTrack + active.offsetWidth / 2);
+      // 只在「跨项目的上下切换」首次进入时做动效方向修正：
+      // - enterDir='next'：从右侧（更大 translateX）滑入中心
+      // - enterDir='prev'：从左侧（更小 translateX）滑入中心
+      if (enterDir && !enterAnimationAppliedRef.current) {
+        enterAnimationAppliedRef.current = true;
+        setDisableTrackTransition(true);
+        const viewportW = viewport.clientWidth;
+        // translateX 的正负号会决定「从左/从右」进入效果；
+        // 当前观测到始终“从右往左”，因此这里交换方向映射。
+        const from = enterDir === 'next' ? next - viewportW : next + viewportW;
+        setTrackOffset(from);
+
+        requestAnimationFrame(() => {
+          setTrackOffset(next);
+          setDisableTrackTransition(false);
+        });
+        return;
+      }
+
       setTrackOffset((prev) => (Math.abs(next - prev) < 0.5 ? prev : next));
     };
 
@@ -305,21 +359,60 @@ const ProjectDetail = ({ slug }) => {
     setActiveIndex(0);
   }, []);
 
-  const goPrevPage = useCallback(() => {
-    setActiveIndex((prev) => (prev > 0 ? prev - 1 : prev));
-  }, []);
+  // 根据目标项目的默认 tab 取首/末帧，用于跨项目时衔接左右翻页体验。
+  const getProjectEdgeFrameId = useCallback((targetSlug, edge) => {
+    const targetProject = getProjectBySlug(targetSlug);
+    if (!targetProject) return null;
 
-  const goNextPage = useCallback(() => {
-    const total = stateRef.current.frames.length;
-    setActiveIndex((prev) => (prev < total - 1 ? prev + 1 : prev));
+    const defaultTabKey = targetProject.tabs?.[0]?.key ?? null;
+    const scopedFrames = defaultTabKey
+      ? (targetProject.frames || []).filter((frame) => frame.tab === defaultTabKey)
+      : targetProject.frames || [];
+
+    if (!scopedFrames.length) return null;
+    return edge === 'end' ? scopedFrames[scopedFrames.length - 1].id : scopedFrames[0].id;
   }, []);
 
   const goProject = useCallback(
-    (targetSlug) => {
-      if (targetSlug) router.push(`/portfolio/${targetSlug}`);
+    (targetSlug, options = {}) => {
+      if (!targetSlug) return;
+
+      const search = new URLSearchParams();
+      if (options.frameId) search.set('frame', options.frameId);
+      if (options.motionDir) search.set('enterDir', options.motionDir);
+      const query = search.toString() ? `?${search.toString()}` : '';
+      router.push(`/portfolio/${targetSlug}${query}`);
     },
     [router]
   );
+
+  const goPrevPage = useCallback(() => {
+    const { activeIndex: currentIndex, neighbors: nb } = stateRef.current;
+    if (currentIndex > 0) {
+      setActiveIndex((prev) => prev - 1);
+      return;
+    }
+
+    if (!nb?.prev?.slug) return;
+    goProject(nb.prev.slug, {
+      frameId: getProjectEdgeFrameId(nb.prev.slug, 'end'),
+    });
+  }, [getProjectEdgeFrameId, goProject]);
+
+  const goNextPage = useCallback(() => {
+    const { activeIndex: currentIndex, frames: currentFrames, neighbors: nb } = stateRef.current;
+    const total = currentFrames.length;
+
+    if (currentIndex < total - 1) {
+      setActiveIndex((prev) => prev + 1);
+      return;
+    }
+
+    if (!nb?.next?.slug) return;
+    goProject(nb.next.slug, {
+      frameId: getProjectEdgeFrameId(nb.next.slug, 'start'),
+    });
+  }, [getProjectEdgeFrameId, goProject]);
 
   const goBack = useCallback(() => router.push('/portfolio'), [router]);
   const toggleComment = useCallback(() => setCommentOpen((prev) => !prev), []);
@@ -450,11 +543,11 @@ const ProjectDetail = ({ slug }) => {
           break;
         case 'ArrowUp':
           event.preventDefault();
-          if (nb.prev) goProject(nb.prev.slug);
+          if (nb.prev) goProject(nb.prev.slug, { motionDir: 'prev' });
           break;
         case 'ArrowDown':
           event.preventDefault();
-          if (nb.next) goProject(nb.next.slug);
+          if (nb.next) goProject(nb.next.slug, { motionDir: 'next' });
           break;
         case 'c':
         case 'C':
@@ -576,8 +669,14 @@ const ProjectDetail = ({ slug }) => {
       >
         <div
           ref={trackRef}
-          className={`w-full md:w-auto flex items-center md:gap-6 will-change-transform ${
-            dragging ? '' : 'transition-transform duration-500 ease-out'
+          className={`w-full md:w-auto flex ${
+            !isMobile && disableTrackTransition
+              ? enterDir === 'next'
+                ? 'items-end'
+                : 'items-start'
+              : 'items-center'
+          } md:gap-6 will-change-transform ${
+            dragging || disableTrackTransition ? '' : 'transition-transform duration-500 ease-out'
           }`}
           style={{ transform: `translateX(${trackOffset + dragOffset}px)` }}
         >
@@ -690,8 +789,8 @@ const ProjectDetail = ({ slug }) => {
             onBack={goBack}
             onPrevPage={goPrevPage}
             onNextPage={goNextPage}
-            onPrevProject={() => neighbors.prev && goProject(neighbors.prev.slug)}
-            onNextProject={() => neighbors.next && goProject(neighbors.next.slug)}
+            onPrevProject={() => neighbors.prev && goProject(neighbors.prev.slug, { motionDir: 'prev' })}
+            onNextProject={() => neighbors.next && goProject(neighbors.next.slug, { motionDir: 'next' })}
             onComment={toggleComment}
           />
 

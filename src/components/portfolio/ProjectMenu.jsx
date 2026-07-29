@@ -32,12 +32,12 @@ const ProjectMenu = ({ groups = [], currentSlug, open, onSelect, onClose }) => {
       radius={12}
       ariaLabel="项目菜单"
       dismissOnEscape={false}
-      className="absolute top-0 left-0 z-40 w-[320px] max-h-[70vh] overflow-y-auto rounded-[12px] bg-card/90 backdrop-blur-xl border border-stroke shadow-xl p-2 flex flex-col gap-0.5"
+      className="absolute top-2 left-[-8px] z-40 w-[320px] max-h-[70vh] overflow-y-auto rounded-[12px] bg-card/60 backdrop-blur-[6px] border border-stroke shadow-xl p-2 flex flex-col gap-0.5"
     >
       {groups.map((group) => (
         <div key={group.key} className="flex flex-col gap-0.5">
           {/* 分组标题 */}
-          <div className="px-2.5 py-1">
+          <div className="px-2.5 pt-0.5">
             <span className="font-regular text-[14px] leading-[24px] text-tertiary">
               {pickLocale(group.label, language)}
             </span>
@@ -52,8 +52,8 @@ const ProjectMenu = ({ groups = [], currentSlug, open, onSelect, onClose }) => {
                   key={project.slug}
                   type="button"
                   onClick={() => onSelect?.(project.slug)}
-                  className={`w-full flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 ${
-                    isActive ? 'bg-hover' : 'hover:bg-hover/60'
+                  className={`w-full flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] hover:bg-hover text-left transition-colors duration-150 ${
+                    isActive ? 'bg-press' : 'hover:bg-hover/60'
                   }`}
                 >
                   <span className="flex-1 font-regular text-[14px] leading-[24px] text-main truncate">

@@ -1,24 +1,38 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ProjectDetail from '@/components/portfolio/ProjectDetail';
 
 /**
  * L3 客户端外壳
- * 只负责读取 URL hash（L2 下钻时带上的 frameId），其余交互在 ProjectDetail
- * hash 不能在 Server Component 中读取，故单独拆一层
- *
- * 使用 useState 初始化函数同步读取 hash，确保 ProjectDetail 首次渲染时
- * 就拿到正确的 initialFrameId，避免先渲染 index=0 再异步纠正导致的偏移闪烁
+ * 只负责读取 URL 中的 frame 定位参数，其余交互在 ProjectDetail。
+ * query 不会触发浏览器原生锚点滚动，比 hash 更适合这里的受控定位。
  */
 export default function ProjectDetailClient({ slug }) {
-  const [initialFrameId] = useState(() => {
-    if (typeof window === 'undefined') return null;
-    const hash = window.location.hash?.slice(1);
-    return hash ? decodeURIComponent(hash) : null;
-  });
-  /*
+  const searchParams = useSearchParams();
+  const frameFromQuery = searchParams.get('frame');
+  const [frameFromHash, setFrameFromHash] = useState(null);
 
-  */
-  return <ProjectDetail slug={slug} initialFrameId={initialFrameId} />;
+  useEffect(() => {
+    // 兼容旧 hash 链接；新逻辑优先使用 query 参数，避免原生锚点跳转干扰布局。
+    const readHash = () => {
+      const hash = window.location.hash?.slice(1);
+      setFrameFromHash(hash ? decodeURIComponent(hash) : null);
+    };
+
+    readHash();
+    window.addEventListener('hashchange', readHash);
+    return () => window.removeEventListener('hashchange', readHash);
+  }, [slug]);
+
+  const initialFrameId = useMemo(() => frameFromQuery || frameFromHash, [frameFromQuery, frameFromHash]);
+
+  return (
+    <ProjectDetail
+      key={`${slug}:${initialFrameId || ''}`}
+      slug={slug}
+      initialFrameId={initialFrameId}
+    />
+  );
 }
