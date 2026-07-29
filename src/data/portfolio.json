@@ -193,7 +193,7 @@
       "frames": [
         {
           "id": "nocode-for-pro-01-p-01",
-          "tab": "design",
+          "tab": "strategy",
           "type": "image",
           "title": {
             "zh": "P 01",
@@ -204,12 +204,12 @@
             "h": 299
           },
           "src": "/images/portfolio/nocode-for-pro/01-p-01.webp",
-          "alt": "NoCode for Pro - P 01",
+          "alt": "【美团项目】01 - P 01",
           "figmaNodeId": "2792:189144"
         },
         {
           "id": "nocode-for-pro-02-p-02",
-          "tab": "design",
+          "tab": "strategy",
           "type": "image",
           "title": {
             "zh": "P 02",
@@ -225,7 +225,7 @@
         },
         {
           "id": "nocode-for-pro-03-p-03",
-          "tab": "design",
+          "tab": "strategy",
           "type": "image",
           "title": {
             "zh": "P 03",
@@ -241,7 +241,7 @@
         },
         {
           "id": "nocode-for-pro-04-p-04",
-          "tab": "design",
+          "tab": "strategy",
           "type": "image",
           "title": {
             "zh": "P 04",
@@ -257,7 +257,7 @@
         },
         {
           "id": "nocode-for-pro-05-p-05",
-          "tab": "design",
+          "tab": "strategy",
           "type": "image",
           "title": {
             "zh": "P 05",
@@ -273,7 +273,7 @@
         },
         {
           "id": "nocode-for-pro-06-p-06",
-          "tab": "design",
+          "tab": "strategy",
           "type": "image",
           "title": {
             "zh": "P 06",
@@ -289,7 +289,7 @@
         },
         {
           "id": "nocode-for-pro-07-p-07",
-          "tab": "design",
+          "tab": "strategy",
           "type": "image",
           "title": {
             "zh": "P 07",
@@ -305,7 +305,7 @@
         },
         {
           "id": "nocode-for-pro-08-p-08",
-          "tab": "design",
+          "tab": "strategy",
           "type": "image",
           "title": {
             "zh": "P 08",
@@ -321,7 +321,7 @@
         },
         {
           "id": "nocode-for-pro-09-p-09",
-          "tab": "design",
+          "tab": "strategy",
           "type": "image",
           "title": {
             "zh": "P 09",
@@ -337,7 +337,7 @@
         },
         {
           "id": "nocode-for-pro-10-p-10",
-          "tab": "design",
+          "tab": "strategy",
           "type": "image",
           "title": {
             "zh": "P 10",
