@@ -147,7 +147,9 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
       <div
         className={[
           "footer__mask",
-          "absolute bottom-0 left-0 right-0 w-full z-1",
+          // z-0 而不是 z-1：Tailwind 没有 z-1 这个类（只有 0/10/20/30/40/50），
+          // 写成 z-1 编译后不产生任何样式，遮罩只能靠 DOM 顺序压在内容下面
+          "absolute bottom-0 left-0 right-0 w-full z-0",
           "transition-opacity duration-100",
           "select-none pointer-events-none",
         ].join(" ")}
@@ -170,7 +172,7 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
         delay={0.2}
         immediate={true}
         flex={false}
-        className="footer__left h-full flex items-start justify-start"
+        className="footer__left relative z-10 h-full flex items-start justify-start"
       >
         <div className={`footer__left-content flex flex-col items-start justify-center gap-4 ${isGallery ? '' : 'md:pb-4'} font-Ding z-10 select-none`}>
           {isGallery ? (
@@ -238,7 +240,7 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
         delay={0.2}
         immediate={true}
         flex={false}
-        className="footer__right h-full flex items-start md:items-end justify-start md:items-end"
+        className="footer__right relative z-10 h-full flex items-start md:items-end justify-start md:items-end"
       >
         {isGallery ? (
           // 二级页极简区块
@@ -260,8 +262,9 @@ const Footer = ({ onUnderlinedClick, isGallery = false, showGallerySubtitle = tr
                 {t('resume')}
               </TextLink>
               <TextLink
-                href="https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024?node-id=0-1&t=5jnQ7E3zqn3Wpan5-1"
+                href="/portfolio"
                 title={t('portfolioTooltip')}
+                target="_self"
               >
                 {t('portfolio')}
               </TextLink>
