@@ -29,6 +29,25 @@ const QUALITY = 92;   // 文字/线条密集幻灯片用 q80 振铃明显，q92+
 const FEED_W = 532; // portfolio.json 既有约定：作品墙卡片统一宽度
 const FRAME_TYPES = new Set(['FRAME', 'COMPONENT', 'INSTANCE', 'GROUP', 'SECTION']);
 
+/**
+ * 按图片真实像素换算 L2 瀑布流占位尺寸（统一宽度，高度随比例）
+ */
+const feedFromSize = (w, h) =>
+  w && h ? { w: FEED_W, h: Math.round(FEED_W * (h / w)) } : { w: FEED_W, h: Math.round(FEED_W * 9 / 16) };
+
+/**
+ * 读取已存在的图片文件，回填 frame.feed。
+ * 用于 SKIP 分支：即便本轮不重新导出，也要校正历史遗留的错误尺寸。
+ */
+async function setFeedFromFile(frame, filePath) {
+  try {
+    const meta = await sharp(filePath).metadata();
+    frame.feed = feedFromSize(meta.width, meta.height);
+  } catch {
+    frame.feed = feedFromSize(0, 0);
+  }
+}
+
 /* ---------------------------------- 参数 ---------------------------------- */
 const args = process.argv.slice(2);
 const getArg = (name, fallback) => {
@@ -232,22 +251,23 @@ async function main() {
     const webpPath = join(outDir, webpName);
     const publicPath = `/images/portfolio/${slug}/${webpName}`;
 
-    const bb = child.absoluteBoundingBox;
-    const ratio = bb && bb.width ? bb.height / bb.width : 1080 / 1920;
-    const feed = { w: FEED_W, h: Math.round(FEED_W * ratio) };
-
+    // feed 供 L2 瀑布流占位。必须来自最终 webp 的真实像素，
+    // 而不是 Figma 画布的 absoluteBoundingBox —— 画板尺寸与导出图在存在
+    // 裁剪 / 约束 / 缩放时会分叉，导致卡片高度与图片对不上。
     const frame = {
       id: `${slug}-${baseName}`,
       tab: tabKey,
       type: 'image',
       title: { zh: child.name, en: child.name },
-      feed,
+      feed: null, // 占位，落盘后由 setFeedFromFile 回填
       src: publicPath,
       alt: `${titleZh || rootNode.name} - ${child.name}`,
       figmaNodeId: child.id,
     };
 
     if (!force && (await exists(webpPath))) {
+      // 跳过重新导出，但仍按现有文件校正 feed，避免沿用历史错误值
+      await setFeedFromFile(frame, webpPath);
       frames.push(frame);
       skipped += 1;
       console.log(`  SKIP   ${child.name} → ${webpName} (已存在，--force 覆盖)`);
@@ -273,10 +293,12 @@ async function main() {
       continue;
     }
 
-    await sharp(buf)
+    // toFile 返回实际写出的宽高，直接用它推导 feed，无需二次读文件
+    const outInfo = await sharp(buf)
       .resize({ width: MAX_WIDTH, withoutEnlargement: true })
       .webp({ quality: QUALITY })
       .toFile(webpPath);
+    frame.feed = feedFromSize(outInfo.width, outInfo.height);
 
     const after = (await stat(webpPath)).size;
     // 只有真正落盘成功的图才写进数据，避免 portfolio.json 里出现指向不存在文件的 src

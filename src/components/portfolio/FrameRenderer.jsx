@@ -22,22 +22,24 @@ const FrameFallback = ({ message, action }) => (
 
 /**
  * 图片型 frame
- * 定高+固定比例+自适应宽度，图片填满容器并居中裁剪
+ * 外框已按图片真实比例定尺寸（见 ProjectDetail 的 useImageRatios），
+ * 故此处让图片以 block 完全铺满容器：既无裁切也无留白，边到边无缝包裹。
+ * 用 object-cover 而非 contain —— 比例一致时二者等效，
+ * 但 cover 能吸收亚像素舍入误差，不会在边缘露出 1px 底色。
  */
 const ImageFrame = ({ frame, title }) => {
   const [error, setError] = useState(false);
   if (error) return <FrameFallback message={frame.alt || title || '图片加载失败'} />;
   return (
-    <div className="w-full h-full overflow-hidden">
-      <img
-        src={frame.src}
-        alt={frame.alt || title}
-        loading="lazy"
-        decoding="async"
-        className="w-full h-full object-cover"
-        onError={() => setError(true)}
-      />
-    </div>
+    <img
+      src={frame.src}
+      alt={frame.alt || title}
+      loading="lazy"
+      decoding="async"
+      draggable={false}
+      className="block w-full h-full object-cover select-none [-webkit-user-drag:none]"
+      onError={() => setError(true)}
+    />
   );
 };
 
@@ -111,7 +113,8 @@ const Block = ({ block, language }) => {
         alt={block.alt || ''}
         loading="lazy"
         decoding="async"
-        className="w-full rounded-[8px] object-cover"
+        draggable={false}
+        className="w-full rounded-[8px] object-contain select-none [-webkit-user-drag:none]"
       />
     );
   }

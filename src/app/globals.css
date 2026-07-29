@@ -39,6 +39,17 @@
 
 /* 自定义字体工具类 */
 @layer utilities {
+  /* 隐藏滚动条但保留滚动能力（移动端浮层式滚动，条本身是多余的视觉噪声） */
+  .no-scrollbar {
+    -ms-overflow-style: none;      /* IE / 旧 Edge */
+    scrollbar-width: none;          /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;                  /* WebKit / Blink */
+    width: 0;
+    height: 0;
+  }
+
   .font-light {
     font-family: 'Alibaba PuHuiTi 2.0', sans-serif;
     font-weight: 300;

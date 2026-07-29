@@ -101,10 +101,10 @@ const Masonry = ({
   scaleOnHover = true,
   hoverScale = 0.95,
   blurToFocus = true,
-  colorShiftOnHover = false
+  colorShiftOnHover = false,
+  maxColumnWidth = 360  // 默认 360，允许外部覆盖
 }) => {
-  // 最大列宽限制（web端）
-  const maxColumnWidth = 360;
+  // 列宽限制由 prop 传入，默认 360px
   
   // 图片放大功能状态
   const [expandedImageId, setExpandedImageId] = useState(null);

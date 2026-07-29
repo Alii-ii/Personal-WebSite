@@ -105,7 +105,7 @@ export default function Portfolio() {
           <div className="w-full flex-1 px-6 md:pr-4 md:pl-0 py-4 md:py-4 flex items-start">
             <Masonry
               items={feedItems}
-              maxColumnWidth={532}
+              maxColumnWidth={720}
               expandable={false}
               onItemClick={handleItemClick}
               renderItem={renderItem}

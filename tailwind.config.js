@@ -28,7 +28,10 @@ module.exports = {
         'press': 'hsl(var(--neutral-bg-press))',
         'divider': 'hsl(var(--neutral-bg-divider))',
         'stroke': 'hsl(var(--neutral-bg-stroke))',
-        'bg': 'hsl(var(--background))',
+        // 指向 --neutral-bg-card：globals.css 中并无 --background 定义，
+        // 此前 .bg-bg 能生效仅因 globals.css 另写了同名类覆盖，
+        // 而 from-bg / to-bg / border-bg / ring-bg 等派生类会拿到无效色而静默失效
+        'bg': 'hsl(var(--neutral-bg-card))',
         'others': 'hsl(var(--neutral-others-bg))',
         'transparent': 'hsl(var(--neutral-others-transparent))',
         'green': 'hsl(var(--function-green-bg))',
