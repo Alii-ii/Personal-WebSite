@@ -7,6 +7,7 @@ import DotGrid from '@/effects/DotGrid';
 import AnimatedContent from '@/effects/AnimatedContent';
 import Masonry from '@/effects/Masonry';
 import PortfolioSidebar from '@/components/portfolio/PortfolioSidebar';
+import MobileDrawer from '@/components/portfolio/MobileDrawer';
 import FeedCard from '@/components/portfolio/FeedCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getFeedFrames, getProjectsByCategory } from '@/contexts/ProjectContext';
@@ -34,6 +35,7 @@ export default function Portfolio() {
   const groups = useMemo(() => getProjectsByCategory(), []);
   const [activeCategory, setActiveCategory] = useState(null);
   const [expandedMap, setExpandedMap] = useState({});
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // 按分类筛选后的平铺 frame 列表
   const feedItems = useMemo(
@@ -124,6 +126,38 @@ export default function Portfolio() {
         backHref="/"
         maskHeight="240px"
         togglesSide="left"
+      />
+
+      {/* 移动端右下角菜单按钮 */}
+      <button
+        type="button"
+        aria-label="目录"
+        onClick={() => setMenuOpen(true)}
+        className="md:hidden fixed right-6 bottom-10 z-30 w-8 h-8 rounded-[8px] flex items-center justify-center text-secondary active:bg-hover active:text-main transition-colors duration-150"
+      >
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M4.22218 4.44434C4.59037 4.44434 4.88885 4.74281 4.88885 5.111C4.88885 5.47919 4.59037 5.77767 4.22218 5.77767H3.33329C2.9651 5.77767 2.66663 5.47919 2.66663 5.111C2.66663 4.74281 2.9651 4.44434 3.33329 4.44434H4.22218ZM18 4.44434C18.3681 4.44434 18.6666 4.74281 18.6666 5.111C18.6666 5.47919 18.3681 5.77767 18 5.77767H7.33329C6.9651 5.77767 6.66663 5.47919 6.66663 5.111C6.66663 4.74281 6.9651 4.44434 7.33329 4.44434H18ZM4.22218 9.99989C4.59037 9.99989 4.88885 10.2984 4.88885 10.6666C4.88885 11.0347 4.59037 11.3332 4.22218 11.3332H3.33329C2.9651 11.3332 2.66663 11.0347 2.66663 10.6666C2.66663 10.2984 2.9651 9.99989 3.33329 9.99989H4.22218ZM6.66663 10.6666C6.66663 10.2984 6.9651 9.99989 7.33329 9.99989H18C18.3681 9.99989 18.6666 10.2984 18.6666 10.6666C18.6666 11.0347 18.3681 11.3332 18 11.3332H7.33329C6.9651 11.3332 6.66663 11.0347 6.66663 10.6666ZM4.22218 15.5554C4.59037 15.5554 4.88885 15.8539 4.88885 16.2221C4.88885 16.5903 4.59037 16.8888 4.22218 16.8888H3.33329C2.9651 16.8888 2.66663 16.5903 2.66663 16.2221C2.66663 15.8539 2.9651 15.5554 3.33329 15.5554H4.22218ZM6.66663 16.2221C6.66663 15.8539 6.9651 15.5554 7.33329 15.5554H18C18.3681 15.5554 18.6666 15.8539 18.6666 16.2221C18.6666 16.5903 18.3681 16.8888 18 16.8888H7.33329C6.9651 16.8888 6.66663 16.5903 6.66663 16.2221Z"
+            fill="currentColor"
+            fillOpacity="0.65"
+          />
+        </svg>
+      </button>
+
+      {/* 移动端底部抽屉：项目切换，返回按钮导航到首页 */}
+      <MobileDrawer
+        open={menuOpen}
+        onOpenChange={setMenuOpen}
+        groups={groups}
+        currentSlug={null}
+        onSelect={(targetSlug) => {
+          setMenuOpen(false);
+          router.push(`/portfolio/${targetSlug}`);
+        }}
+        onBack={() => {
+          setMenuOpen(false);
+          router.push('/');
+        }}
       />
 
       <style jsx global>{`

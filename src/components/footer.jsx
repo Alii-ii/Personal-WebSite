@@ -9,6 +9,7 @@ import AnimatedContent from '@/effects/AnimatedContent';
 import CyclingDecryptedText from '@/components/CyclingDecryptedText';
 import { ChatsIcon, CheckIcon, BilibiliIcon, FigmaIcon } from '@/public/icons';
 import { ActionSwapIcon } from '@/components/motion/action-swap';
+import EdgeMask from '@/components/EdgeMask';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
@@ -149,25 +150,8 @@ const Footer = ({
         className,
       ].join(" ")}
     >
-      {/* 背景遮罩 - 独立的快速过渡 */}
-      <div
-        className={[
-          "footer__mask",
-          // z-0 而不是 z-1：Tailwind 没有 z-1 这个类（只有 0/10/20/30/40/50），
-          // 写成 z-1 编译后不产生任何样式，遮罩只能靠 DOM 顺序压在内容下面
-          "absolute bottom-0 left-0 right-0 w-full z-0",
-          "transition-opacity duration-100",
-          "select-none pointer-events-none",
-        ].join(" ")}
-        style={{
-          height: maskHeight,
-          background:
-            "linear-gradient(to top, hsl(var(--neutral-bg-card)), hsl(var(--neutral-bg-card) / 0.8), hsl(var(--neutral-bg-card) / 0.5), transparent)",
-          backdropFilter: "blur(2px)",
-          WebkitBackdropFilter: "blur(48px)",
-          maskImage: "linear-gradient(to top, black 0%, black 50%, transparent 100%)",
-        }}
-      />
+      {/* 背景遮罩 */}
+      <EdgeMask from="bottom" height={maskHeight} className="footer__mask z-0 transition-opacity duration-100" />
 
       {/* 左区：动画/标题 */}
       <AnimatedContent
@@ -191,7 +175,7 @@ const Footer = ({
                 >
                   ←
                 </button>
-                <div className="flex items-center gap-2 md:gap-3 py-2 md:py-0 select-none font-regular text-secondary">
+                <div className="hidden md:flex items-center gap-3 select-none font-regular text-secondary">
                   <ThemeToggle />
                   <LanguageToggle />
                 </div>

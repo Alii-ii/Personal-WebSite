@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
+import DotGrid from '@/effects/DotGrid';
+import EdgeMask from '@/components/EdgeMask';
 import FrameRenderer from '@/components/portfolio/FrameRenderer';
 import ProjectMenu from '@/components/portfolio/ProjectMenu';
 import MobileDrawer from '@/components/portfolio/MobileDrawer';
@@ -11,6 +13,7 @@ import ShortcutBar from '@/components/portfolio/ShortcutBar';
 import SlideProgress from '@/components/portfolio/SlideProgress';
 import CommentSection from '@/components/comments/CommentSection';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import {
   getCommentTargetPath,
   getProjectBySlug,
@@ -140,6 +143,7 @@ const MenuButton = ({ onClick, active }) => (
 const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) => {
   const router = useRouter();
   const { language } = useLanguage();
+  const { baseColor, activeColor } = useThemeColors();
   const enterDir = initialEnterDir;
 
   const project = useMemo(() => getProjectBySlug(slug), [slug]);
@@ -587,15 +591,28 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
 
   return (
     <div className="relative h-screen w-full flex flex-col bg-bg overflow-hidden">
+      {/* 背景点阵效果 */}
+      <div className="absolute inset-0 z-0">
+        <DotGrid
+          dotSize={3}
+          gap={18}
+          baseColor={baseColor}
+          activeColor={activeColor}
+          proximity={120}
+          speedTrigger={80}
+          shockRadius={200}
+          shockStrength={3}
+          maxSpeed={2000}
+          resistance={800}
+          returnDuration={1.2}
+          className="opacity-75"
+        />
+      </div>
+
       {/* 顶部：目录按钮 + 标题 + tabs */}
       <header className="absolute inset-x-0 top-0 z-20 isolate px-6 md:px-16 pt-6 md:pt-8 pb-2 pointer-events-auto">
-        {/* 移动端渐变遮罩：帧会滚到 header 下方，纯文字会失去对比度。
-            自上而下由背景色淡出，与 footer 的同款渐变方向相反。
-            桌面端帧不会滚动到此处，无需遮罩。 */}
-        <div
-          aria-hidden="true"
-          className="md:hidden absolute inset-x-0 top-0 h-[160%] -z-10 pointer-events-none bg-gradient-to-b from-bg via-bg/90 to-transparent"
-        />
+        {/* 移动端渐变遮罩：帧会滚到 header 下方，纯文字会失去对比度 */}
+        <EdgeMask from="top" className="md:hidden" />
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <MenuButton onClick={() => setMenuOpen((prev) => !prev)} active={menuOpen} />
@@ -767,14 +784,11 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
 
       {/* 底部：快捷键 + 主题/语言 */}
       <footer className="absolute inset-x-0 bottom-0 z-20 isolate px-6 md:px-16 pb-6 md:pb-8 pt-2 pointer-events-auto">
-        {/* 移动端渐变遮罩：与 header 同款、方向反转（自下而上由背景色淡出） */}
-        <div
-          aria-hidden="true"
-          className="md:hidden absolute inset-x-0 bottom-0 h-[160%] -z-10 pointer-events-none bg-gradient-to-t from-bg via-bg/90 to-transparent"
-        />
+        {/* 移动端渐变遮罩 */}
+        <EdgeMask from="bottom" height="300%" className="md:hidden" />
         {/* 页数轴：absolute 居中于 footer。
             移动端为纯展示 —— 1px 宽的竖条对手指来说热区过小，只读不点。 */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 md:translate-y-[-50%] translate-y-[calc(-50%-12px)]">
           <SlideProgress
             total={frames.length}
             activeIndex={activeIndex}

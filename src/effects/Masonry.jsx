@@ -356,31 +356,51 @@ const Masonry = ({
       return;
     }
 
-    // 不再在这里 new Image() 预加载全部图片。
-    // 原实现会在挂载瞬间对全部 item 发起下载（作品墙 = 52 个并发请求），
-    // 且每张 2560x1440 原图解码后占约 14MB 位图，合计 700MB+。
-    //
-    // 现在改为：布局尺寸直接取 item.feed 预设值（数据里已有，无需下载即可确定），
-    // 真正的图片下载交给 <img loading="lazy"> 由浏览器按视口调度。
+    // 分两类处理：
+    // 1. 有 feed.w/h 预设尺寸的（portfolio）：直接用预设值，无需下载图片
+    // 2. 没有 feed 预设的（gallery）：通过 new Image() 获取真实尺寸以保持原图比例
     const dims = {};
     const sources = {};
     const status = {};
+    const needProbe = []; // 需要探测真实尺寸的图片
 
     items.forEach((item, index) => {
       const itemKey = item.id || index;
       const src = resolveFeedSrc(item);
       sources[itemKey] = src;
-      // feed 预设宽高来自数据层，缺失时回落到 4:3
-      const w = item.feed?.w || 400;
-      const h = item.feed?.h || 300;
-      dims[src] = { width: w, height: h };
-      status[itemKey] = true;
+
+      if (item.feed?.w && item.feed?.h) {
+        // 有预设尺寸，直接使用
+        dims[src] = { width: item.feed.w, height: item.feed.h };
+        status[itemKey] = true;
+      } else {
+        // 没有预设尺寸，需要探测原图比例
+        needProbe.push({ itemKey, src });
+        // 先给一个占位尺寸让布局不跳，后续探测完成后会更新
+        dims[src] = { width: 400, height: 300 };
+        status[itemKey] = true;
+      }
     });
 
     setImageSources(sources);
     setImageDimensions(dims);
     setImageLoadStatus(status);
     setImagesReady(true);
+
+    // 对没有预设尺寸的图片，异步探测真实宽高
+    if (needProbe.length > 0 && typeof window !== 'undefined') {
+      needProbe.forEach(({ itemKey, src }) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+          setImageDimensions(prev => ({
+            ...prev,
+            [src]: { width: img.naturalWidth, height: img.naturalHeight }
+          }));
+        };
+        // onerror 时保留占位尺寸，不做额外处理
+      });
+    }
   }, [items]);
 
   const grid = useMemo(() => {

@@ -129,7 +129,7 @@ const MobileDrawer = ({ open, onOpenChange, groups = [], currentSlug, onSelect, 
 
             {/* 项目列表：超过阈值内部滚动，overscroll-contain 防止滚动串到页面 */}
             <div
-              className="flex-1 overflow-y-auto overscroll-contain no-scrollbar px-2 pt-2"
+              className="flex-1 overflow-y-auto overscroll-contain no-scrollbar px-5 pt-2"
               style={{ maxHeight: LIST_MAX_H }}
             >
               {groups.map((group) => (
@@ -148,7 +148,7 @@ const MobileDrawer = ({ open, onOpenChange, groups = [], currentSlug, onSelect, 
                         type="button"
                         onClick={() => onSelect?.(project.slug)}
                         className={`w-full flex items-center gap-1.5 px-2.5 py-2 rounded-[8px] text-left transition-colors duration-150 ${
-                          isActive ? 'bg-hover' : 'active:bg-hover/60'
+                          isActive ? 'bg-hover' : 'hover:bg-hover active:bg-hover/60'
                         }`}
                       >
                         <span className="flex-1 font-regular text-[15px] leading-[24px] text-main truncate">
