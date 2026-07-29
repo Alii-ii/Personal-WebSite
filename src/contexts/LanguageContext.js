@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getLastUpdatedText } from '../lib/git-info';
+import { getLastUpdatedText, getLastCommitYear } from '../lib/git-info';
 
 // 翻译数据
 const translations = {
@@ -13,9 +13,9 @@ const translations = {
     resume: "简历",
     resumeTooltip: "点击访问简历",
     portfolioTooltip: "点击访问作品集",
-    mainSite: "主站平台", 
-    mainSiteTooltip: "点击访问主站平台",
-    copyright: "© Alii.Wong 2025 all rights reserved",
+    mainSite: "摸鱼平台", 
+    mainSiteTooltip: "点击访问摸鱼平台",
+    copyright: `© Alii.Wong ${getLastCommitYear()} all rights reserved`,
     lastUpdated: getLastUpdatedText('zh'),
     
     // 社交按钮
@@ -48,7 +48,7 @@ const translations = {
     portfolioTooltip: "Click to visit portfolio",
     mainSite: "Main Site",
     mainSiteTooltip: "Click to visit main site",
-    copyright: "© Alii.Wong 2025 all rights reserved",
+    copyright: `© Alii.Wong ${getLastCommitYear()} all rights reserved`,
     lastUpdated: getLastUpdatedText('en'),
     
     // Social buttons

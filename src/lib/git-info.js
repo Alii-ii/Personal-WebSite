@@ -70,3 +70,13 @@ export function getLastUpdatedText(language = 'zh') {
   const date = getLastCommitDate();
   return language === 'zh' ? `更新于 ${date}` : `Updated ${date}`;
 }
+
+/**
+ * 从最后提交日期中提取年份
+ * @returns {string} 年份字符串，如 '2026'
+ */
+export function getLastCommitYear() {
+  const date = getLastCommitDate();
+  // date 格式为 'YYYY.M.D'，取第一段
+  return date.split('.')[0];
+}

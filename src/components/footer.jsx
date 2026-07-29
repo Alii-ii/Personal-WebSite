@@ -76,6 +76,7 @@ const Footer = ({
   className = '',
   maskHeight = '480px',
   togglesSide = 'right', // 仅影响 isGallery 模式下 ThemeToggle/LanguageToggle 的位置
+  hideRight = false, // false=显示, true=全隐藏, 'mobile'=仅移动端隐藏
 }) => {
   // 获取语言上下文
   const { t } = useLanguage();
@@ -235,7 +236,7 @@ const Footer = ({
       {/* 中区：版权信息（仅首页显示） */}
       {!isGallery && <CopyrightFade t={t} />}
 
-      {/* 右区：操作/链接 */}
+      {/* 右区：操作/链接（hideRight='mobile' 时仅移动端隐藏） */}
       <AnimatedContent
         direction="horizontal"
         reverse={false}
@@ -248,7 +249,7 @@ const Footer = ({
       >
         {isGallery ? (
           // 二级页极简区块
-          <div className="footer__right-gallery flex flex-col items-start md:items-end gap-1 md:gap-6 z-10">
+          <div className={`footer__right-gallery flex flex-col items-start md:items-end gap-1 md:gap-6 z-10${hideRight === 'mobile' ? ' hidden md:flex' : hideRight ? ' hidden' : ''}`}>
             {togglesSide !== 'left' ? (
               <div className="footer__right-toggles flex flex-row-reverse md:flex-row items-center justify-start md:justify-center gap-2 md:gap-3 py-2 md:py-0">
                 <ThemeToggle />
@@ -257,7 +258,7 @@ const Footer = ({
             ) : null}
           </div>
         ) : (
-          <div className="footer__right-main flex flex-col items-start md:items-end gap-1 md:gap-6 z-10">
+          <div className={`footer__right-main flex flex-col items-start md:items-end gap-1 md:gap-6 z-10${hideRight === 'mobile' ? ' hidden md:flex' : hideRight ? ' hidden' : ''}`}>
             {/* 重要入口区 */}
             <div className="footer__right-links flex flex-row md:flex-col items-center md:items-end justify-start gap-6 pt-4 md:pt-0">
               <TextLink

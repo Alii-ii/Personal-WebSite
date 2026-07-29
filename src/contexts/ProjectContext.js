@@ -153,15 +153,19 @@ export const getProjectFrames = (slug, tabKey) => {
 
 /**
  * 上一个 / 下一个项目（供 L3 的 ↑↓ 切换项目使用）
+ * 排序与 getProjectsByCategory() 一致：按分类顺序 → 组内 order 升序，
+ * 确保 L3 的上下切换与 L2 侧栏 / L3 菜单的项目顺序完全一致。
  * @param {string} slug - 当前项目标识
  * @returns {{ prev: Object|null, next: Object|null, index: number }}
  */
 export const getProjectNeighbors = (slug) => {
-  const index = projects.findIndex((project) => project.slug === slug);
+  // 与 getProjectsByCategory 同源：按分类展平为有序列表
+  const ordered = getProjectsByCategory().flatMap((group) => group.projects);
+  const index = ordered.findIndex((project) => project.slug === slug);
   if (index === -1) return { prev: null, next: null, index: -1 };
   return {
-    prev: index > 0 ? projects[index - 1] : null,
-    next: index < projects.length - 1 ? projects[index + 1] : null,
+    prev: index > 0 ? ordered[index - 1] : null,
+    next: index < ordered.length - 1 ? ordered[index + 1] : null,
     index,
   };
 };

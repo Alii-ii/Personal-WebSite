@@ -312,7 +312,23 @@
           "figmaNodeId": "513:49979"
         },
         {
-          "id": "chatgpt-home-buying-04-zhizhu-04",
+          "id": "chatgpt-home-buying-04-zhizhu-10",
+          "tab": "slides",
+          "type": "image",
+          "title": {
+            "zh": "知住 10",
+            "en": "知住 10"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/chatgpt-home-buying/09-zhizhu-10.webp",
+          "alt": "【实习项目】 - 知住 10",
+          "figmaNodeId": "513:49978"
+        },
+        {
+          "id": "chatgpt-home-buying-05-zhizhu-04",
           "tab": "slides",
           "type": "image",
           "title": {
@@ -328,7 +344,7 @@
           "figmaNodeId": "513:49982"
         },
         {
-          "id": "chatgpt-home-buying-05-zhizhu-05",
+          "id": "chatgpt-home-buying-06-zhizhu-05",
           "tab": "slides",
           "type": "image",
           "title": {
@@ -344,7 +360,7 @@
           "figmaNodeId": "513:49981"
         },
         {
-          "id": "chatgpt-home-buying-06-zhizhu-07",
+          "id": "chatgpt-home-buying-07-zhizhu-07",
           "tab": "slides",
           "type": "image",
           "title": {
@@ -360,7 +376,7 @@
           "figmaNodeId": "513:49976"
         },
         {
-          "id": "chatgpt-home-buying-07-zhizhu-08",
+          "id": "chatgpt-home-buying-08-zhizhu-08",
           "tab": "slides",
           "type": "image",
           "title": {
@@ -376,7 +392,7 @@
           "figmaNodeId": "513:49977"
         },
         {
-          "id": "chatgpt-home-buying-08-zhizhu-09",
+          "id": "chatgpt-home-buying-09-zhizhu-09",
           "tab": "slides",
           "type": "image",
           "title": {
@@ -390,22 +406,6 @@
           "src": "/images/portfolio/chatgpt-home-buying/08-zhizhu-09.webp",
           "alt": "【实习项目】 - 知住 09",
           "figmaNodeId": "513:49975"
-        },
-        {
-          "id": "chatgpt-home-buying-09-zhizhu-10",
-          "tab": "slides",
-          "type": "image",
-          "title": {
-            "zh": "知住 10",
-            "en": "知住 10"
-          },
-          "feed": {
-            "w": 532,
-            "h": 299
-          },
-          "src": "/images/portfolio/chatgpt-home-buying/09-zhizhu-10.webp",
-          "alt": "【实习项目】 - 知住 10",
-          "figmaNodeId": "513:49978"
         }
       ]
     },
