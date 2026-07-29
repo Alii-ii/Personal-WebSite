@@ -17,7 +17,17 @@
  */
 import { readdir, mkdir, access, stat } from 'node:fs/promises';
 import { join, extname } from 'node:path';
-import sharp from 'sharp';
+
+// sharp 在 devDependencies 里。CI（如 Cloudflare Pages 的
+// `npm ci --only=production`）不会安装它，因此这里动态引入：
+// 拿不到就跳过生成，直接复用仓库里已提交的 thumbs/ 产物。
+// 静态 import 会在模块加载阶段就抛错，没有降级的机会。
+let sharp = null;
+try {
+  ({ default: sharp } = await import('sharp'));
+} catch {
+  sharp = null;
+}
 
 const ROOT = process.cwd();
 const SRC_ROOT = join(ROOT, 'public/images/portfolio');
@@ -84,6 +94,16 @@ async function processDir(dir) {
 }
 
 async function main() {
+  if (!sharp) {
+    console.log('[thumbs] 未安装 sharp，跳过缩略图生成，使用仓库中已有的 thumbs/ 产物');
+    return;
+  }
+
+  if (!(await exists(SRC_ROOT))) {
+    console.log(`[thumbs] 未找到 ${SRC_ROOT}，跳过`);
+    return;
+  }
+
   const entries = await readdir(SRC_ROOT, { withFileTypes: true });
   const dirs = entries.filter((e) => e.isDirectory() && e.name !== THUMB_DIR_NAME);
 
@@ -105,7 +125,8 @@ async function main() {
   );
 }
 
+// 缩略图属于非关键优化，且仓库里已提交了一份产物兜底。
+// 生成失败不应该让整个构建挂掉，告警即可。
 main().catch((err) => {
-  console.error(err);
-  process.exit(1);
+  console.warn('[thumbs] 生成失败，改用仓库中已有的 thumbs/ 产物：', err?.message || err);
 });
