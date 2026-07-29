@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import ProjectDetail from '@/components/portfolio/ProjectDetail';
 
 /**
@@ -10,29 +9,36 @@ import ProjectDetail from '@/components/portfolio/ProjectDetail';
  * query 不会触发浏览器原生锚点滚动，比 hash 更适合这里的受控定位。
  */
 export default function ProjectDetailClient({ slug }) {
-  const searchParams = useSearchParams();
-  const frameFromQuery = searchParams.get('frame');
-  const [frameFromHash, setFrameFromHash] = useState(null);
+  const [initialFrameId, setInitialFrameId] = useState(null);
+  const [initialEnterDir, setInitialEnterDir] = useState(null);
 
   useEffect(() => {
-    // 兼容旧 hash 链接；新逻辑优先使用 query 参数，避免原生锚点跳转干扰布局。
-    const readHash = () => {
+    // 兼容 query/hash 两种定位参数，优先 query（新逻辑）。
+    const readFromLocation = () => {
+      const query = new URLSearchParams(window.location.search);
+      const queryFrame = query.get('frame');
+      const queryEnterDir = query.get('enterDir');
       const hash = window.location.hash?.slice(1);
-      setFrameFromHash(hash ? decodeURIComponent(hash) : null);
+      const hashFrame = hash ? decodeURIComponent(hash) : null;
+      setInitialFrameId(queryFrame || hashFrame || null);
+      setInitialEnterDir(queryEnterDir === 'next' || queryEnterDir === 'prev' ? queryEnterDir : null);
     };
 
-    readHash();
-    window.addEventListener('hashchange', readHash);
-    return () => window.removeEventListener('hashchange', readHash);
+    readFromLocation();
+    window.addEventListener('hashchange', readFromLocation);
+    window.addEventListener('popstate', readFromLocation);
+    return () => {
+      window.removeEventListener('hashchange', readFromLocation);
+      window.removeEventListener('popstate', readFromLocation);
+    };
   }, [slug]);
-
-  const initialFrameId = useMemo(() => frameFromQuery || frameFromHash, [frameFromQuery, frameFromHash]);
 
   return (
     <ProjectDetail
-      key={`${slug}:${initialFrameId || ''}`}
+      key={`${slug}:${initialFrameId || ''}:${initialEnterDir || ''}`}
       slug={slug}
       initialFrameId={initialFrameId}
+      initialEnterDir={initialEnterDir}
     />
   );
 }

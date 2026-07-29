@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
 import FrameRenderer from '@/components/portfolio/FrameRenderer';
@@ -135,12 +135,12 @@ const MenuButton = ({ onClick, active }) => (
  *
  * @param {string} slug - 项目标识
  * @param {string | null} initialFrameId - 首次进入时要定位的帧 id
+ * @param {'next' | 'prev' | null} initialEnterDir - 跨项目切换进入方向
  */
-const ProjectDetail = ({ slug, initialFrameId = null }) => {
+const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) => {
   const router = useRouter();
   const { language } = useLanguage();
-  const searchParams = useSearchParams();
-  const enterDir = searchParams.get('enterDir'); // 'next' | 'prev'
+  const enterDir = initialEnterDir;
 
   const project = useMemo(() => getProjectBySlug(slug), [slug]);
   const groups = useMemo(() => getProjectsByCategory(), []);
