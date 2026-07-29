@@ -183,7 +183,10 @@
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100%;
+    /* 不要设 height:100%：会把 body 变成固定高度的滚动容器，
+       导致 documentElement.scrollHeight 恒等于视口高度，
+       window.scrollY / scrollTo / 锚点跳转全部失效。
+       各页面用 min-h-screen 保证首屏撑满，不依赖父元素高度。 */
     overflow-x: hidden; /* 防止水平滚动 */
   }
   
