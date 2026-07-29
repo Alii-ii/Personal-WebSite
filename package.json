@@ -10,6 +10,7 @@
     "update-date": "node scripts/get-last-commit-date.js",
     "export": "node scripts/get-last-commit-date.js && next build && next export",
     "compress:images": "node scripts/compress-images.mjs",
+    "thumbs:portfolio": "node scripts/generate-portfolio-thumbs.mjs",
     "publish:gallery": "node scripts/publish-gallery.mjs",
     "sync:figma": "node scripts/sync-figma-frames.mjs",
     "subset:fonts": "node scripts/subset-fonts.mjs"

@@ -1,6 +1,21 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 
+/**
+ * 作品墙里每张卡片只显示约 532px 宽，但 portfolio 原图是 2560x1440。
+ * 即使懒加载，图片一旦进入视口仍要解码成约 14MB 位图；
+ * 因此这里把 /images/portfolio/<项目>/<图>.webp 映射到同目录的 thumbs/ 版本。
+ *
+ * 缩略图由 scripts/generate-portfolio-thumbs.mjs 生成。
+ * 非 portfolio 图片（如 gallery）保持原路径不变。
+ */
+const resolveFeedSrc = (item) => {
+  const src = item?.img || item?.src || '';
+  if (!src.startsWith('/images/portfolio/') || src.includes('/thumbs/')) return src;
+  const idx = src.lastIndexOf('/');
+  return `${src.slice(0, idx)}/thumbs${src.slice(idx)}`;
+};
+
 const useMedia = (queries, values, defaultValue) => {
   const get = () => {
     if (typeof window === 'undefined') return defaultValue;
@@ -335,66 +350,36 @@ const Masonry = ({
   };
 
   useEffect(() => {
-    console.log('Masonry 组件接收到 items:', items);
     if (items.length === 0) {
-      console.warn('Masonry 组件接收到空的 items 数组');
       setImagesReady(true);
       return;
     }
-    
-    // 重置状态
-    setImageDimensions({});
-    setImageSources({});
-    setImageLoadStatus({});
-    setImagesReady(false);
-    
-    // 逐个加载图片，加载完一个显示一个
+
+    // 不再在这里 new Image() 预加载全部图片。
+    // 原实现会在挂载瞬间对全部 item 发起下载（作品墙 = 52 个并发请求），
+    // 且每张 2560x1440 原图解码后占约 14MB 位图，合计 700MB+。
+    //
+    // 现在改为：布局尺寸直接取 item.feed 预设值（数据里已有，无需下载即可确定），
+    // 真正的图片下载交给 <img loading="lazy"> 由浏览器按视口调度。
+    const dims = {};
+    const sources = {};
+    const status = {};
+
     items.forEach((item, index) => {
       const itemKey = item.id || index;
-      
-      // 初始状态：标记为加载中
-      setImageLoadStatus(prev => ({
-        ...prev,
-        [itemKey]: 'loading'
-      }));
-      
-      const img = new Image();
-      img.src = item.img;
-      
-      img.onload = () => {
-        const imgData = {
-          src: item.img,
-          width: img.naturalWidth,
-          height: img.naturalHeight
-        };
-        
-        setImageSources(prev => ({
-          ...prev,
-          [itemKey]: imgData.src
-        }));
-        
-        setImageDimensions(prev => ({
-          ...prev,
-          [imgData.src]: { width: imgData.width, height: imgData.height }
-        }));
-        
-        setImageLoadStatus(prev => ({
-          ...prev,
-          [itemKey]: true
-        }));
-        
-        setImagesReady(true);
-      };
-      
-      img.onerror = () => {
-        setImageLoadStatus(prev => ({
-          ...prev,
-          [itemKey]: 'error'
-        }));
-        
-        setImagesReady(true);
-      };
+      const src = resolveFeedSrc(item);
+      sources[itemKey] = src;
+      // feed 预设宽高来自数据层，缺失时回落到 4:3
+      const w = item.feed?.w || 400;
+      const h = item.feed?.h || 300;
+      dims[src] = { width: w, height: h };
+      status[itemKey] = true;
     });
+
+    setImageSources(sources);
+    setImageDimensions(dims);
+    setImageLoadStatus(status);
+    setImagesReady(true);
   }, [items]);
 
   const grid = useMemo(() => {
