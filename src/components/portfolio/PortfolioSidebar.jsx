@@ -4,7 +4,7 @@ import CopyEmailButton from '@/components/CopyEmailButton';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
-import { ChatsIcon, BilibiliIcon, FigmaIcon } from '@/public/icons';
+import { ChatsIcon, BilibiliIcon, FigmaIcon, XiaohongshuIcon } from '@/public/icons';
 
 /**
  * 侧栏分隔位（隐藏横线，仅保留原分割线占位的间距）
@@ -85,6 +85,10 @@ const PortfolioSidebar = ({
 
           <IconButton label="Bilibili" onClick={() => window.open('https://space.bilibili.com/38773851/upload/video', '_blank')}>
             <BilibiliIcon className="w-4 h-4" />
+          </IconButton>
+
+          <IconButton label="小红书" onClick={() => window.open('https://www.xiaohongshu.com/user/profile/60877ccc000000000101c324', '_blank')}>
+            <XiaohongshuIcon className="w-4 h-4" />
           </IconButton>
 
           <IconButton label="Chats">

@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale, getProjectsByCategory } from '@/contexts/ProjectContext';
 import CopyEmailButton from '@/components/CopyEmailButton';
 import IconTextButton from '@/components/icon-text-botton';
-import { ChatsIcon, FigmaIcon, BilibiliIcon, DownloadIcon } from '@/public/icons';
+import { ChatsIcon, FigmaIcon, BilibiliIcon, XiaohongshuIcon, DownloadIcon } from '@/public/icons';
 import AnimatedContent from '@/effects/AnimatedContent';
 import PortfolioCard from '@/components/portfolio/PortfolioCard';
 
@@ -179,6 +179,12 @@ export default function PortfolioCompact() {
                 onClick={() => window.open('https://space.bilibili.com/38773851/upload/video', '_blank')}
               >
                 <BilibiliIcon className="w-4 h-4" />
+              </IconButton>
+              <IconButton
+                label="小红书"
+                onClick={() => window.open('https://www.xiaohongshu.com/user/profile/60877ccc000000000101c324', '_blank')}
+              >
+                <XiaohongshuIcon className="w-4 h-4" />
               </IconButton>
               <IconButton label="Chats">
                 <ChatsIcon className="w-4 h-4" />

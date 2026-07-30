@@ -7,7 +7,7 @@ import TextLink from '@/components/TextLink';
 import IconTextButton from '@/components/icon-text-botton';
 import AnimatedContent from '@/effects/AnimatedContent';
 import CyclingDecryptedText from '@/components/CyclingDecryptedText';
-import { ChatsIcon, CheckIcon, BilibiliIcon, FigmaIcon } from '@/public/icons';
+import { ChatsIcon, CheckIcon, BilibiliIcon, FigmaIcon, XiaohongshuIcon } from '@/public/icons';
 import { ActionSwapIcon } from '@/components/motion/action-swap';
 import EdgeMask from '@/components/EdgeMask';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -96,6 +96,7 @@ const Footer = ({
   // 图标 hover 状态（默认灰度，hover 显示原色）
   const [bilibiliHovered, setBilibiliHovered] = useState(false);
   const [figmaHovered, setFigmaHovered] = useState(false);
+  const [xhsHovered, setXhsHovered] = useState(false);
 
   // 处理复制成功后的状态更新
   const handleCopySuccess = (type) => {
@@ -317,6 +318,22 @@ const Footer = ({
                     tooltip="Figma Portfolio"
                     onClick={() => {
                       window.open('https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024', '_blank');
+                    }}
+                  />
+                </div>
+                <div
+                  onMouseEnter={() => setXhsHovered(true)}
+                  onMouseLeave={() => setXhsHovered(false)}
+                  style={{ filter: xhsHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
+                >
+                  <IconTextButton
+                    text=""
+                    icon={<XiaohongshuIcon />}
+                    variant="ghost"
+                    size="md"
+                    tooltip="小红书"
+                    onClick={() => {
+                      window.open('https://www.xiaohongshu.com/user/profile/60877ccc000000000101c324', '_blank');
                     }}
                   />
                 </div>

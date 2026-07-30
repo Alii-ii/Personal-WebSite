@@ -6,7 +6,7 @@ import LanguageToggle from '@/components/LanguageToggle';
 import CopyEmailButton from '@/components/CopyEmailButton';
 import IconTextButton from '@/components/icon-text-botton';
 import { ActionSwapIcon } from '@/components/motion/action-swap';
-import { ChatsIcon, CheckIcon, BilibiliIcon, FigmaIcon } from '@/public/icons';
+import { ChatsIcon, CheckIcon, BilibiliIcon, FigmaIcon, XiaohongshuIcon } from '@/public/icons';
 import { useLanguage } from '@/contexts/LanguageContext';
 import EdgeMask from '@/components/EdgeMask';
 
@@ -50,6 +50,7 @@ const AppMenu = ({ open, onClose, children }) => {
   const [tooltipStates, setTooltipStates] = useState({ wechat: false });
   const [bilibiliHovered, setBilibiliHovered] = useState(false);
   const [figmaHovered, setFigmaHovered] = useState(false);
+  const [xhsHovered, setXhsHovered] = useState(false);
 
   // 动画状态：visible 控制 DOM 挂载，animating 控制过渡
   const [visible, setVisible] = useState(false);
@@ -161,6 +162,22 @@ const AppMenu = ({ open, onClose, children }) => {
                 size="md"
                 tooltip={t('bilibiliTooltip')}
                 onClick={() => window.open('https://space.bilibili.com/38773851/upload/video', '_blank')}
+              />
+            </div>
+
+            <div
+              className="shrink-0"
+              onMouseEnter={() => setXhsHovered(true)}
+              onMouseLeave={() => setXhsHovered(false)}
+              style={{ filter: xhsHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
+            >
+              <IconTextButton
+                text=""
+                icon={<XiaohongshuIcon />}
+                variant="ghost"
+                size="md"
+                tooltip="小红书"
+                onClick={() => window.open('https://www.xiaohongshu.com/user/profile/60877ccc000000000101c324', '_blank')}
               />
             </div>
           </div>

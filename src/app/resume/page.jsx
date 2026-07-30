@@ -9,7 +9,7 @@ import ResumeExperienceItem from '@/components/resume/ResumeExperienceItem';
 import ResumeNavSections from '@/components/resume/ResumeNavSections';
 import DotGrid from '@/effects/DotGrid';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { MailIcon, ChatsIcon, CheckIcon, FigmaIcon, DownloadIcon } from '@/public/icons';
+import { MailIcon, ChatsIcon, CheckIcon, FigmaIcon, XiaohongshuIcon, DownloadIcon } from '@/public/icons';
 import { ActionSwapIcon } from '@/components/motion/action-swap';
 
 /** 复制文本到剪贴板 */
@@ -40,6 +40,7 @@ function SidebarContactButtons() {
   const [copyStates, setCopyStates] = useState({ wechat: false, email: false });
   const [tooltipStates, setTooltipStates] = useState({ wechat: false, email: false });
   const [figmaHovered, setFigmaHovered] = useState(false);
+  const [xhsHovered, setXhsHovered] = useState(false);
 
   const handleCopySuccess = (type) => {
     setCopyStates(prev => ({ ...prev, [type]: true }));
@@ -112,6 +113,20 @@ function SidebarContactButtons() {
           size="md"
           tooltip="Figma Portfolio"
           onClick={() => { window.open('https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024', '_blank'); }}
+        />
+      </div>
+      <div
+        onMouseEnter={() => setXhsHovered(true)}
+        onMouseLeave={() => setXhsHovered(false)}
+        style={{ filter: xhsHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
+      >
+        <IconTextButton
+          text=""
+          icon={<XiaohongshuIcon />}
+          variant="ghost"
+          size="md"
+          tooltip="小红书"
+          onClick={() => { window.open('https://www.xiaohongshu.com/user/profile/60877ccc000000000101c324', '_blank'); }}
         />
       </div>
     </div>
