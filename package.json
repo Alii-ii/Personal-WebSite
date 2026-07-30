@@ -13,6 +13,7 @@
     "thumbs:portfolio": "node scripts/generate-portfolio-thumbs.mjs",
     "publish:gallery": "node scripts/publish-gallery.mjs",
     "sync:figma": "node scripts/sync-figma-frames.mjs",
+    "sync:portfolio-r2": "node scripts/sync-portfolio-r2.mjs",
     "subset:fonts": "node scripts/subset-fonts.mjs"
   },
   "packageManager": "pnpm@8.15.0",

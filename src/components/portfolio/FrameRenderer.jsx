@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
+import { toPortfolioLocalSrc } from '@/utils/portfolioImage';
 
 /**
  * 通用错误 / 占位态
@@ -28,17 +29,27 @@ const FrameFallback = ({ message, action }) => (
  * 但 cover 能吸收亚像素舍入误差，不会在边缘露出 1px 底色。
  */
 const ImageFrame = ({ frame, title }) => {
+  const localSrc = toPortfolioLocalSrc(frame.src, frame.srcLocal);
+  // 优先 CDN；失败后切本地兜底，再失败才显示错误态
+  const [src, setSrc] = useState(frame.src);
   const [error, setError] = useState(false);
+
   if (error) return <FrameFallback message={frame.alt || title || '图片加载失败'} />;
   return (
     <img
-      src={frame.src}
+      src={src}
       alt={frame.alt || title}
       loading="lazy"
       decoding="async"
       draggable={false}
       className="block w-full h-full object-cover select-none [-webkit-user-drag:none]"
-      onError={() => setError(true)}
+      onError={() => {
+        if (localSrc && src !== localSrc) {
+          setSrc(localSrc);
+          return;
+        }
+        setError(true);
+      }}
     />
   );
 };

@@ -1,19 +1,18 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
+import { toPortfolioLocalSrc, toPortfolioThumbSrc } from '@/utils/portfolioImage';
 
 /**
  * 作品墙里每张卡片只显示约 532px 宽，但 portfolio 原图是 2560x1440。
  * 即使懒加载，图片一旦进入视口仍要解码成约 14MB 位图；
- * 因此这里把 /images/portfolio/<项目>/<图>.webp 映射到同目录的 thumbs/ 版本。
+ * 因此把 portfolio 原图映射到同路径的 thumbs/ 版本（本地与 CDN 都支持）。
  *
  * 缩略图由 scripts/generate-portfolio-thumbs.mjs 生成。
  * 非 portfolio 图片（如 gallery）保持原路径不变。
  */
 const resolveFeedSrc = (item) => {
   const src = item?.img || item?.src || '';
-  if (!src.startsWith('/images/portfolio/') || src.includes('/thumbs/')) return src;
-  const idx = src.lastIndexOf('/');
-  return `${src.slice(0, idx)}/thumbs${src.slice(idx)}`;
+  return toPortfolioThumbSrc(src);
 };
 
 const useMedia = (queries, values, defaultValue) => {
@@ -829,6 +828,14 @@ const Masonry = ({
                   }}
                   onError={(e) => {
                     const itemKey = item.id || items.findIndex(i => i === item);
+                    // CDN 失败时回退本地 thumbs / 原图
+                    const localFull = toPortfolioLocalSrc(item.img || item.src, item.srcLocal);
+                    const localThumb = localFull ? toPortfolioThumbSrc(localFull) : '';
+                    const current = e.currentTarget?.src || '';
+                    if (localThumb && !current.includes(localThumb) && !current.endsWith(localThumb)) {
+                      e.currentTarget.src = localThumb;
+                      return;
+                    }
                     setImageLoadStatus(prev => ({
                       ...prev,
                       [itemKey]: 'error'

@@ -119,6 +119,8 @@ export const getFeedFrames = ({ category, shuffle = true } = {}) => {
       // 图片类保留 img 字段，兼容 Masonry 既有的图片分支与预加载逻辑
       img: frame.type === 'image' ? frame.src : undefined,
       src: frame.src,
+      // CDN 主路径失败时回退本地 public/ 副本
+      srcLocal: frame.srcLocal,
       alt: frame.alt,
       html: frame.html,
       url: frame.url,

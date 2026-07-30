@@ -1,5 +1,6 @@
 import ProjectDetailClient from './ProjectDetailClient';
 import { getAllProjectSlugs } from '@/contexts/ProjectContext';
+import { Suspense } from 'react';
 
 /**
  * 静态导出要求动态路由必须预生成全部路径
@@ -17,5 +18,9 @@ export async function generateStaticParams() {
  */
 export default async function ProjectPage({ params }) {
   const { slug } = await params;
-  return <ProjectDetailClient slug={slug} />;
+  return (
+    <Suspense fallback={null}>
+      <ProjectDetailClient slug={slug} />
+    </Suspense>
+  );
 }

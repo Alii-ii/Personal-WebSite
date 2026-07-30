@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
+import { toPortfolioLocalSrc, toPortfolioThumbSrc } from '@/utils/portfolioImage';
 
 /**
  * 图片占位 / 失败态
@@ -100,6 +101,10 @@ const RichPreview = ({ blocks = [], language }) => (
 const FeedCard = ({ item }) => {
   const { language } = useLanguage();
   const [imgError, setImgError] = useState(false);
+  // Masonry 可能已把 img 换成 thumbs；这里仍对 CDN/本地做统一回退
+  const primarySrc = toPortfolioThumbSrc(item.img || item.src || '');
+  const localThumb = toPortfolioThumbSrc(toPortfolioLocalSrc(item.src || item.img, item.srcLocal));
+  const [imgSrc, setImgSrc] = useState(primarySrc);
 
   const projectTitle = pickLocale(item.projectTitle, language);
   const frameTitle = pickLocale(item.title, language);
@@ -111,13 +116,19 @@ const FeedCard = ({ item }) => {
           <ImageFallback label={item.alt || frameTitle} />
         ) : (
           <img
-            src={item.src}
+            src={imgSrc}
             alt={item.alt || frameTitle || projectTitle}
             loading="lazy"
             decoding="async"
             className="w-full h-full object-cover"
             style={{ transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
-            onError={() => setImgError(true)}
+            onError={() => {
+              if (localThumb && imgSrc !== localThumb) {
+                setImgSrc(localThumb);
+                return;
+              }
+              setImgError(true);
+            }}
           />
         )
       ) : item.type === 'prototype' ? (

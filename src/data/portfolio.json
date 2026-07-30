@@ -73,9 +73,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-for-pro/01-p-01.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/01-p-01.webp",
           "alt": "【美团项目】01 - P 01",
-          "figmaNodeId": "2792:189144"
+          "figmaNodeId": "2792:189144",
+          "srcLocal": "/images/portfolio/nocode-for-pro/01-p-01.webp"
         },
         {
           "id": "nocode-for-pro-02-p-02",
@@ -89,9 +90,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-for-pro/02-p-02.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/02-p-02.webp",
           "alt": "【美团项目】01 - P 02",
-          "figmaNodeId": "2792:189145"
+          "figmaNodeId": "2792:189145",
+          "srcLocal": "/images/portfolio/nocode-for-pro/02-p-02.webp"
         },
         {
           "id": "nocode-for-pro-03-p-03",
@@ -105,9 +107,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-for-pro/03-p-03.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/03-p-03.webp",
           "alt": "【美团项目】01 - P 03",
-          "figmaNodeId": "2792:189146"
+          "figmaNodeId": "2792:189146",
+          "srcLocal": "/images/portfolio/nocode-for-pro/03-p-03.webp"
         },
         {
           "id": "nocode-for-pro-04-p-04",
@@ -121,9 +124,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-for-pro/04-p-04.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/04-p-04.webp",
           "alt": "【美团项目】01 - P 04",
-          "figmaNodeId": "2807:257221"
+          "figmaNodeId": "2807:257221",
+          "srcLocal": "/images/portfolio/nocode-for-pro/04-p-04.webp"
         },
         {
           "id": "nocode-for-pro-05-p-05",
@@ -137,9 +141,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-for-pro/05-p-05.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/05-p-05.webp",
           "alt": "【美团项目】01 - P 05",
-          "figmaNodeId": "2792:189147"
+          "figmaNodeId": "2792:189147",
+          "srcLocal": "/images/portfolio/nocode-for-pro/05-p-05.webp"
         },
         {
           "id": "nocode-for-pro-06-p-06",
@@ -153,9 +158,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-for-pro/06-p-06.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/06-p-06.webp",
           "alt": "【美团项目】01 - P 06",
-          "figmaNodeId": "2792:189148"
+          "figmaNodeId": "2792:189148",
+          "srcLocal": "/images/portfolio/nocode-for-pro/06-p-06.webp"
         },
         {
           "id": "nocode-for-pro-07-p-07",
@@ -169,9 +175,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-for-pro/07-p-07.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/07-p-07.webp",
           "alt": "【美团项目】01 - P 07",
-          "figmaNodeId": "2792:189149"
+          "figmaNodeId": "2792:189149",
+          "srcLocal": "/images/portfolio/nocode-for-pro/07-p-07.webp"
         },
         {
           "id": "nocode-for-pro-08-p-08",
@@ -185,9 +192,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-for-pro/08-p-08.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/08-p-08.webp",
           "alt": "【美团项目】01 - P 08",
-          "figmaNodeId": "2815:61700"
+          "figmaNodeId": "2815:61700",
+          "srcLocal": "/images/portfolio/nocode-for-pro/08-p-08.webp"
         },
         {
           "id": "nocode-for-pro-09-p-09",
@@ -201,9 +209,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-for-pro/09-p-09.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/09-p-09.webp",
           "alt": "【美团项目】01 - P 09",
-          "figmaNodeId": "2792:189150"
+          "figmaNodeId": "2792:189150",
+          "srcLocal": "/images/portfolio/nocode-for-pro/09-p-09.webp"
         },
         {
           "id": "nocode-for-pro-10-p-10",
@@ -217,12 +226,11 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-for-pro/10-p-10.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/10-p-10.webp",
           "alt": "【美团项目】01 - P 10",
-          "figmaNodeId": "2792:189151"
+          "figmaNodeId": "2792:189151",
+          "srcLocal": "/images/portfolio/nocode-for-pro/10-p-10.webp"
         },
-
-
         {
           "id": "nfp-design-figma",
           "tab": "design",
@@ -275,9 +283,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/chatgpt-home-buying/01-zhizhu-01.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/chatgpt-home-buying/01-zhizhu-01.webp",
           "alt": "【实习项目】 - 知住 01",
-          "figmaNodeId": "513:49983"
+          "figmaNodeId": "513:49983",
+          "srcLocal": "/images/portfolio/chatgpt-home-buying/01-zhizhu-01.webp"
         },
         {
           "id": "chatgpt-home-buying-02-zhizhu-02",
@@ -291,9 +300,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/chatgpt-home-buying/02-zhizhu-02.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/chatgpt-home-buying/02-zhizhu-02.webp",
           "alt": "【实习项目】 - 知住 02",
-          "figmaNodeId": "513:49980"
+          "figmaNodeId": "513:49980",
+          "srcLocal": "/images/portfolio/chatgpt-home-buying/02-zhizhu-02.webp"
         },
         {
           "id": "chatgpt-home-buying-03-zhizhu-03",
@@ -307,9 +317,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/chatgpt-home-buying/03-zhizhu-03.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/chatgpt-home-buying/03-zhizhu-03.webp",
           "alt": "【实习项目】 - 知住 03",
-          "figmaNodeId": "513:49979"
+          "figmaNodeId": "513:49979",
+          "srcLocal": "/images/portfolio/chatgpt-home-buying/03-zhizhu-03.webp"
         },
         {
           "id": "chatgpt-home-buying-04-zhizhu-10",
@@ -339,9 +350,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/chatgpt-home-buying/04-zhizhu-04.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/chatgpt-home-buying/04-zhizhu-04.webp",
           "alt": "【实习项目】 - 知住 04",
-          "figmaNodeId": "513:49982"
+          "figmaNodeId": "513:49982",
+          "srcLocal": "/images/portfolio/chatgpt-home-buying/04-zhizhu-04.webp"
         },
         {
           "id": "chatgpt-home-buying-06-zhizhu-05",
@@ -355,9 +367,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/chatgpt-home-buying/05-zhizhu-05.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/chatgpt-home-buying/05-zhizhu-05.webp",
           "alt": "【实习项目】 - 知住 05",
-          "figmaNodeId": "513:49981"
+          "figmaNodeId": "513:49981",
+          "srcLocal": "/images/portfolio/chatgpt-home-buying/05-zhizhu-05.webp"
         },
         {
           "id": "chatgpt-home-buying-07-zhizhu-07",
@@ -371,9 +384,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/chatgpt-home-buying/06-zhizhu-07.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/chatgpt-home-buying/06-zhizhu-07.webp",
           "alt": "【实习项目】 - 知住 07",
-          "figmaNodeId": "513:49976"
+          "figmaNodeId": "513:49976",
+          "srcLocal": "/images/portfolio/chatgpt-home-buying/06-zhizhu-07.webp"
         },
         {
           "id": "chatgpt-home-buying-08-zhizhu-08",
@@ -387,9 +401,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/chatgpt-home-buying/07-zhizhu-08.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/chatgpt-home-buying/07-zhizhu-08.webp",
           "alt": "【实习项目】 - 知住 08",
-          "figmaNodeId": "513:49977"
+          "figmaNodeId": "513:49977",
+          "srcLocal": "/images/portfolio/chatgpt-home-buying/07-zhizhu-08.webp"
         },
         {
           "id": "chatgpt-home-buying-09-zhizhu-09",
@@ -403,9 +418,27 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/chatgpt-home-buying/08-zhizhu-09.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/chatgpt-home-buying/08-zhizhu-09.webp",
           "alt": "【实习项目】 - 知住 09",
-          "figmaNodeId": "513:49975"
+          "figmaNodeId": "513:49975",
+          "srcLocal": "/images/portfolio/chatgpt-home-buying/08-zhizhu-09.webp"
+        },
+        {
+          "id": "chatgpt-home-buying-09-zhizhu-10",
+          "tab": "slides",
+          "type": "image",
+          "title": {
+            "zh": "知住 10",
+            "en": "知住 10"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/chatgpt-home-buying/09-zhizhu-10.webp",
+          "alt": "【实习项目】 - 知住 10",
+          "figmaNodeId": "513:49978",
+          "srcLocal": "/images/portfolio/chatgpt-home-buying/09-zhizhu-10.webp"
         }
       ]
     },
@@ -444,9 +477,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/01-p-01.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/01-p-01.webp",
           "alt": "本科毕设 - P 01",
-          "figmaNodeId": "746:75153"
+          "figmaNodeId": "746:75153",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/01-p-01.webp"
         },
         {
           "id": "undergraduate-thesis-02-p-02",
@@ -460,9 +494,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/02-p-02.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/02-p-02.webp",
           "alt": "本科毕设 - P 02",
-          "figmaNodeId": "746:75160"
+          "figmaNodeId": "746:75160",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/02-p-02.webp"
         },
         {
           "id": "undergraduate-thesis-03-p-03",
@@ -476,9 +511,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/03-p-03.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/03-p-03.webp",
           "alt": "本科毕设 - P 03",
-          "figmaNodeId": "746:75157"
+          "figmaNodeId": "746:75157",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/03-p-03.webp"
         },
         {
           "id": "undergraduate-thesis-04-p-04",
@@ -492,9 +528,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/04-p-04.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/04-p-04.webp",
           "alt": "本科毕设 - P 04",
-          "figmaNodeId": "746:75161"
+          "figmaNodeId": "746:75161",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/04-p-04.webp"
         },
         {
           "id": "undergraduate-thesis-05-p-05",
@@ -508,9 +545,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/05-p-05.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/05-p-05.webp",
           "alt": "本科毕设 - P 05",
-          "figmaNodeId": "746:75150"
+          "figmaNodeId": "746:75150",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/05-p-05.webp"
         },
         {
           "id": "undergraduate-thesis-06-p-06",
@@ -524,9 +562,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/06-p-06.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/06-p-06.webp",
           "alt": "本科毕设 - P 06",
-          "figmaNodeId": "746:75155"
+          "figmaNodeId": "746:75155",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/06-p-06.webp"
         },
         {
           "id": "undergraduate-thesis-07-p-07",
@@ -540,9 +579,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/07-p-07.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/07-p-07.webp",
           "alt": "本科毕设 - P 07",
-          "figmaNodeId": "746:75154"
+          "figmaNodeId": "746:75154",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/07-p-07.webp"
         },
         {
           "id": "undergraduate-thesis-08-p-08",
@@ -556,9 +596,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/08-p-08.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/08-p-08.webp",
           "alt": "本科毕设 - P 08",
-          "figmaNodeId": "746:75149"
+          "figmaNodeId": "746:75149",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/08-p-08.webp"
         },
         {
           "id": "undergraduate-thesis-09-p-09",
@@ -572,9 +613,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/09-p-09.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/09-p-09.webp",
           "alt": "本科毕设 - P 09",
-          "figmaNodeId": "746:75151"
+          "figmaNodeId": "746:75151",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/09-p-09.webp"
         },
         {
           "id": "undergraduate-thesis-10-p-10",
@@ -588,9 +630,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/10-p-10.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/10-p-10.webp",
           "alt": "本科毕设 - P 10",
-          "figmaNodeId": "746:75148"
+          "figmaNodeId": "746:75148",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/10-p-10.webp"
         },
         {
           "id": "undergraduate-thesis-11-p-11",
@@ -604,9 +647,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/11-p-11.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/11-p-11.webp",
           "alt": "本科毕设 - P 11",
-          "figmaNodeId": "746:75156"
+          "figmaNodeId": "746:75156",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/11-p-11.webp"
         },
         {
           "id": "undergraduate-thesis-12-p-12",
@@ -620,9 +664,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/12-p-12.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/12-p-12.webp",
           "alt": "本科毕设 - P 12",
-          "figmaNodeId": "746:75147"
+          "figmaNodeId": "746:75147",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/12-p-12.webp"
         },
         {
           "id": "undergraduate-thesis-13-p-13",
@@ -636,9 +681,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/13-p-13.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/13-p-13.webp",
           "alt": "本科毕设 - P 13",
-          "figmaNodeId": "746:75159"
+          "figmaNodeId": "746:75159",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/13-p-13.webp"
         },
         {
           "id": "undergraduate-thesis-14-p-14",
@@ -652,9 +698,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/14-p-14.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/14-p-14.webp",
           "alt": "本科毕设 - P 14",
-          "figmaNodeId": "746:75146"
+          "figmaNodeId": "746:75146",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/14-p-14.webp"
         },
         {
           "id": "undergraduate-thesis-15-p-15",
@@ -668,9 +715,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/15-p-15.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/15-p-15.webp",
           "alt": "本科毕设 - P 15",
-          "figmaNodeId": "746:75158"
+          "figmaNodeId": "746:75158",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/15-p-15.webp"
         },
         {
           "id": "undergraduate-thesis-16-p-16",
@@ -684,9 +732,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/undergraduate-thesis/16-p-16.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/16-p-16.webp",
           "alt": "本科毕设 - P 16",
-          "figmaNodeId": "746:75152"
+          "figmaNodeId": "746:75152",
+          "srcLocal": "/images/portfolio/undergraduate-thesis/16-p-16.webp"
         },
         {
           "id": "szrh-szrh-strategy-01",
@@ -740,9 +789,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/01-laolao-01.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/01-laolao-01.webp",
           "alt": "捞捞服务设计 - 捞捞 01",
-          "figmaNodeId": "83:27156"
+          "figmaNodeId": "83:27156",
+          "srcLocal": "/images/portfolio/laolao-service-design/01-laolao-01.webp"
         },
         {
           "id": "laolao-service-design-02-laolao-02",
@@ -756,9 +806,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/02-laolao-02.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/02-laolao-02.webp",
           "alt": "捞捞服务设计 - 捞捞 02",
-          "figmaNodeId": "83:27154"
+          "figmaNodeId": "83:27154",
+          "srcLocal": "/images/portfolio/laolao-service-design/02-laolao-02.webp"
         },
         {
           "id": "laolao-service-design-03-laolao-03",
@@ -772,9 +823,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/03-laolao-03.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/03-laolao-03.webp",
           "alt": "捞捞服务设计 - 捞捞 03",
-          "figmaNodeId": "83:27151"
+          "figmaNodeId": "83:27151",
+          "srcLocal": "/images/portfolio/laolao-service-design/03-laolao-03.webp"
         },
         {
           "id": "laolao-service-design-04-laolao-04",
@@ -788,9 +840,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/04-laolao-04.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/04-laolao-04.webp",
           "alt": "捞捞服务设计 - 捞捞 04",
-          "figmaNodeId": "83:27147"
+          "figmaNodeId": "83:27147",
+          "srcLocal": "/images/portfolio/laolao-service-design/04-laolao-04.webp"
         },
         {
           "id": "laolao-service-design-05-laolao-05",
@@ -804,9 +857,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/05-laolao-05.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/05-laolao-05.webp",
           "alt": "捞捞服务设计 - 捞捞 05",
-          "figmaNodeId": "83:27153"
+          "figmaNodeId": "83:27153",
+          "srcLocal": "/images/portfolio/laolao-service-design/05-laolao-05.webp"
         },
         {
           "id": "laolao-service-design-06-laolao-06",
@@ -820,9 +874,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/06-laolao-06.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/06-laolao-06.webp",
           "alt": "捞捞服务设计 - 捞捞 06",
-          "figmaNodeId": "83:27152"
+          "figmaNodeId": "83:27152",
+          "srcLocal": "/images/portfolio/laolao-service-design/06-laolao-06.webp"
         },
         {
           "id": "laolao-service-design-07-laolao-07",
@@ -836,9 +891,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/07-laolao-07.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/07-laolao-07.webp",
           "alt": "捞捞服务设计 - 捞捞 07",
-          "figmaNodeId": "83:27150"
+          "figmaNodeId": "83:27150",
+          "srcLocal": "/images/portfolio/laolao-service-design/07-laolao-07.webp"
         },
         {
           "id": "laolao-service-design-08-laolao-08",
@@ -852,9 +908,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/08-laolao-08.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/08-laolao-08.webp",
           "alt": "捞捞服务设计 - 捞捞 08",
-          "figmaNodeId": "83:27149"
+          "figmaNodeId": "83:27149",
+          "srcLocal": "/images/portfolio/laolao-service-design/08-laolao-08.webp"
         },
         {
           "id": "laolao-service-design-09-laolao-09",
@@ -868,9 +925,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/09-laolao-09.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/09-laolao-09.webp",
           "alt": "捞捞服务设计 - 捞捞 09",
-          "figmaNodeId": "83:27146"
+          "figmaNodeId": "83:27146",
+          "srcLocal": "/images/portfolio/laolao-service-design/09-laolao-09.webp"
         },
         {
           "id": "laolao-service-design-10-laolao-10",
@@ -884,9 +942,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/10-laolao-10.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/10-laolao-10.webp",
           "alt": "捞捞服务设计 - 捞捞 10",
-          "figmaNodeId": "83:27148"
+          "figmaNodeId": "83:27148",
+          "srcLocal": "/images/portfolio/laolao-service-design/10-laolao-10.webp"
         },
         {
           "id": "laolao-service-design-11-laolao-11",
@@ -900,9 +959,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/11-laolao-11.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/11-laolao-11.webp",
           "alt": "捞捞服务设计 - 捞捞 11",
-          "figmaNodeId": "83:27155"
+          "figmaNodeId": "83:27155",
+          "srcLocal": "/images/portfolio/laolao-service-design/11-laolao-11.webp"
         },
         {
           "id": "laolao-service-design-12-laolao-12",
@@ -916,9 +976,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/12-laolao-12.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/12-laolao-12.webp",
           "alt": "捞捞服务设计 - 捞捞 12",
-          "figmaNodeId": "83:27145"
+          "figmaNodeId": "83:27145",
+          "srcLocal": "/images/portfolio/laolao-service-design/12-laolao-12.webp"
         },
         {
           "id": "laolao-service-design-13-laolao-13",
@@ -932,9 +993,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/13-laolao-13.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/13-laolao-13.webp",
           "alt": "捞捞服务设计 - 捞捞 13",
-          "figmaNodeId": "83:27144"
+          "figmaNodeId": "83:27144",
+          "srcLocal": "/images/portfolio/laolao-service-design/13-laolao-13.webp"
         },
         {
           "id": "laolao-service-design-14-laolao-14",
@@ -948,9 +1010,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/14-laolao-14.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/14-laolao-14.webp",
           "alt": "捞捞服务设计 - 捞捞 14",
-          "figmaNodeId": "83:27143"
+          "figmaNodeId": "83:27143",
+          "srcLocal": "/images/portfolio/laolao-service-design/14-laolao-14.webp"
         },
         {
           "id": "laolao-service-design-15-laolao-15",
@@ -964,9 +1027,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/laolao-service-design/15-laolao-15.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/15-laolao-15.webp",
           "alt": "捞捞服务设计 - 捞捞 15",
-          "figmaNodeId": "83:27142"
+          "figmaNodeId": "83:27142",
+          "srcLocal": "/images/portfolio/laolao-service-design/15-laolao-15.webp"
         }
       ]
     }
