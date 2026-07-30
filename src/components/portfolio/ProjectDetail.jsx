@@ -21,6 +21,7 @@ import {
   getProjectsByCategory,
   pickLocale,
 } from '@/contexts/ProjectContext';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/tooltip';
 
 // 已解析过的图片比例缓存（模块级，跨组件/跨项目复用，避免重复探测）
 const ratioCache = new Map();
@@ -112,23 +113,34 @@ const useImageRatios = (frames) => {
  * 目录按钮（对应设计稿 32×32 r8）
  */
 const MenuButton = ({ onClick, active }) => (
-  <button
-    type="button"
-    aria-label="目录"
-    onClick={onClick}
-    className={`w-8 h-8 rounded-[8px] flex items-center justify-center transition-colors duration-150 ${
-      active ? 'bg-hover text-main' : 'text-secondary hover:bg-hover hover:text-main'
-    }`}
-  >
-    {/* 菜单 icon：替换为外部提供的版本 */}
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M4.22218 4.44434C4.59037 4.44434 4.88885 4.74281 4.88885 5.111C4.88885 5.47919 4.59037 5.77767 4.22218 5.77767H3.33329C2.9651 5.77767 2.66663 5.47919 2.66663 5.111C2.66663 4.74281 2.9651 4.44434 3.33329 4.44434H4.22218ZM18 4.44434C18.3681 4.44434 18.6666 4.74281 18.6666 5.111C18.6666 5.47919 18.3681 5.77767 18 5.77767H7.33329C6.9651 5.77767 6.66663 5.47919 6.66663 5.111C6.66663 4.74281 6.9651 4.44434 7.33329 4.44434H18ZM4.22218 9.99989C4.59037 9.99989 4.88885 10.2984 4.88885 10.6666C4.88885 11.0347 4.59037 11.3332 4.22218 11.3332H3.33329C2.9651 11.3332 2.66663 11.0347 2.66663 10.6666C2.66663 10.2984 2.9651 9.99989 3.33329 9.99989H4.22218ZM6.66663 10.6666C6.66663 10.2984 6.9651 9.99989 7.33329 9.99989H18C18.3681 9.99989 18.6666 10.2984 18.6666 10.6666C18.6666 11.0347 18.3681 11.3332 18 11.3332H7.33329C6.9651 11.3332 6.66663 11.0347 6.66663 10.6666ZM4.22218 15.5554C4.59037 15.5554 4.88885 15.8539 4.88885 16.2221C4.88885 16.5903 4.59037 16.8888 4.22218 16.8888H3.33329C2.9651 16.8888 2.66663 16.5903 2.66663 16.2221C2.66663 15.8539 2.9651 15.5554 3.33329 15.5554H4.22218ZM6.66663 16.2221C6.66663 15.8539 6.9651 15.5554 7.33329 15.5554H18C18.3681 15.5554 18.6666 15.8539 18.6666 16.2221C18.6666 16.5903 18.3681 16.8888 18 16.8888H7.33329C6.9651 16.8888 6.66663 16.5903 6.66663 16.2221Z"
-        fill="currentColor"
-        fillOpacity="0.65"
-      />
-    </svg>
-  </button>
+  <Tooltip delayDuration={200}>
+    <TooltipTrigger asChild>
+      <button
+        type="button"
+        aria-label="目录"
+        onClick={onClick}
+        className={`relative z-50 w-8 h-8 rounded-[8px] flex items-center justify-center cursor-pointer transition-colors duration-150 ${
+          active ? 'bg-hover text-main' : 'text-secondary hover:bg-hover hover:text-main'
+        }`}
+      >
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M4.22218 4.44434C4.59037 4.44434 4.88885 4.74281 4.88885 5.111C4.88885 5.47919 4.59037 5.77767 4.22218 5.77767H3.33329C2.9651 5.77767 2.66663 5.47919 2.66663 5.111C2.66663 4.74281 2.9651 4.44434 3.33329 4.44434H4.22218ZM18 4.44434C18.3681 4.44434 18.6666 4.74281 18.6666 5.111C18.6666 5.47919 18.3681 5.77767 18 5.77767H7.33329C6.9651 5.77767 6.66663 5.47919 6.66663 5.111C6.66663 4.74281 6.9651 4.44434 7.33329 4.44434H18ZM4.22218 9.99989C4.59037 9.99989 4.88885 10.2984 4.88885 10.6666C4.88885 11.0347 4.59037 11.3332 4.22218 11.3332H3.33329C2.9651 11.3332 2.66663 11.0347 2.66663 10.6666C2.66663 10.2984 2.9651 9.99989 3.33329 9.99989H4.22218ZM6.66663 10.6666C6.66663 10.2984 6.9651 9.99989 7.33329 9.99989H18C18.3681 9.99989 18.6666 10.2984 18.6666 10.6666C18.6666 11.0347 18.3681 11.3332 18 11.3332H7.33329C6.9651 11.3332 6.66663 11.0347 6.66663 10.6666ZM4.22218 15.5554C4.59037 15.5554 4.88885 15.8539 4.88885 16.2221C4.88885 16.5903 4.59037 16.8888 4.22218 16.8888H3.33329C2.9651 16.8888 2.66663 16.5903 2.66663 16.2221C2.66663 15.8539 2.9651 15.5554 3.33329 15.5554H4.22218ZM6.66663 16.2221C6.66663 15.8539 6.9651 15.5554 7.33329 15.5554H18C18.3681 15.5554 18.6666 15.8539 18.6666 16.2221C18.6666 16.5903 18.3681 16.8888 18 16.8888H7.33329C6.9651 16.8888 6.66663 16.5903 6.66663 16.2221Z"
+            fill="currentColor"
+            fillOpacity="0.65"
+          />
+        </svg>
+      </button>
+    </TooltipTrigger>
+    <TooltipContent side="bottom" className="z-[9999]">
+      <div className="flex items-center gap-1">
+        <span className="text-card">目录</span>
+        <kbd className="inline-flex size-fit select-none items-center font-regular text-[12px] text-card/50 [letter-spacing:4px] [&:last-child]:mr-[-4px] text-center">
+          ⌘/
+        </kbd>
+      </div>
+    </TooltipContent>
+  </Tooltip>
 );
 
 /**
@@ -508,6 +520,13 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
 
       const { neighbors: nb, commentOpen: isCommentOpen, menuOpen: isMenuOpen } =
         stateRef.current;
+
+      // Cmd+/ (macOS) / Ctrl+/ (Win) 切换菜单
+      if ((event.metaKey || event.ctrlKey) && event.key === '/') {
+        event.preventDefault();
+        setMenuOpen((prev) => !prev);
+        return;
+      }
 
       // alt + 数字切换 tab：不与固定 tab 绑定，而是与「从右往左数」的顺位绑定
       // 最右侧 tab 对应 0，往左依次 9、8、7…
