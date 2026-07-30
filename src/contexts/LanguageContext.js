@@ -20,6 +20,7 @@ const translations = {
     
     // 社交按钮
     bilibiliTooltip: "Alii在B站刷什么👀",
+    writing: "文章随笔",
     wechatTooltip: "get 微信",
     wechatCopied: "已复制到粘贴板~",
     emailTooltip: "get 邮箱", 
@@ -53,6 +54,7 @@ const translations = {
     
     // Social buttons
     bilibiliTooltip: "What is Alii watching on Bilibili 👀",
+    writing: "Writing",
     wechatTooltip: "get WeChat",
     wechatCopied: "Copied to clipboard~",
     emailTooltip: "get Email",

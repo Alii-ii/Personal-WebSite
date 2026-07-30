@@ -340,7 +340,7 @@ export default function ResumePage() {
       </div>
 
       <div className="flex-1 w-full">
-        <div className="relative z-10 w-full flex justify-center px-6 md:px-16 py-12 md:py-[80px]">
+        <div className="relative z-10 w-full flex justify-center px-6 md:px-0 py-12 md:py-0">
 
           <ResumeNavSections
             sections={RESUME_SECTIONS}

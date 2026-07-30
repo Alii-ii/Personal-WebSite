@@ -25,6 +25,40 @@
   ],
   "projects": [
     {
+      "slug": "catdesk-dynamic-workflow",
+      "category": "product",
+      "order": -1,
+      "disabled": true,
+      "title": {
+        "zh": "CatDesk Dynamic Workflow",
+        "en": "CatDesk Dynamic Workflow"
+      },
+      "period": "2025",
+      "summary": {
+        "zh": "整理中",
+        "en": "Coming soon"
+      },
+      "tabs": [],
+      "frames": []
+    },
+    {
+      "slug": "nocode-design-mode",
+      "category": "product",
+      "order": 0,
+      "disabled": true,
+      "title": {
+        "zh": "NoCode Design Mode 0-1",
+        "en": "NoCode Design Mode 0-1"
+      },
+      "period": "2025",
+      "summary": {
+        "zh": "整理中",
+        "en": "Coming soon"
+      },
+      "tabs": [],
+      "frames": []
+    },
+    {
       "slug": "nocode-for-pro",
       "category": "product",
       "order": 1,
@@ -447,7 +481,7 @@
       "category": "product",
       "order": 2,
       "title": {
-        "zh": "本科毕设",
+        "zh": "深圳保租房 0-1 服务设计",
         "en": "Undergraduate Thesis"
       },
       "period": "2024.6",
@@ -478,7 +512,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/01-p-01.webp",
-          "alt": "本科毕设 - P 01",
+          "alt": "深圳保租房 0-1 服务设计 - 01",
           "figmaNodeId": "746:75153",
           "srcLocal": "/images/portfolio/undergraduate-thesis/01-p-01.webp"
         },
@@ -495,7 +529,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/02-p-02.webp",
-          "alt": "本科毕设 - P 02",
+          "alt": "深圳保租房 0-1 服务设计 - 02",
           "figmaNodeId": "746:75160",
           "srcLocal": "/images/portfolio/undergraduate-thesis/02-p-02.webp"
         },
@@ -512,7 +546,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/03-p-03.webp",
-          "alt": "本科毕设 - P 03",
+          "alt": "深圳保租房 0-1 服务设计 - 03",
           "figmaNodeId": "746:75157",
           "srcLocal": "/images/portfolio/undergraduate-thesis/03-p-03.webp"
         },
@@ -529,7 +563,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/04-p-04.webp",
-          "alt": "本科毕设 - P 04",
+          "alt": "深圳保租房 0-1 服务设计 - 04",
           "figmaNodeId": "746:75161",
           "srcLocal": "/images/portfolio/undergraduate-thesis/04-p-04.webp"
         },
@@ -546,7 +580,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/05-p-05.webp",
-          "alt": "本科毕设 - P 05",
+          "alt": "深圳保租房 0-1 服务设计 - 05",
           "figmaNodeId": "746:75150",
           "srcLocal": "/images/portfolio/undergraduate-thesis/05-p-05.webp"
         },
@@ -563,7 +597,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/06-p-06.webp",
-          "alt": "本科毕设 - P 06",
+          "alt": "深圳保租房 0-1 服务设计 - 06",
           "figmaNodeId": "746:75155",
           "srcLocal": "/images/portfolio/undergraduate-thesis/06-p-06.webp"
         },
@@ -580,7 +614,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/07-p-07.webp",
-          "alt": "本科毕设 - P 07",
+          "alt": "深圳保租房 0-1 服务设计 - 07",
           "figmaNodeId": "746:75154",
           "srcLocal": "/images/portfolio/undergraduate-thesis/07-p-07.webp"
         },
@@ -597,7 +631,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/08-p-08.webp",
-          "alt": "本科毕设 - P 08",
+          "alt": "深圳保租房 0-1 服务设计 - 08",
           "figmaNodeId": "746:75149",
           "srcLocal": "/images/portfolio/undergraduate-thesis/08-p-08.webp"
         },
@@ -614,7 +648,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/09-p-09.webp",
-          "alt": "本科毕设 - P 09",
+          "alt": "深圳保租房 0-1 服务设计 - 09",
           "figmaNodeId": "746:75151",
           "srcLocal": "/images/portfolio/undergraduate-thesis/09-p-09.webp"
         },
@@ -631,7 +665,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/10-p-10.webp",
-          "alt": "本科毕设 - P 10",
+          "alt": "深圳保租房 0-1 服务设计 - 10",
           "figmaNodeId": "746:75148",
           "srcLocal": "/images/portfolio/undergraduate-thesis/10-p-10.webp"
         },
@@ -648,7 +682,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/11-p-11.webp",
-          "alt": "本科毕设 - P 11",
+          "alt": "深圳保租房 0-1 服务设计 - 11",
           "figmaNodeId": "746:75156",
           "srcLocal": "/images/portfolio/undergraduate-thesis/11-p-11.webp"
         },
@@ -665,7 +699,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/12-p-12.webp",
-          "alt": "本科毕设 - P 12",
+          "alt": "深圳保租房 0-1 服务设计 - 12",
           "figmaNodeId": "746:75147",
           "srcLocal": "/images/portfolio/undergraduate-thesis/12-p-12.webp"
         },
@@ -682,7 +716,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/13-p-13.webp",
-          "alt": "本科毕设 - P 13",
+          "alt": "深圳保租房 0-1 服务设计 - 13",
           "figmaNodeId": "746:75159",
           "srcLocal": "/images/portfolio/undergraduate-thesis/13-p-13.webp"
         },
@@ -699,7 +733,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/14-p-14.webp",
-          "alt": "本科毕设 - P 14",
+          "alt": "深圳保租房 0-1 服务设计 - 14",
           "figmaNodeId": "746:75146",
           "srcLocal": "/images/portfolio/undergraduate-thesis/14-p-14.webp"
         },
@@ -716,7 +750,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/15-p-15.webp",
-          "alt": "本科毕设 - P 15",
+          "alt": "深圳保租房 0-1 服务设计 - 15",
           "figmaNodeId": "746:75158",
           "srcLocal": "/images/portfolio/undergraduate-thesis/15-p-15.webp"
         },
@@ -733,7 +767,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/undergraduate-thesis/16-p-16.webp",
-          "alt": "本科毕设 - P 16",
+          "alt": "深圳保租房 0-1 服务设计 - 16",
           "figmaNodeId": "746:75152",
           "srcLocal": "/images/portfolio/undergraduate-thesis/16-p-16.webp"
         },
@@ -759,7 +793,7 @@
       "category": "product",
       "order": 4,
       "title": {
-        "zh": "捞捞服务设计",
+        "zh": "服务设计课题: 捞捞闲置",
         "en": "Lao Lao Service Design"
       },
       "period": "2022.7",
@@ -790,7 +824,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/01-laolao-01.webp",
-          "alt": "捞捞服务设计 - 捞捞 01",
+          "alt": "服务设计课题: 捞捞闲置 - 01",
           "figmaNodeId": "83:27156",
           "srcLocal": "/images/portfolio/laolao-service-design/01-laolao-01.webp"
         },
@@ -807,7 +841,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/02-laolao-02.webp",
-          "alt": "捞捞服务设计 - 捞捞 02",
+          "alt": "服务设计课题: 捞捞闲置 - 02",
           "figmaNodeId": "83:27154",
           "srcLocal": "/images/portfolio/laolao-service-design/02-laolao-02.webp"
         },
@@ -824,7 +858,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/03-laolao-03.webp",
-          "alt": "捞捞服务设计 - 捞捞 03",
+          "alt": "服务设计课题: 捞捞闲置 - 03",
           "figmaNodeId": "83:27151",
           "srcLocal": "/images/portfolio/laolao-service-design/03-laolao-03.webp"
         },
@@ -841,7 +875,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/04-laolao-04.webp",
-          "alt": "捞捞服务设计 - 捞捞 04",
+          "alt": "服务设计课题: 捞捞闲置 - 04",
           "figmaNodeId": "83:27147",
           "srcLocal": "/images/portfolio/laolao-service-design/04-laolao-04.webp"
         },
@@ -858,7 +892,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/05-laolao-05.webp",
-          "alt": "捞捞服务设计 - 捞捞 05",
+          "alt": "服务设计课题: 捞捞闲置 - 05",
           "figmaNodeId": "83:27153",
           "srcLocal": "/images/portfolio/laolao-service-design/05-laolao-05.webp"
         },
@@ -875,7 +909,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/06-laolao-06.webp",
-          "alt": "捞捞服务设计 - 捞捞 06",
+          "alt": "服务设计课题: 捞捞闲置 - 06",
           "figmaNodeId": "83:27152",
           "srcLocal": "/images/portfolio/laolao-service-design/06-laolao-06.webp"
         },
@@ -892,7 +926,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/07-laolao-07.webp",
-          "alt": "捞捞服务设计 - 捞捞 07",
+          "alt": "服务设计课题: 捞捞闲置 - 07",
           "figmaNodeId": "83:27150",
           "srcLocal": "/images/portfolio/laolao-service-design/07-laolao-07.webp"
         },
@@ -909,7 +943,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/08-laolao-08.webp",
-          "alt": "捞捞服务设计 - 捞捞 08",
+          "alt": "服务设计课题: 捞捞闲置 - 08",
           "figmaNodeId": "83:27149",
           "srcLocal": "/images/portfolio/laolao-service-design/08-laolao-08.webp"
         },
@@ -926,7 +960,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/09-laolao-09.webp",
-          "alt": "捞捞服务设计 - 捞捞 09",
+          "alt": "服务设计课题: 捞捞闲置 - 09",
           "figmaNodeId": "83:27146",
           "srcLocal": "/images/portfolio/laolao-service-design/09-laolao-09.webp"
         },
@@ -943,7 +977,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/10-laolao-10.webp",
-          "alt": "捞捞服务设计 - 捞捞 10",
+          "alt": "服务设计课题: 捞捞闲置 - 10",
           "figmaNodeId": "83:27148",
           "srcLocal": "/images/portfolio/laolao-service-design/10-laolao-10.webp"
         },
@@ -960,7 +994,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/11-laolao-11.webp",
-          "alt": "捞捞服务设计 - 捞捞 11",
+          "alt": "服务设计课题: 捞捞闲置 - 11",
           "figmaNodeId": "83:27155",
           "srcLocal": "/images/portfolio/laolao-service-design/11-laolao-11.webp"
         },
@@ -977,7 +1011,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/12-laolao-12.webp",
-          "alt": "捞捞服务设计 - 捞捞 12",
+          "alt": "服务设计课题: 捞捞闲置 - 12",
           "figmaNodeId": "83:27145",
           "srcLocal": "/images/portfolio/laolao-service-design/12-laolao-12.webp"
         },
@@ -994,7 +1028,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/13-laolao-13.webp",
-          "alt": "捞捞服务设计 - 捞捞 13",
+          "alt": "服务设计课题: 捞捞闲置 - 13",
           "figmaNodeId": "83:27144",
           "srcLocal": "/images/portfolio/laolao-service-design/13-laolao-13.webp"
         },
@@ -1011,7 +1045,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/14-laolao-14.webp",
-          "alt": "捞捞服务设计 - 捞捞 14",
+          "alt": "服务设计课题: 捞捞闲置 - 14",
           "figmaNodeId": "83:27143",
           "srcLocal": "/images/portfolio/laolao-service-design/14-laolao-14.webp"
         },
@@ -1028,7 +1062,7 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/laolao-service-design/15-laolao-15.webp",
-          "alt": "捞捞服务设计 - 捞捞 15",
+          "alt": "服务设计课题: 捞捞闲置 - 15",
           "figmaNodeId": "83:27142",
           "srcLocal": "/images/portfolio/laolao-service-design/15-laolao-15.webp"
         }

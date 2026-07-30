@@ -16,27 +16,29 @@ export default function ResumeNavSections({
 }) {
   return (
     <div className="w-full max-w-[960px] flex flex-col md:flex-row gap-10 md:gap-[64px]">
-      {/* 左侧导航 */}
-      <aside className="w-full md:w-[240px] flex flex-col gap-8 sticky top-[80px] self-start">
-        {sidebar}
-        <nav
-          className="flex flex-col gap-2 text-[16px] md:text-[18px] text-tertiary"
-          aria-label="Resume sections"
-        >
-          {sections.map(({ id, title }) => (
-            <a
-              key={id}
-              href={`#${id}`}
-              className="w-fit hover:text-main transition-colors"
-            >
-              {title}
-            </a>
-          ))}
-        </nav>
+      {/* 左侧导航 — 桌面端 fixed 不随页面滚动 */}
+      <aside className="w-full md:w-[240px] shrink-0 self-start">
+        <div className="flex flex-col gap-8 pt-0 md:pt-[80px] pb-4 md:fixed md:top-0 md:left-0 md:w-[240px] md:ml-[max(64px,calc((100vw-960px)/2))] md:h-screen md:overflow-y-auto md:z-10">
+          {sidebar}
+          <nav
+            className="flex flex-col gap-2 text-[16px] md:text-[18px] text-tertiary"
+            aria-label="Resume sections"
+          >
+            {sections.map(({ id, title }) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className="w-fit hover:text-main transition-colors"
+              >
+                {title}
+              </a>
+            ))}
+          </nav>
+        </div>
       </aside>
 
       {/* 右侧内容区 */}
-      <main className="flex-1 flex flex-col gap-10 md:gap-12">
+      <main className="flex-1 flex flex-col gap-10 md:gap-12 md:pt-[80px]">
         {sections.map(({ id, title, content }, index) => (
           <AnimatedContent
             key={id}

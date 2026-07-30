@@ -18,7 +18,7 @@ import AppMenu from '@/components/AppMenu';
  * @param {Array}    writingItems - 文章随笔列表 [{ title, url }]
  */
 const PortfolioMenu = ({ open, onClose, groups = [], writingItems = [] }) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const router = useRouter();
 
   const navigate = useCallback((href) => {
@@ -37,16 +37,17 @@ const PortfolioMenu = ({ open, onClose, groups = [], writingItems = [] }) => {
         label: pickLocale(p.title, language),
         href: `/portfolio/${p.slug}`,
         external: false,
+        disabled: !!p.disabled,
       })),
     }));
 
     if (writingItems.length > 0) {
       result.push({
         key: '__writing',
-        label: '文章随笔',
+        label: t('writing'),
         items: writingItems.map((item, idx) => ({
           key: `writing-${idx}`,
-          label: item.title,
+          label: pickLocale(item.title, language),
           href: item.url,
           external: true,
         })),
@@ -86,10 +87,11 @@ const PortfolioMenu = ({ open, onClose, groups = [], writingItems = [] }) => {
                   <button
                     key={item.key}
                     type="button"
-                    onClick={() => navigate(item.href)}
-                    className="w-full flex flex-row items-start gap-1 py-1.5 px-2 rounded-[8px] text-left transition-colors duration-150 active:bg-press hover:bg-hover"
+                    disabled={item.disabled}
+                    onClick={item.disabled ? undefined : () => navigate(item.href)}
+                    className={`w-full flex flex-row items-start gap-1 py-1.5 px-2 rounded-[8px] text-left transition-colors duration-150 ${item.disabled ? 'cursor-default' : 'active:bg-press hover:bg-hover'}`}
                   >
-                    <span className="w-fit font-regular text-[16px] leading-[24px] text-main truncate">
+                    <span className={`w-fit font-regular text-[16px] leading-[24px] truncate ${item.disabled ? 'text-disabled' : 'text-main'}`}>
                       {item.label}
                     </span>
                   </button>

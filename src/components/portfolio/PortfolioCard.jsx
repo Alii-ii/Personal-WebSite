@@ -13,12 +13,13 @@ import EdgeMask from '@/components/EdgeMask';
  *
  * isResume 模式：仅单张封面，hover 时同样有 EdgeMask 效果。
  */
-const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false }) => {
+const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, disabled = false }) => {
   const { language } = useLanguage();
   const [imgError, setImgError] = useState(false);
   const [hovered, setHovered] = useState(false);
 
   const title = isResume ? '查看简历' : (project ? pickLocale(project.title, language) : '');
+  const subtitle = disabled && project ? pickLocale(project.summary, language) : '';
   const coverSrc = previewSrcs[0] || '';
 
   /* ─── 卡片布局参数 ─── */
@@ -46,11 +47,9 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false })
       className="absolute inset-0 pointer-events-none"
       style={{
         zIndex: 30,
-        borderLeft: `0.5px solid ${strokeColor}`,
-        borderTop: `0.5px solid ${strokeColor}`,
-        borderBottom: `0.5px solid ${strokeColor}`,
-        borderRight: 'none',
-        borderRadius: '12px 0 0 12px',
+        border: `0.5px solid ${strokeColor}`,
+        borderRadius: '12px',
+        clipPath: 'inset(0 12px 0 0)',
         opacity: hovered ? 1 : 0,
         transition: 'opacity 0.3s ease-out',
       }}
@@ -85,6 +84,19 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false })
       </div>
     </div>
   );
+
+  // ── 禁用卡片：纯占位，不可点击，无 hover 效果 ──
+  if (disabled) {
+    return (
+      <div className="relative w-full rounded-[12px] px-8 py-5 bg-press/50">
+        <div className="flex flex-col gap-1">
+          <span className="text-tertiary font-regular text-[16px]">{title}</span>
+          {subtitle && <span className="text-disabled font-regular text-[13px]">{subtitle}</span>}
+        </div>
+        {strokeOverlay}
+      </div>
+    );
+  }
 
   // ── 简历卡片：单张封面 + hover mask ──
   if (isResume) {

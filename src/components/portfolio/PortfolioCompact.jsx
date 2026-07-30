@@ -43,15 +43,15 @@ function getProjectPreviewSrcs(project, count = 4) {
  */
 export const WRITING_ITEMS = [
   {
-    title: 'Spec Coding 与工程师协作艺术',
+    title: { zh: 'Spec Coding 与工程师协作艺术', en: 'The Art of Spec Coding with Engineers' },
     url: 'https://my.feishu.cn/docx/MyY4d4Zbfo575Xx8XIRcogSHnIh',
   },
   {
-    title: '设计师 AI Coding 入门概览',
+    title: { zh: '设计师 AI Coding 入门概览', en: 'AI Coding Overview for Designers' },
     url: 'https://my.feishu.cn/docx/CEfMdfpdfoQTK0xMElmcyC5gnCn',
   },
   {
-    title: '工程化设计思维',
+    title: { zh: '工程化设计思维', en: 'Engineering-Minded Design Thinking' },
     url: 'https://my.feishu.cn/docx/YZcIdsLzpojD1mx9KuqcG8dHn8f',
   },
 ];
@@ -67,7 +67,7 @@ export const WRITING_ITEMS = [
  *   后续为作品集卡片 → /portfolio/[slug]
  */
 export default function PortfolioCompact() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const router = useRouter();
 
   const groups = useMemo(() => getProjectsByCategory(), []);
@@ -83,7 +83,7 @@ export default function PortfolioCompact() {
       <div className="w-full max-w-[960px] flex flex-col md:flex-row items-start px-6 md:px-0">
         {/* ═══════ 左侧信息栏（移动端隐藏，移入菜单） ═══════ */}
         <aside className="hidden md:block md:w-[240px] shrink-0 self-start">
-          <div className="flex flex-col gap-4 pt-8 md:pt-[80px] pb-4 md:fixed md:top-0 md:left-0 md:w-[240px] md:ml-[max(64px,calc((100vw-960px)/2))] md:h-screen md:overflow-y-auto md:z-10">
+          <div className="flex flex-col gap-4 pt-8 md:pt-[80px] pb-4 md:fixed md:top-0 md:left-0 md:w-[240px] md:ml-[max(64px,calc((100vw-960px)/2))] md:h-screen md:z-10">
             {/* 姓名 */}
             <div className="flex flex-col gap-2">
               <h1 className="font-Ding text-[40px] md:text-[64px] leading-[1] text-main opacity-80">
@@ -119,55 +119,73 @@ export default function PortfolioCompact() {
 
             <Divider />
 
-            {/* 项目目录 */}
+            {/* 项目目录 + 文章随笔 — 统一 sections 结构 */}
             <nav className="flex flex-col gap-1 ml-[-6px]">
-              {groups.map((group) => (
-                <div key={group.key} className="flex flex-col">
+              {[
+                ...groups.map((group) => ({
+                  key: group.key,
+                  label: pickLocale(group.label, language),
+                  items: group.projects.map((p) => ({
+                    key: p.slug,
+                    label: pickLocale(p.title, language),
+                    href: `/portfolio/${p.slug}`,
+                    external: false,
+                    disabled: !!p.disabled,
+                  })),
+                })),
+                ...(WRITING_ITEMS.length > 0 ? [{
+                  key: '__writing',
+                  label: t('writing'),
+                  items: WRITING_ITEMS.map((item, idx) => ({
+                    key: `writing-${idx}`,
+                    label: pickLocale(item.title, language),
+                    href: item.url,
+                    external: true,
+                    disabled: false,
+                  })),
+                }] : []),
+              ].map((section) => (
+                <div key={section.key} className="flex flex-col">
+
+                  {/* 标题 */}
                   <div className="px-2.5 py-1">
                     <span className="font-regular text-[14px] leading-[24px] text-tertiary">
-                      {pickLocale(group.label, language)}
+                      {section.label}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-0.5 pb-2">
-                    {group.projects.map((project) => (
-                      <button
-                        key={project.slug}
-                        type="button"
-                        onClick={() => handleProjectClick(project.slug)}
-                        className="w-full flex flex-row items-start gap-1 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 hover:bg-hover"
-                      >
-                        <span className="w-fit font-regular text-[14px] leading-[24px] text-main truncate">
-                          {pickLocale(project.title, language)}
-                        </span>
-                      </button>
-                    ))}
+
+                  {/* 选项 */}
+                  <div className="flex flex-col gap-1 pb-2">
+                    {section.items.map((item) =>
+                      item.external ? (
+                        <a
+                          key={item.key}
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full flex flex-row items-start gap-1 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 hover:bg-hover"
+                        >
+                          <span className="w-fit font-regular text-[16px] leading-[24px] text-main truncate">
+                            {item.label}
+                          </span>
+                        </a>
+                      ) : (
+                        <button
+                          key={item.key}
+                          type="button"
+                          disabled={item.disabled}
+                          onClick={item.disabled ? undefined : () => handleProjectClick(item.href.replace('/portfolio/', ''))}
+                          className={`w-full flex flex-row items-start gap-1 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 ${item.disabled ? 'cursor-default' : 'hover:bg-hover'}`}
+                        >
+                          <span className={`w-fit font-regular text-[16px] leading-[24px] truncate ${item.disabled ? 'text-disabled' : 'text-main'}`}>
+                            {item.label}
+                          </span>
+                        </button>
+                      )
+                    )}
                   </div>
                 </div>
               ))}
-
-              {/* 文章随笔 — 3 篇真实外链 */}
-              <div className="flex flex-col">
-                <div className="px-2.5 py-1">
-                  <span className="font-regular text-[14px] leading-[24px] text-tertiary">
-                    文章随笔
-                  </span>
-                </div>
-                <div className="flex flex-col gap-0.5 pb-2">
-                  {WRITING_ITEMS.map((item, idx) => (
-                    <a
-                      key={idx}
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full flex flex-row items-start gap-1 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 hover:bg-hover"
-                    >
-                      <span className="w-fit font-regular text-[14px] leading-[24px] text-main truncate">
-                        {item.title}
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              </div>
             </nav>
           </div>
         </aside>
@@ -206,8 +224,9 @@ export default function PortfolioCompact() {
                 <PortfolioCard
                   key={project.slug}
                   project={project}
+                  disabled={!!project.disabled}
                   previewSrcs={getProjectPreviewSrcs(project)}
-                  onClick={() => handleProjectClick(project.slug)}
+                  onClick={project.disabled ? undefined : () => handleProjectClick(project.slug)}
                 />
               )),
             )}
