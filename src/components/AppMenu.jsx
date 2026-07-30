@@ -160,7 +160,7 @@ const AppMenu = ({ open, onClose, children }) => {
                 variant="ghost"
                 size="md"
                 tooltip={t('bilibiliTooltip')}
-                onClick={() => window.open('https://space.bilibili.com/38773851/favlist?fid=702542351&ftype=create', '_blank')}
+                onClick={() => window.open('https://space.bilibili.com/38773851/upload/video', '_blank')}
               />
             </div>
           </div>

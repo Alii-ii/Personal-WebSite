@@ -83,7 +83,7 @@ const PortfolioSidebar = ({
             <FigmaIcon className="w-4 h-4" />
           </IconButton>
 
-          <IconButton label="Bilibili" onClick={() => window.open('https://space.bilibili.com', '_blank')}>
+          <IconButton label="Bilibili" onClick={() => window.open('https://space.bilibili.com/38773851/upload/video', '_blank')}>
             <BilibiliIcon className="w-4 h-4" />
           </IconButton>
 

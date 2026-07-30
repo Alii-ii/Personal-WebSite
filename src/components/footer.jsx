@@ -300,7 +300,7 @@ const Footer = ({
                     size="md"
                     tooltip={t('bilibiliTooltip')}
                     onClick={() => {
-                      window.open('https://space.bilibili.com/38773851/favlist?fid=702542351&ftype=create', '_blank');
+                      window.open('https://space.bilibili.com/38773851/upload/video', '_blank');
                     }}
                   />
                 </div>

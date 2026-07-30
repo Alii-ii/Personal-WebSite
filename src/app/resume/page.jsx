@@ -9,7 +9,7 @@ import ResumeExperienceItem from '@/components/resume/ResumeExperienceItem';
 import ResumeNavSections from '@/components/resume/ResumeNavSections';
 import DotGrid from '@/effects/DotGrid';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { MailIcon, ChatsIcon, CheckIcon, FigmaIcon } from '@/public/icons';
+import { MailIcon, ChatsIcon, CheckIcon, FigmaIcon, DownloadIcon } from '@/public/icons';
 import { ActionSwapIcon } from '@/components/motion/action-swap';
 
 /** 复制文本到剪贴板 */
@@ -51,7 +51,22 @@ function SidebarContactButtons() {
   };
 
   return (
-    <div className="mt-4 flex flex-wrap gap-0.5">
+    <div className="mt-4 flex flex-wrap items-center gap-1">
+      <IconTextButton
+        text="下载PDF"
+        icon={<DownloadIcon />}
+        variant="default"
+        size="md"
+        tooltip="下载简历 PDF"
+        onClick={() => {
+          const link = document.createElement('a');
+          link.href = '/resume/resume-zh.pdf';
+          link.download = '【简历】产品设计-黄奕礼.pdf';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }}
+      />
       <IconTextButton
         text=""
         icon={

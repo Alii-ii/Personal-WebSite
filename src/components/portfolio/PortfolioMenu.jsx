@@ -26,7 +26,7 @@ const PortfolioMenu = ({ open, onClose, groups = [] }) => {
   }, [onClose, router]);
 
   const sections = useMemo(
-    () => buildNavSections(groups, language, t),
+    () => buildNavSections(groups, language, t, false),
     [groups, language, t],
   );
 

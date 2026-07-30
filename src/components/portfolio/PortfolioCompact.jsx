@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale, getProjectsByCategory } from '@/contexts/ProjectContext';
 import CopyEmailButton from '@/components/CopyEmailButton';
-import { ChatsIcon, FigmaIcon, BilibiliIcon } from '@/public/icons';
+import IconTextButton from '@/components/icon-text-botton';
+import { ChatsIcon, FigmaIcon, BilibiliIcon, DownloadIcon } from '@/public/icons';
 import AnimatedContent from '@/effects/AnimatedContent';
 import PortfolioCard from '@/components/portfolio/PortfolioCard';
 
@@ -43,6 +44,14 @@ function getProjectPreviewSrcs(project, count = 4) {
  */
 export const WRITING_ITEMS = [
   {
+    title: { zh: '个人向 Design Engineer 工作流思考', en: 'Personal Design Engineer Workflow Reflections' },
+    disabled: true,
+  },
+  {
+    title: { zh: 'Codex & Cursor 的信任设计与交互粒度差异', en: 'Trust Design & Interaction Granularity: Codex vs Cursor' },
+    disabled: true,
+  },
+  {
     title: { zh: 'Spec Coding 与工程师协作艺术', en: 'The Art of Spec Coding with Engineers' },
     url: 'https://my.feishu.cn/docx/MyY4d4Zbfo575Xx8XIRcogSHnIh',
   },
@@ -61,30 +70,32 @@ export const WRITING_ITEMS = [
  * @param {Array} groups - getProjectsByCategory() 结果
  * @param {string} language - 当前语言
  * @param {Function} t - i18n 翻译函数
+ * @param {boolean} includeDisabled - 是否包含禁用态条目（L2=true, L3=false）
  */
-export function buildNavSections(groups, language, t) {
+export function buildNavSections(groups, language, t, includeDisabled = true) {
+  const filterDisabled = (items) => includeDisabled ? items : items.filter((i) => !i.disabled);
+
   return [
-    ...groups.map((group) => ({
-      key: group.key,
-      label: pickLocale(group.label, language),
-      items: group.projects.map((p) => ({
+    ...groups.map((group) => {
+      const items = filterDisabled(group.projects.map((p) => ({
         key: p.slug,
         label: pickLocale(p.title, language),
         href: `/portfolio/${p.slug}`,
         external: false,
         disabled: !!p.disabled,
-      })),
-    })),
+      })));
+      return { key: group.key, label: pickLocale(group.label, language), items };
+    }),
     ...(WRITING_ITEMS.length > 0 ? [{
       key: '__writing',
       label: t('writing'),
-      items: WRITING_ITEMS.map((item, idx) => ({
+      items: filterDisabled(WRITING_ITEMS.map((item, idx) => ({
         key: `writing-${idx}`,
         label: pickLocale(item.title, language),
-        href: item.url,
-        external: true,
-        disabled: false,
-      })),
+        href: item.url || '#',
+        external: !item.disabled,
+        disabled: !!item.disabled,
+      }))),
     }] : []),
     {
       key: '__side-project',
@@ -142,6 +153,21 @@ export default function PortfolioCompact() {
 
             {/* 社交图标 — 匹配 Figma icons 区域 */}
             <div className="flex items-center gap-1.5">
+              <IconTextButton
+                text="下载PDF"
+                icon={<DownloadIcon />}
+                variant="default"
+                size="sm"
+                tooltip="下载简历 PDF"
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = '/resume/resume-zh.pdf';
+                  link.download = '【简历】产品设计-黄奕礼.pdf';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              />
               <IconButton
                 label="Figma"
                 onClick={() => window.open('https://www.figma.com/@alii', '_blank')}
@@ -150,7 +176,7 @@ export default function PortfolioCompact() {
               </IconButton>
               <IconButton
                 label="Bilibili"
-                onClick={() => window.open('https://space.bilibili.com', '_blank')}
+                onClick={() => window.open('https://space.bilibili.com/38773851/upload/video', '_blank')}
               >
                 <BilibiliIcon className="w-4 h-4" />
               </IconButton>
@@ -158,7 +184,6 @@ export default function PortfolioCompact() {
                 <ChatsIcon className="w-4 h-4" />
               </IconButton>
               <CopyEmailButton appearance="sidebar" />
-
             </div>
 
             <Divider />

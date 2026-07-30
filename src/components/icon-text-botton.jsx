@@ -120,7 +120,7 @@ const IconTextButton = ({
       >
         {/* 左侧图标 */}
         {icon && (
-          <span className={cn("flex-shrink-0 opacity-80", iconSizes[size])}>
+          <span className={cn("flex-shrink-0 opacity-80 inline-flex items-center justify-center", iconSizes[size])}>
             {icon}
           </span>
         )}
@@ -130,7 +130,7 @@ const IconTextButton = ({
 
         {/* 右侧图标 */}
         {rightIcon && (
-          <span className={cn("flex-shrink-0 opacity-80", iconSizes[size])}>
+          <span className={cn("flex-shrink-0 opacity-80 inline-flex items-center justify-center", iconSizes[size])}>
             {rightIcon}
           </span>
         )}
