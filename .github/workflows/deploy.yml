@@ -38,6 +38,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code (for Cloudflare Functions)
+        uses: actions/checkout@v4
+
       - name: Download static artifact
         uses: actions/download-artifact@v4
         with:
@@ -60,6 +63,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code (for Cloudflare Functions)
+        uses: actions/checkout@v4
+
       - name: Download static artifact
         uses: actions/download-artifact@v4
         with:
