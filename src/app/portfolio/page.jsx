@@ -197,7 +197,7 @@ export default function Portfolio() {
         showGallerySubtitle={false}
         backHref="/"
         maskHeight="240px"
-        togglesSide="left"
+        togglesSide="right"
         hideRight="mobile"
       />
 
