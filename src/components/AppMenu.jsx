@@ -104,13 +104,15 @@ const AppMenu = ({ open, onClose, children }) => {
         {/* 底栏：切换 + 社交图标 + 关闭，同行横排，空间不够时右侧按钮隐藏 */}
         <div className="flex flex-row items-center justify-between">
           {/* 左侧 */}
-          <div className="flex flex-row items-center gap-2 min-w-0 flex-wrap overflow-hidden min-w-[118px] h-full" style={{ maxHeight: '2.5rem' }}>
+          <div className="flex flex-row items-center gap-1.5 min-w-0 flex-wrap overflow-hidden min-w-[118px] h-full" style={{ maxHeight: '2.5rem' }}>
             <div className="shrink-0"><ThemeToggle /></div>
             <div className="shrink-0"><LanguageToggle /></div>
             <div className="w-px h-3 mx-0.5 shrink-0" aria-hidden="true" />
+
             <div className="shrink-0">
               <CopyEmailButton />
             </div>
+
             <div className="shrink-0">
               <IconTextButton
                 text=""
@@ -129,6 +131,7 @@ const AppMenu = ({ open, onClose, children }) => {
                 }}
               />
             </div>
+
             <div
               className="shrink-0"
               onMouseEnter={() => setFigmaHovered(true)}
@@ -144,6 +147,7 @@ const AppMenu = ({ open, onClose, children }) => {
                 onClick={() => window.open('https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024', '_blank')}
               />
             </div>
+            
             <div
               className="shrink-0"
               onMouseEnter={() => setBilibiliHovered(true)}
