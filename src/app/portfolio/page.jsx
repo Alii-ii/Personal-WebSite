@@ -7,7 +7,7 @@ import DotGrid from '@/effects/DotGrid';
 import AnimatedContent from '@/effects/AnimatedContent';
 import Masonry from '@/effects/Masonry';
 import PortfolioSidebar from '@/components/portfolio/PortfolioSidebar';
-import PortfolioCompact, { WRITING_ITEMS } from '@/components/portfolio/PortfolioCompact';
+import PortfolioCompact from '@/components/portfolio/PortfolioCompact';
 import PortfolioMenu from '@/components/portfolio/PortfolioMenu';
 import MobileDrawer from '@/components/portfolio/MobileDrawer';
 import FeedCard from '@/components/portfolio/FeedCard';
@@ -187,7 +187,6 @@ export default function Portfolio() {
             open={menuOpen}
             onClose={() => setMenuOpen(false)}
             groups={groups}
-            writingItems={WRITING_ITEMS}
           />
         </>
       )}

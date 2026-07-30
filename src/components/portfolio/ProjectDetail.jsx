@@ -9,7 +9,6 @@ import EdgeMask from '@/components/EdgeMask';
 import FrameRenderer from '@/components/portfolio/FrameRenderer';
 import ProjectMenu from '@/components/portfolio/ProjectMenu';
 import PortfolioMenu from '@/components/portfolio/PortfolioMenu';
-import { WRITING_ITEMS } from '@/components/portfolio/PortfolioCompact';
 import ShortcutBar from '@/components/portfolio/ShortcutBar';
 import SlideProgress from '@/components/portfolio/SlideProgress';
 import CommentSection from '@/components/comments/CommentSection';
@@ -949,7 +948,6 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
         open={menuOpen && isMobile}
         onClose={() => setMenuOpen(false)}
         groups={groups}
-        writingItems={WRITING_ITEMS}
       />
     </div>
   );

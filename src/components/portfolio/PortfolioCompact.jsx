@@ -57,6 +57,50 @@ export const WRITING_ITEMS = [
 ];
 
 /**
+ * 构建目录 sections 数据 — sidebar 和 PortfolioMenu 共享
+ * @param {Array} groups - getProjectsByCategory() 结果
+ * @param {string} language - 当前语言
+ * @param {Function} t - i18n 翻译函数
+ */
+export function buildNavSections(groups, language, t) {
+  return [
+    ...groups.map((group) => ({
+      key: group.key,
+      label: pickLocale(group.label, language),
+      items: group.projects.map((p) => ({
+        key: p.slug,
+        label: pickLocale(p.title, language),
+        href: `/portfolio/${p.slug}`,
+        external: false,
+        disabled: !!p.disabled,
+      })),
+    })),
+    ...(WRITING_ITEMS.length > 0 ? [{
+      key: '__writing',
+      label: t('writing'),
+      items: WRITING_ITEMS.map((item, idx) => ({
+        key: `writing-${idx}`,
+        label: pickLocale(item.title, language),
+        href: item.url,
+        external: true,
+        disabled: false,
+      })),
+    }] : []),
+    {
+      key: '__side-project',
+      label: t('sideProject'),
+      items: [{
+        key: 'vibe-writing',
+        label: 'Cursor for Documentation',
+        href: 'https://vibe-writing.mynocode.host',
+        external: true,
+        disabled: false,
+      }],
+    },
+  ];
+}
+
+/**
  * PortfolioCompact — 精简版作品集页面
  *
  * 匹配 Figma 设计稿 node 11262:4546 的布局：
@@ -119,32 +163,9 @@ export default function PortfolioCompact() {
 
             <Divider />
 
-            {/* 项目目录 + 文章随笔 — 统一 sections 结构 */}
-            <nav className="flex flex-col gap-1 ml-[-6px]">
-              {[
-                ...groups.map((group) => ({
-                  key: group.key,
-                  label: pickLocale(group.label, language),
-                  items: group.projects.map((p) => ({
-                    key: p.slug,
-                    label: pickLocale(p.title, language),
-                    href: `/portfolio/${p.slug}`,
-                    external: false,
-                    disabled: !!p.disabled,
-                  })),
-                })),
-                ...(WRITING_ITEMS.length > 0 ? [{
-                  key: '__writing',
-                  label: t('writing'),
-                  items: WRITING_ITEMS.map((item, idx) => ({
-                    key: `writing-${idx}`,
-                    label: pickLocale(item.title, language),
-                    href: item.url,
-                    external: true,
-                    disabled: false,
-                  })),
-                }] : []),
-              ].map((section) => (
+            {/* 项目目录 + 文章随笔 + 独立开发 — 共享 buildNavSections */}
+            <nav className="flex flex-col gap-1.5 ml-[-6px]">
+              {buildNavSections(groups, language, t).map((section) => (
                 <div key={section.key} className="flex flex-col">
 
                   {/* 标题 */}
@@ -155,7 +176,7 @@ export default function PortfolioCompact() {
                   </div>
 
                   {/* 选项 */}
-                  <div className="flex flex-col gap-1 pb-2">
+                  <div className="flex flex-col gap-1 pb-4">
                     {section.items.map((item) =>
                       item.external ? (
                         <a
