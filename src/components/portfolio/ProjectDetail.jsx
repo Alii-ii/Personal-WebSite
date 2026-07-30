@@ -8,7 +8,8 @@ import DotGrid from '@/effects/DotGrid';
 import EdgeMask from '@/components/EdgeMask';
 import FrameRenderer from '@/components/portfolio/FrameRenderer';
 import ProjectMenu from '@/components/portfolio/ProjectMenu';
-import MobileDrawer from '@/components/portfolio/MobileDrawer';
+import PortfolioMenu from '@/components/portfolio/PortfolioMenu';
+import { WRITING_ITEMS } from '@/components/portfolio/PortfolioCompact';
 import ShortcutBar from '@/components/portfolio/ShortcutBar';
 import SlideProgress from '@/components/portfolio/SlideProgress';
 import CommentSection from '@/components/comments/CommentSection';
@@ -727,7 +728,7 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
           ) : null}
         </div>
 
-        {/* 菜单浮层：仅桌面端；移动端改用底部抽屉（见组件末尾 MobileDrawer） */}
+        {/* 菜单浮层：仅桌面端；移动端使用 PortfolioMenu 全屏菜单 */}
         <div className="hidden md:block absolute top-[60px] left-6 md:left-16">
           <ProjectMenu
             groups={groups}
@@ -855,7 +856,7 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
       </main>
 
       {/* 底部：快捷键 + 主题/语言 */}
-      <footer className="absolute inset-x-0 bottom-0 z-20 isolate px-6 md:px-16 pb-6 md:pb-8 pt-2 pointer-events-auto">
+      <footer className="absolute inset-x-0 bottom-0 z-20 isolate px-12 md:px-16 pb-12 md:pb-8 pt-2 pointer-events-auto">
         {/* 移动端渐变遮罩 */}
         <EdgeMask from="bottom" height="300%" className="md:hidden" />
         {/* 页数轴：absolute 居中于 footer。
@@ -869,7 +870,7 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
           />
         </div>
 
-        {/* 快捷键说明与主题/语言切换仅桌面端；移动端前者无意义、后者已移入抽屉 */}
+        {/* 桌面端：快捷键说明 + 主题/语言切换 */}
         <div className="hidden md:flex items-center justify-between gap-4">
           <ShortcutBar
             onBack={goBack}
@@ -884,6 +885,32 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
             <ThemeToggle />
             <LanguageToggle />
           </div>
+        </div>
+
+        {/* 移动端：左侧返回 + 右侧菜单 */}
+        <div className="flex md:hidden items-center justify-between">
+          <button
+            type="button"
+            aria-label="返回作品集"
+            onClick={goBack}
+            className="text-secondary text-[32px] leading-[80%] hover:opacity-80 transition-opacity duration-200 cursor-pointer font-Ding"
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            aria-label="菜单"
+            onClick={() => setMenuOpen(true)}
+            className="w-8 h-8 rounded-[8px] flex items-center justify-center text-secondary hover:text-main active:text-main transition-colors duration-150 cursor-pointer"
+          >
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M4.22218 4.44434C4.59037 4.44434 4.88885 4.74281 4.88885 5.111C4.88885 5.47919 4.59037 5.77767 4.22218 5.77767H3.33329C2.9651 5.77767 2.66663 5.47919 2.66663 5.111C2.66663 4.74281 2.9651 4.44434 3.33329 4.44434H4.22218ZM18 4.44434C18.3681 4.44434 18.6666 4.74281 18.6666 5.111C18.6666 5.47919 18.3681 5.77767 18 5.77767H7.33329C6.9651 5.77767 6.66663 5.47919 6.66663 5.111C6.66663 4.74281 6.9651 4.44434 7.33329 4.44434H18ZM4.22218 9.99989C4.59037 9.99989 4.88885 10.2984 4.88885 10.6666C4.88885 11.0347 4.59037 11.3332 4.22218 11.3332H3.33329C2.9651 11.3332 2.66663 11.0347 2.66663 10.6666C2.66663 10.2984 2.9651 9.99989 3.33329 9.99989H4.22218ZM6.66663 10.6666C6.66663 10.2984 6.9651 9.99989 7.33329 9.99989H18C18.3681 9.99989 18.6666 10.2984 18.6666 10.6666C18.6666 11.0347 18.3681 11.3332 18 11.3332H7.33329C6.9651 11.3332 6.66663 11.0347 6.66663 10.6666ZM4.22218 15.5554C4.59037 15.5554 4.88885 15.8539 4.88885 16.2221C4.88885 16.5903 4.59037 16.8888 4.22218 16.8888H3.33329C2.9651 16.8888 2.66663 16.5903 2.66663 16.2221C2.66663 15.8539 2.9651 15.5554 3.33329 15.5554H4.22218ZM6.66663 16.2221C6.66663 15.8539 6.9651 15.5554 7.33329 15.5554H18C18.3681 15.5554 18.6666 15.8539 18.6666 16.2221C18.6666 16.5903 18.3681 16.8888 18 16.8888H7.33329C6.9651 16.8888 6.66663 16.5903 6.66663 16.2221Z"
+                fill="currentColor"
+                fillOpacity="0.65"
+              />
+            </svg>
+          </button>
         </div>
       </footer>
 
@@ -917,20 +944,12 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
         </div>
       </aside>
 
-      {/* 移动端底部抽屉：项目切换 + 主题/语言，替代桌面端的菜单浮层与 footer 控件 */}
-      <MobileDrawer
+      {/* 移动端全屏菜单：复用作品集通用 PortfolioMenu（项目目录 + 文章随笔 + 社交） */}
+      <PortfolioMenu
         open={menuOpen && isMobile}
-        onOpenChange={setMenuOpen}
+        onClose={() => setMenuOpen(false)}
         groups={groups}
-        currentSlug={slug}
-        onSelect={(targetSlug) => {
-          setMenuOpen(false);
-          goProject(targetSlug);
-        }}
-        onBack={() => {
-          setMenuOpen(false);
-          goBack();
-        }}
+        writingItems={WRITING_ITEMS}
       />
     </div>
   );

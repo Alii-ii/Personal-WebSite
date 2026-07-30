@@ -3,115 +3,195 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
+import EdgeMask from '@/components/EdgeMask';
 
 /**
- * 作品集卡片组件 — 匹配 Figma protfolio_set 组件
+ * 作品集卡片组件 — 匹配 Figma protfolio_set 组件 (node 11272:7373)
  *
- * 多张封面图叠放、透视渐远，hover 时整体微缩。
- * 每张封面带半透明遮罩模拟景深。
+ * Default 态：容器宽高比 562:300，多层叠放效果（项目卡片）。
+ * Hover 态：前层卡片叠加 EdgeMask from="left" — 复用 footer 调好的模糊渐变参数。
  *
- * @param {Object} project     - portfolio.json 中的 project 对象
- * @param {string} coverSrc    - 封面图路径
- * @param {Function} onClick   - 点击回调
- * @param {boolean} isResume   - 是否为简历卡片（仅一张图，不做层叠）
+ * isResume 模式：仅单张封面，hover 时同样有 EdgeMask 效果。
  */
-const PortfolioCard = ({ project, coverSrc, onClick, isResume = false }) => {
+const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false }) => {
   const { language } = useLanguage();
   const [imgError, setImgError] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
-  const title = project ? pickLocale(project.title, language) : '';
+  const title = isResume ? '查看简历' : (project ? pickLocale(project.title, language) : '');
+  const coverSrc = previewSrcs[0] || '';
 
-  // 简历卡片：单层，无层叠效果
+  /* ─── 卡片布局参数 ─── */
+  const W = 562;
+  const H = 300;
+
+  /**
+   * 0.5px 描边层 — 用于卡片内部各图层
+   */
+  const strokeOverlay = (
+    <div
+      className="absolute inset-0 rounded-[12px] pointer-events-none"
+      style={{ border: '0.5px solid hsl(var(--neutral-bg-stroke))' }}
+    />
+  );
+
+  /**
+   * 顶层描边 — z-30，始终在 hoverMask(z-20) 之上
+   * 仅左+上+下三侧，不含右侧 — 因为 EdgeMask 从左到右渐变，
+   * 右侧是透明/清晰区域，如果有描边会在不透明图片上露出
+   */
+  const strokeColor = 'hsl(var(--neutral-bg-stroke))';
+  const topStroke = (
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        zIndex: 30,
+        borderLeft: `0.5px solid ${strokeColor}`,
+        borderTop: `0.5px solid ${strokeColor}`,
+        borderBottom: `0.5px solid ${strokeColor}`,
+        borderRight: 'none',
+        borderRadius: '12px 0 0 12px',
+        opacity: hovered ? 1 : 0,
+        transition: 'opacity 0.3s ease-out',
+      }}
+    />
+  );
+
+  // 后层数据：从远到近
+  const backLayers = [
+    { w: 460, h: 259, x: 96,  y: 21, hx: 462, srcIdx: 3, overlayOpacity: 0.8 },
+    { w: 485, h: 273, x: 66,  y: 14, hx: 317, srcIdx: 2, overlayOpacity: 0.6 },
+    { w: 509, h: 286, x: 34,  y: 7,  hx: 158, srcIdx: 1, overlayOpacity: 0.4 },
+  ];
+
+  /**
+   * Hover mask — 直接复用 EdgeMask from="left"，保留已调好的模糊渐变参数
+   */
+  const hoverMask = (
+    <div
+      className="absolute inset-0 rounded-[12px] overflow-hidden pointer-events-none"
+      style={{
+        zIndex: 20,
+        opacity: hovered ? 1 : 0,
+        transition: 'opacity 0.3s ease-out',
+      }}
+    >
+      <EdgeMask from="left" width="80%" />
+      {/* 箭头 — z-20 确保在 EdgeMask(z-10) 之上 */}
+      <div className="absolute inset-y-0 left-0 z-20 flex items-center justify-center pointer-events-none" style={{ width: '25%' }}>
+        <span className="font-Ding text-[42px] leading-[1] text-main opacity-60 select-none">
+          →
+        </span>
+      </div>
+    </div>
+  );
+
+  // ── 简历卡片：单张封面 + hover mask ──
   if (isResume) {
     return (
       <button
         type="button"
         onClick={onClick}
-        className="group relative w-full overflow-hidden rounded-[12px] cursor-pointer transition-transform duration-300 ease-out hover:scale-[0.98] active:scale-[0.96] focus:outline-none"
-        style={{ aspectRatio: '533 / 300' }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="group relative w-full cursor-pointer focus:outline-none"
+        style={{ aspectRatio: `${W} / ${H}` }}
       >
-        {imgError ? (
-          <div className="absolute inset-0 bg-press flex items-center justify-center">
-            <span className="text-disabled font-regular text-[14px]">简历预览</span>
-          </div>
-        ) : (
-          <img
-            src={coverSrc}
-            alt="简历预览"
-            loading="eager"
-            className="w-full h-full object-cover"
-            style={{ transform: 'translateZ(0)' }}
-            onError={() => setImgError(true)}
-          />
-        )}
-        {/* hover 浮出标题 */}
-        <div className="absolute inset-x-0 bottom-0 px-5 pb-4 pt-12 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 bg-gradient-to-t from-black/50 to-transparent pointer-events-none">
-          <p className="font-Ding text-[15px] leading-[22px] text-white">查看简历</p>
+        <div className="absolute top-0 left-0 w-full h-full rounded-[12px] overflow-hidden">
+          {imgError ? (
+            <div className="absolute inset-0 bg-press flex items-center justify-center">
+              <span className="text-disabled font-regular text-[14px]">{title}</span>
+            </div>
+          ) : (
+            <img
+              src={coverSrc}
+              alt={title}
+              loading="eager"
+              className="w-full h-full object-cover object-top"
+              style={{ transform: 'translateZ(0)' }}
+              onError={() => setImgError(true)}
+            />
+          )}
+          {strokeOverlay}
         </div>
+        {hoverMask}
+        {topStroke}
       </button>
     );
   }
 
-  // 作品集卡片：多层叠放效果（匹配 Figma protfolio_set）
-  // Figma 中每个 portfolio_set 有 6 层（p01 最前 → Page 最后），
-  // 这里用 CSS 模拟 3-4 层叠放透视效果
-  const layers = [
-    { scale: 0.865, offsetY: -14, opacity: 0.35, blur: 6 },  // 最后层
-    { scale: 0.91,  offsetY: -7,  opacity: 0.55, blur: 3 },  // 中间层
-    { scale: 0.955, offsetY: -2,  opacity: 0.75, blur: 1 },  // 次前层
-  ];
-
+  // ── 项目卡片：多层叠放 + hover 展开 + hover mask ──
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group relative w-full cursor-pointer transition-transform duration-300 ease-out hover:scale-[0.98] active:scale-[0.96] focus:outline-none"
-      style={{ aspectRatio: '562 / 300' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group relative w-full cursor-pointer focus:outline-none"
+      style={{ aspectRatio: `${W} / ${H}` }}
     >
-      {/* 背景层叠效果 */}
-      {layers.map((layer, i) => (
-        <div
-          key={i}
-          className="absolute left-1/2 bottom-0 rounded-[12px] overflow-hidden border border-stroke/15"
-          style={{
-            width: `${layer.scale * 100}%`,
-            aspectRatio: '533 / 300',
-            transform: `translateX(-50%) translateY(${layer.offsetY}px)`,
-            zIndex: i,
-          }}
-        >
-          {/* 封面图 */}
-          {!imgError && (
+      {/* ── 后层（真实图片预览 + 渐变遮罩，从远到近） ── */}
+      {backLayers.map((layer, i) => {
+        const wPct = (layer.w / W) * 100;
+        const hPct = (layer.h / H) * 100;
+        const defaultX = (layer.x / W) * 100;
+        const yPct = (layer.y / H) * 100;
+        const hoverX = (layer.hx / W) * 100;
+
+        const currentX = hovered ? hoverX : defaultX;
+        const layerSrc = previewSrcs[layer.srcIdx] || coverSrc;
+
+        const maskColor = 'hsl(var(--neutral-bg-card))';
+        const op = layer.overlayOpacity;
+
+        return (
+          <div
+            key={i}
+            className="absolute rounded-[12px] overflow-hidden"
+            style={{
+              width: `${wPct}%`,
+              height: `${hPct}%`,
+              left: `${currentX}%`,
+              top: `${yPct}%`,
+              zIndex: i + 1,
+              transition: 'left 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
             <img
-              src={coverSrc}
+              src={layerSrc}
               alt=""
               loading="lazy"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-top"
               style={{ transform: 'translateZ(0)' }}
               aria-hidden="true"
             />
-          )}
-          {/* 半透明遮罩 — 模拟深色透视衰减 */}
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundColor: `hsl(var(--neutral-bg-card) / ${layer.opacity})`,
-              backdropFilter: `blur(${layer.blur}px)`,
-              WebkitBackdropFilter: `blur(${layer.blur}px)`,
-            }}
-          />
-        </div>
-      ))}
+            {/* bg-card 渐变遮罩 — 从四周边缘向内渐隐 */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: [
+                  `linear-gradient(to right, ${maskColor} 0%, transparent 40%)`,
+                  `linear-gradient(to left, ${maskColor} 0%, transparent 40%)`,
+                  `linear-gradient(to bottom, ${maskColor} 0%, transparent 40%)`,
+                  `linear-gradient(to top, ${maskColor} 0%, transparent 40%)`,
+                ].join(', '),
+                opacity: hovered ? 0 : op,
+                transition: 'opacity 0.35s ease-out',
+              }}
+            />
+            {/* 0.5px 描边 */}
+            {strokeOverlay}
+          </div>
+        );
+      })}
 
-      {/* 最前层（主封面） */}
+      {/* ── 最前层 p01：第 1 帧封面图 ── */}
       <div
-        className="absolute left-1/2 bottom-0 rounded-[12px] overflow-hidden border border-stroke/15"
+        className="absolute top-0 left-0 rounded-[12px] overflow-hidden"
         style={{
-          width: '95%',
-          aspectRatio: '533 / 300',
-          transform: 'translateX(-50%)',
-          zIndex: layers.length,
-          boxShadow: '0 2px 10px -1px hsl(var(--neutral-bg-card) / 0.1)',
+          width: `${(533 / W) * 100}%`,
+          height: '100%',
+          zIndex: backLayers.length + 1,
         }}
       >
         {imgError ? (
@@ -123,22 +203,19 @@ const PortfolioCard = ({ project, coverSrc, onClick, isResume = false }) => {
             src={coverSrc}
             alt={title}
             loading="lazy"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
             style={{ transform: 'translateZ(0)' }}
             onError={() => setImgError(true)}
           />
         )}
-
-        {/* hover 浮出项目信息 */}
-        <div className="absolute inset-x-0 bottom-0 px-5 pb-4 pt-12 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 bg-gradient-to-t from-black/50 to-transparent pointer-events-none">
-          <p className="font-Ding text-[15px] leading-[22px] text-white truncate">{title}</p>
-          {project?.period && (
-            <p className="font-regular text-[12px] leading-[18px] text-white/70">
-              {project.period}
-            </p>
-          )}
-        </div>
+        {/* 0.5px 描边 */}
+        {strokeOverlay}
       </div>
+
+      {/* ── Hover mask：复用 EdgeMask from="left" ── */}
+      {hoverMask}
+      {/* ── 顶层描边：始终在 mask 之上 ── */}
+      {topStroke}
     </button>
   );
 };

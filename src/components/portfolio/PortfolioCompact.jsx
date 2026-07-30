@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale, getProjectsByCategory } from '@/contexts/ProjectContext';
 import CopyEmailButton from '@/components/CopyEmailButton';
-import { ChatsIcon, FigmaIcon } from '@/public/icons';
+import { ChatsIcon, FigmaIcon, BilibiliIcon } from '@/public/icons';
 import AnimatedContent from '@/effects/AnimatedContent';
 import PortfolioCard from '@/components/portfolio/PortfolioCard';
 
@@ -24,50 +24,47 @@ const IconButton = ({ children, label, onClick }) => (
 );
 
 /**
- * 侧栏分隔位
+ * 侧栏分隔位（与 PortfolioSidebar 保持一致）
  */
 const Divider = () => <div className="w-[192px] h-px" aria-hidden="true" />;
 
-/* ────────────────────────────────────────────────────────────────
- * 卡片封面映射：将 project slug 映射到从 Figma 导出的封面图
- * 当前已有的作品集项目封面（来自 Figma REST API 导出）
- * ──────────────────────────────────────────────────────────────── */
-const PROJECT_COVERS = {
-  'nocode-for-pro': '/images/portfolio/covers/nocode-for-pro.webp',
-  'chatgpt-home-buying': '/images/portfolio/covers/chatgpt-home-buying.webp',
-  'laolao-service-design': '/images/portfolio/covers/laolao-service-design.webp',
-};
-
 /**
- * 获取项目的封面图路径：
- * 1. 优先使用从 Figma 导出的 covers/ 目录
- * 2. 回退到项目第一帧的 src（缩略图）
+ * 获取项目的预览图路径数组 — 按 frames 顺序取前 N 张图片
+ * 用于卡片多层叠放预览：[0] 最前层, [1] 第2层, [2] 第3层, [3] 第4层
  */
-function getProjectCover(project) {
-  if (PROJECT_COVERS[project.slug]) return PROJECT_COVERS[project.slug];
-  // 回退：取项目第一帧图片
-  const firstImage = (project.frames || []).find(f => f.type === 'image');
-  return firstImage?.src || '';
+function getProjectPreviewSrcs(project, count = 4) {
+  const images = (project.frames || []).filter((f) => f.type === 'image');
+  return images.slice(0, count).map((f) => f.src);
 }
 
-/* ────────────────────────────────────────────────────────────────
- * 文章随笔项目列表 — 外部链接 or 未来扩展
- * 从 Figma 设计稿中提取的文章列表数据
- * ──────────────────────────────────────────────────────────────── */
-const WRITING_ITEMS = [
-  { title: '思考 | Cursor 和 Codex 的交互粒...', href: null },
-  { title: '思考 | 个人向 Design Engineer...', href: null },
-  { title: '课程 | Spec Coding 与工程师协作...', href: null },
-  { title: '课程 | 工程化设计思维', href: null },
-  { title: '课程 | AI Coding 入门概览', href: null },
+/**
+ * 文章随笔 — 真实飞书文章外链（3 篇）
+ * 标题严格按照文档名称，点击直接跳转外链
+ */
+export const WRITING_ITEMS = [
+  {
+    title: 'Spec Coding 与工程师协作艺术',
+    url: 'https://my.feishu.cn/docx/MyY4d4Zbfo575Xx8XIRcogSHnIh',
+  },
+  {
+    title: '设计师 AI Coding 入门概览',
+    url: 'https://my.feishu.cn/docx/CEfMdfpdfoQTK0xMElmcyC5gnCn',
+  },
+  {
+    title: '工程化设计思维',
+    url: 'https://my.feishu.cn/docx/YZcIdsLzpojD1mx9KuqcG8dHn8f',
+  },
 ];
 
 /**
  * PortfolioCompact — 精简版作品集页面
  *
- * 匹配 Figma 设计稿（node 11262:4546），适用于当前可展示内容较少的阶段。
- * 布局：左侧 sticky 信息栏（姓名 + 社交 + 项目目录）+ 右侧卡片纵向列表。
- * 第一张卡片为简历封面，点击跳转 /resume；其余为作品集卡片，点击跳转 L3 详情页。
+ * 匹配 Figma 设计稿 node 11262:4546 的布局：
+ *   整体居中，最大宽度 1440px（Figma 画板宽度），左右 padding 240px
+ *   左侧 sticky 信息栏（姓名 + 社交 + 项目目录）
+ *   右侧卡片纵向列表（gap 20px）
+ *   第一张卡片为简历封面 → /resume
+ *   后续为作品集卡片 → /portfolio/[slug]
  */
 export default function PortfolioCompact() {
   const { language } = useLanguage();
@@ -81,120 +78,142 @@ export default function PortfolioCompact() {
   );
 
   return (
-    <div className="w-full flex-1 flex flex-col md:flex-row items-start relative z-10">
-      {/* ═══════ 左侧信息栏 ═══════ */}
-      <aside className="w-full md:w-[360px] shrink-0 self-start">
-        <div className="flex flex-col gap-4 px-6 md:px-16 pt-8 md:pt-20 pb-4 md:fixed md:top-0 md:left-0 md:w-[352px] md:h-screen md:overflow-y-auto md:z-10">
-          {/* 姓名 */}
-          <div className="flex flex-col gap-2">
-            <h1 className="font-Ding text-[40px] md:text-[64px] leading-[1] text-main opacity-80">
-              黄奕礼
-            </h1>
-            <p className="font-Ding text-[20px] md:text-[24px] leading-[1] text-main opacity-80">
-              Alii / 阿礼
-            </p>
-          </div>
+    <div className="w-full flex-1 flex justify-center relative z-10">
+      {/* 居中容器，最大宽度对齐 Figma 1440px 画板 */}
+      <div className="w-full max-w-[960px] flex flex-col md:flex-row items-start px-6 md:px-0">
+        {/* ═══════ 左侧信息栏（移动端隐藏，移入菜单） ═══════ */}
+        <aside className="hidden md:block md:w-[240px] shrink-0 self-start">
+          <div className="flex flex-col gap-4 pt-8 md:pt-[80px] pb-4 md:fixed md:top-0 md:left-0 md:w-[240px] md:ml-[max(64px,calc((100vw-960px)/2))] md:h-screen md:overflow-y-auto md:z-10">
+            {/* 姓名 */}
+            <div className="flex flex-col gap-2">
+              <h1 className="font-Ding text-[40px] md:text-[64px] leading-[1] text-main opacity-80">
+                黄奕礼
+              </h1>
+              <p className="font-Ding text-[20px] md:text-[24px] leading-[1] text-main opacity-80">
+                Alii / 阿礼
+              </p>
+            </div>
 
-          <Divider />
+            <Divider />
 
-          {/* 社交图标 — 与 PortfolioSidebar 一致 */}
-          <div className="flex items-center gap-1.5">
-            <IconButton
-              label="Figma"
-              onClick={() => window.open('https://www.figma.com/@alii', '_blank')}
-            >
-              <FigmaIcon className="w-4 h-4" />
-            </IconButton>
-            <IconButton label="Chats">
-              <ChatsIcon className="w-4 h-4" />
-            </IconButton>
-            <CopyEmailButton appearance="sidebar" />
-          </div>
+            {/* 社交图标 — 匹配 Figma icons 区域 */}
+            <div className="flex items-center gap-1.5">
+              <IconButton
+                label="Figma"
+                onClick={() => window.open('https://www.figma.com/@alii', '_blank')}
+              >
+                <FigmaIcon className="w-4 h-4" />
+              </IconButton>
+              <IconButton
+                label="Bilibili"
+                onClick={() => window.open('https://space.bilibili.com', '_blank')}
+              >
+                <BilibiliIcon className="w-4 h-4" />
+              </IconButton>
+              <IconButton label="Chats">
+                <ChatsIcon className="w-4 h-4" />
+              </IconButton>
+              <CopyEmailButton appearance="sidebar" />
 
-          <Divider />
+            </div>
 
-          {/* 产品项目 */}
-          <nav className="flex flex-col gap-1 ml-[-6px]">
-            {groups.map((group) => (
-              <div key={group.key} className="flex flex-col">
+            <Divider />
+
+            {/* 项目目录 */}
+            <nav className="flex flex-col gap-1 ml-[-6px]">
+              {groups.map((group) => (
+                <div key={group.key} className="flex flex-col">
+                  <div className="px-2.5 py-1">
+                    <span className="font-regular text-[14px] leading-[24px] text-tertiary">
+                      {pickLocale(group.label, language)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-0.5 pb-2">
+                    {group.projects.map((project) => (
+                      <button
+                        key={project.slug}
+                        type="button"
+                        onClick={() => handleProjectClick(project.slug)}
+                        className="w-full flex flex-row items-start gap-1 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 hover:bg-hover"
+                      >
+                        <span className="w-fit font-regular text-[14px] leading-[24px] text-main truncate">
+                          {pickLocale(project.title, language)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              {/* 文章随笔 — 3 篇真实外链 */}
+              <div className="flex flex-col">
                 <div className="px-2.5 py-1">
                   <span className="font-regular text-[14px] leading-[24px] text-tertiary">
-                    {pickLocale(group.label, language)}
+                    文章随笔
                   </span>
                 </div>
                 <div className="flex flex-col gap-0.5 pb-2">
-                  {group.projects.map((project) => (
-                    <button
-                      key={project.slug}
-                      type="button"
-                      onClick={() => handleProjectClick(project.slug)}
+                  {WRITING_ITEMS.map((item, idx) => (
+                    <a
+                      key={idx}
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="w-full flex flex-row items-start gap-1 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 hover:bg-hover"
                     >
                       <span className="w-fit font-regular text-[14px] leading-[24px] text-main truncate">
-                        {pickLocale(project.title, language)}
+                        {item.title}
                       </span>
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>
-            ))}
+            </nav>
+          </div>
+        </aside>
 
-            {/* 文章随笔 — 静态条目 */}
-            <div className="flex flex-col">
-              <div className="px-2.5 py-1">
-                <span className="font-regular text-[14px] leading-[24px] text-tertiary">
-                  文章随笔
-                </span>
-              </div>
-              <div className="flex flex-col gap-0.5 pb-2">
-                {WRITING_ITEMS.map((item) => (
-                  <div
-                    key={item.title}
-                    className="w-full flex flex-row items-start gap-1 px-2.5 py-1 rounded-[8px] text-left text-quaternary"
-                  >
-                    <span className="w-fit font-regular text-[14px] leading-[24px] truncate">
-                      {item.title}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </nav>
-        </div>
-      </aside>
+        {/* ═══════ 间距（Figma gap=120px） ═══════ */}
+        <div className="hidden md:block w-[64px] shrink-0" />
 
-      {/* ═══════ 右侧卡片列表 ═══════ */}
-      <AnimatedContent
-        direction="vertical"
-        reverse={false}
-        distance={80}
-        duration={1.2}
-        delay={0.6}
-        immediate={true}
-        flex={true}
-        className="w-full flex-1"
-      >
-        <div className="w-full flex-1 px-6 md:pr-16 md:pl-0 py-4 md:py-20 flex flex-col gap-5 max-w-[600px]">
-          {/* 第一张：简历封面 → /resume */}
-          <PortfolioCard
-            isResume
-            coverSrc="/images/portfolio/covers/resume-cover.webp"
-            onClick={() => router.push('/resume')}
-          />
+        {/* ═══════ 右侧卡片列表 ═══════ */}
+        <AnimatedContent
+          direction="vertical"
+          reverse={false}
+          distance={80}
+          duration={1.2}
+          delay={0.6}
+          immediate={true}
+          flex={true}
+          className="w-full flex-1 min-w-0"
+        >
+          {/* 卡片组容器 — menu 同款投影 + 圆角 */}
+          <div
+            className="w-full flex-1 py-4 md:py-[80px] flex flex-col gap-5"
+            style={{
+              filter: 'drop-shadow(0 4px 24px hsl(var(--neutral-fg-main) / 0.08)) drop-shadow(0 1px 4px hsl(var(--neutral-fg-main) / 0.04))',
+            }}
+          >
+            {/* 第一张：简历封面 → /resume */}
+            <PortfolioCard
+              isResume
+              previewSrcs={['/images/portfolio/covers/resume-cover.webp']}
+              onClick={() => router.push('/resume')}
+            />
 
-          {/* 作品集项目卡片 — 按 order 排列 */}
-          {groups.flatMap((group) =>
-            group.projects.map((project) => (
-              <PortfolioCard
-                key={project.slug}
-                project={project}
-                coverSrc={getProjectCover(project)}
-                onClick={() => handleProjectClick(project.slug)}
-              />
-            )),
-          )}
-        </div>
-      </AnimatedContent>
+            {/* 作品集项目卡片 — 数据和顺序来自 portfolio.json */}
+            {groups.flatMap((group) =>
+              group.projects.map((project) => (
+                <PortfolioCard
+                  key={project.slug}
+                  project={project}
+                  previewSrcs={getProjectPreviewSrcs(project)}
+                  onClick={() => handleProjectClick(project.slug)}
+                />
+              )),
+            )}
+          </div>
+        </AnimatedContent>
+      </div>
     </div>
   );
 }

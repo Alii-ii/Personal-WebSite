@@ -13,8 +13,8 @@ const translations = {
     resume: "简历",
     resumeTooltip: "点击访问简历",
     portfolioTooltip: "点击访问作品集",
-    mainSite: "摸鱼平台", 
-    mainSiteTooltip: "点击访问摸鱼平台",
+    mainSite: "绘画平台", 
+    mainSiteTooltip: "点击访问绘画平台",
     copyright: `© Alii.Wong ${getLastCommitYear()} all rights reserved`,
     lastUpdated: getLastUpdatedText('zh'),
     
