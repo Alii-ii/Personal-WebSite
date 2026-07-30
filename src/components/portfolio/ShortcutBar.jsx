@@ -87,8 +87,9 @@ const ShortcutBar = ({ onBack, onPrevPage, onNextPage, onPrevProject, onNextProj
       </Key>
       <Label>{label.project}</Label>
 
-      {/* <Divider />
+      <Divider />
 
+      {/* 评论：符号 + 文字整体可点 */}
       <button
         type="button"
         onClick={onComment}
@@ -101,7 +102,7 @@ const ShortcutBar = ({ onBack, onPrevPage, onNextPage, onPrevProject, onNextProj
         <span className="font-regular text-[12px] leading-[18px] text-tertiary group-hover:text-main transition-colors duration-150 ml-1">
           {label.comment}
         </span>
-      </button> */}
+      </button>
     </div>
   );
 };

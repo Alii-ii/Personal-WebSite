@@ -224,19 +224,19 @@
 
 
         {
-          "id": "nfp-code-01",
-          "tab": "code",
+          "id": "nfp-design-figma",
+          "tab": "design",
           "type": "prototype",
           "title": {
-            "zh": "终端交互原型",
-            "en": "Terminal Prototype"
+            "zh": "Figma 原型",
+            "en": "Figma Prototype"
           },
           "feed": {
-            "w": 532,
-            "h": 262
+            "w": 1440,
+            "h": 900
           },
-          "html": "<div style=\"font-family:ui-monospace,SFMono-Regular,Menlo,monospace;padding:24px;line-height:1.8;font-size:13px\"><div style=\"opacity:.5\">TERMINAL</div><div><span style=\"color:#98c379\">cameron@web1</span>:~ $ 0x -n init</div><div style=\"opacity:.7\">├ Title&nbsp;&nbsp;<span style=\"color:#61afef\">Colossal Cave Adventure</span></div><div style=\"opacity:.7\">├ Generate boilerplate&nbsp;&nbsp;<span style=\"color:#98c379\">Yes</span></div><div style=\"opacity:.7\">└ Deploy&nbsp;&nbsp;<span style=\"color:#e5c07b\">Automatic</span></div></div>",
-          "alt": "终端原型"
+          "url": "https://embed.figma.com/proto/WeXLihQ4waQ8qMu2zQJ781/NoCode-Release?node-id=8945-14780&viewport=-83%2C-1630%2C0.5&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=8945%3A14780&show-proto-sidebar=1&page-id=8168%3A26959&embed-host=share",
+          "alt": "NoCode Figma 页面原稿"
         }
       ]
     },

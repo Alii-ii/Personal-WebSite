@@ -196,6 +196,21 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
     setActiveIndex(initialSelection.index);
   }, [initialSelection.tabKey, initialSelection.index]);
 
+  // 收集所有非当前 tab 的 prototype iframe URL，用于预加载
+  const preloadUrls = useMemo(() => {
+    if (!project) return [];
+    return (project.frames || [])
+      .filter((f) => f.type === 'prototype' && f.url && f.tab !== activeTab)
+      .map((f) => f.url);
+  }, [project, activeTab]);
+
+  // 过滤掉没有 frames 的空 tab
+  const visibleTabs = useMemo(() => {
+    if (!project?.tabs) return [];
+    const all = project.frames || [];
+    return project.tabs.filter((tab) => all.some((f) => f.tab === tab.key));
+  }, [project]);
+
   // 当前 tab 下的 frame 列表
   const frames = useMemo(() => {
     if (!project) return [];
@@ -218,10 +233,13 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
   stateRef.current = {
     frames,
     activeIndex,
+    activeTab,
+    visibleTabs,
     neighbors,
     commentOpen,
     menuOpen,
     tabs: project?.tabs || [],
+    allFrames: project?.frames || [],
   };
 
   // 横向轨道：实测每页位置，把激活页精确居中
@@ -375,16 +393,20 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
     setActiveIndex(0);
   }, []);
 
-  // 根据目标项目的默认 tab 取首/末帧，用于跨项目时衔接左右翻页体验。
+  // 根据目标项目的首/末 visible tab 取边界帧 id，用于跨项目时衔接左右翻页体验。
   const getProjectEdgeFrameId = useCallback((targetSlug, edge) => {
     const targetProject = getProjectBySlug(targetSlug);
     if (!targetProject) return null;
 
-    const defaultTabKey = targetProject.tabs?.[0]?.key ?? null;
-    const scopedFrames = defaultTabKey
-      ? (targetProject.frames || []).filter((frame) => frame.tab === defaultTabKey)
-      : targetProject.frames || [];
+    const allFrames = targetProject.frames || [];
+    const vTabs = (targetProject.tabs || []).filter((tab) =>
+      allFrames.some((f) => f.tab === tab.key)
+    );
 
+    if (!vTabs.length) return allFrames[0]?.id ?? null;
+
+    const targetTab = edge === 'end' ? vTabs[vTabs.length - 1] : vTabs[0];
+    const scopedFrames = allFrames.filter((f) => f.tab === targetTab.key);
     if (!scopedFrames.length) return null;
     return edge === 'end' ? scopedFrames[scopedFrames.length - 1].id : scopedFrames[0].id;
   }, []);
@@ -403,12 +425,21 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
   );
 
   const goPrevPage = useCallback(() => {
-    const { activeIndex: currentIndex, neighbors: nb } = stateRef.current;
+    const { activeIndex: currentIndex, activeTab: curTab, visibleTabs: vTabs, neighbors: nb, allFrames } = stateRef.current;
     if (currentIndex > 0) {
       setActiveIndex((prev) => prev - 1);
       return;
     }
-
+    // 当前 tab 首页 → 切到上一个 tab 的末页
+    const tabIdx = vTabs.findIndex((t) => t.key === curTab);
+    if (tabIdx > 0) {
+      const prevTab = vTabs[tabIdx - 1].key;
+      const prevTabFrames = allFrames.filter((f) => f.tab === prevTab);
+      setActiveTab(prevTab);
+      setActiveIndex(prevTabFrames.length - 1);
+      return;
+    }
+    // 所有 tab 遍历完 → 跳到上一个项目
     if (!nb?.prev?.slug) return;
     goProject(nb.prev.slug, {
       frameId: getProjectEdgeFrameId(nb.prev.slug, 'end'),
@@ -416,14 +447,21 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
   }, [getProjectEdgeFrameId, goProject]);
 
   const goNextPage = useCallback(() => {
-    const { activeIndex: currentIndex, frames: currentFrames, neighbors: nb } = stateRef.current;
+    const { activeIndex: currentIndex, frames: currentFrames, activeTab: curTab, visibleTabs: vTabs, neighbors: nb } = stateRef.current;
     const total = currentFrames.length;
-
     if (currentIndex < total - 1) {
       setActiveIndex((prev) => prev + 1);
       return;
     }
-
+    // 当前 tab 末页 → 切到下一个 tab 的首页
+    const tabIdx = vTabs.findIndex((t) => t.key === curTab);
+    if (tabIdx < vTabs.length - 1) {
+      const nextTab = vTabs[tabIdx + 1].key;
+      setActiveTab(nextTab);
+      setActiveIndex(0);
+      return;
+    }
+    // 所有 tab 遍历完 → 跳到下一个项目
     if (!nb?.next?.slug) return;
     goProject(nb.next.slug, {
       frameId: getProjectEdgeFrameId(nb.next.slug, 'start'),
@@ -534,15 +572,14 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
       if (event.altKey) {
         const match = /^Digit([0-9])$/.exec(event.code || '');
         if (match) {
-          const tabs = stateRef.current.tabs || [];
-          if (tabs.length <= 1) return;
-          // 0→倒数第1，9→倒数第2，8→倒数第3 …（键盘上从 0 往左依次对应）
+          const vTabs = stateRef.current.visibleTabs || [];
+          if (vTabs.length <= 1) return;
           const digit = Number(match[1]);
           const fromRight = digit === 0 ? 1 : 11 - digit;
-          const index = tabs.length - fromRight;
-          if (index >= 0 && index < tabs.length) {
+          const index = vTabs.length - fromRight;
+          if (index >= 0 && index < vTabs.length) {
             event.preventDefault();
-            handleTabChange(tabs[index].key);
+            handleTabChange(vTabs[index].key);
           }
           return;
         }
@@ -610,6 +647,20 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
 
   return (
     <div className="relative h-screen w-full flex flex-col bg-bg overflow-hidden">
+      {/* 预加载：非当前 tab 的 prototype iframe，零尺寸隐藏，
+          用户浏览当前 tab 内容时 Figma 等重型 embed 在后台静默加载，
+          切 tab 后因 URL 相同浏览器复用已加载资源，实现秒开 */}
+      {preloadUrls.map((url) => (
+        <iframe
+          key={url}
+          src={url}
+          aria-hidden="true"
+          tabIndex={-1}
+          className="absolute w-0 h-0 overflow-hidden border-0 opacity-0 pointer-events-none"
+          allow="clipboard-write; storage-access; cross-origin-isolated"
+        />
+      ))}
+
       {/* 背景点阵效果 */}
       <div className="absolute inset-0 z-0">
         <DotGrid
@@ -643,12 +694,12 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
             </span>
           </div>
 
-          {/* tabs：有则显示，无（或仅一个）则隐藏 */}
-          {project.tabs?.length > 1 ? (
+          {/* tabs：有内容的 tab >1 才显示文字切换栏 */}
+          {visibleTabs.length > 1 ? (
             <nav className="hidden md:flex items-center gap-1 shrink-0">
-              {project.tabs.map((tab, index) => {
+              {visibleTabs.map((tab, index) => {
                 // 快捷键与「从右往左数」的顺位绑定：最右 alt+0，往左 alt+9、alt+8…
-                const fromRight = project.tabs.length - index;
+                const fromRight = visibleTabs.length - index;
                 const digit = fromRight === 1 ? 0 : 11 - fromRight;
                 return (
                   <div key={tab.key} className="flex items-center gap-1">
@@ -720,9 +771,11 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
           <div className="hidden md:flex items-center gap-6">
             {frames.map((frame, index) => {
               const isActive = index === activeIndex;
-              // 图片类 frame：比例取自图片文件本身（见 useImageRatios），外框据此贴合，
-              // 无需在 JSON 里维护尺寸。非图片类（原型 / 图文）无固有比例，沿用固定视口尺寸。
-              const ratio = frame.type === 'image' ? imageRatios[frame.src] : null;
+              // 宽高比：图片类取自图片文件探测（见 useImageRatios），
+              // 非图片类（原型 / 图文）有 feed.w/h 则用它，否则回退固定视口尺寸。
+              const ratio = frame.type === 'image'
+                ? imageRatios[frame.src]
+                : (frame.feed?.w && frame.feed?.h ? frame.feed.w / frame.feed.h : null);
               // 高度以舞台实际可用高度为基准：活跃帧填满，非活跃帧按 STAGE_SHRINK 缩小。
               // 宽度取「高度换算值」与「宽度上限」的较小者，再由 aspect-ratio 反推，
               // 保证任一维度触顶时都等比缩放、比例不失真。

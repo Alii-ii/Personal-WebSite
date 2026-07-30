@@ -70,12 +70,20 @@ const PrototypeFrame = ({ frame, title }) => {
         />
       );
     }
+    // Figma embed 需要完整的权限策略：
+    //   - clipboard-write：Figma 的复制功能
+    //   - storage-access：第三方 cookie/storage（Figma 内部跨域资源依赖此权限）
+    //   - 不设 sandbox：Figma 内部多层 iframe + WASM 需要完整浏览器能力
+    const isFigma = frame.url.includes('figma.com');
     return (
       <iframe
         src={frame.url}
         title={title || 'prototype'}
-        loading="lazy"
-        sandbox="allow-scripts allow-same-origin allow-forms"
+        {...(!isFigma && { loading: 'lazy', sandbox: 'allow-scripts allow-same-origin allow-forms' })}
+        {...(isFigma && {
+          allow: 'clipboard-write; storage-access; cross-origin-isolated',
+        })}
+        allowFullScreen
         className="w-full h-full border-0 bg-card"
         onError={() => setError(true)}
       />
