@@ -56,6 +56,16 @@ export const getCategories = () => categories;
 export const getProjects = () => projects;
 
 /**
+ * 项目是否拥有可进入 L3 的内容页。
+ * frames 是唯一内容源：至少有一个 frame 才允许生成路由或触发导航。
+ * disabled 继续作为人工总开关，便于内容临时下线。
+ * @param {Object} project - 项目对象
+ * @returns {boolean}
+ */
+export const hasProjectPage = (project) =>
+  Boolean(project && !project.disabled && Array.isArray(project.frames) && project.frames.length > 0);
+
+/**
  * 按分类分组的项目（用于 L2 左栏与 L3 菜单，二者共用同一 schema）
  * @returns {Array<{ key, label, projects }>}
  */
@@ -88,7 +98,8 @@ export const getProjectBySlug = (slug) =>
  * 获取全部 slug（供 generateStaticParams 使用）
  * @returns {Array<string>}
  */
-export const getAllProjectSlugs = () => projects.map((project) => project.slug);
+export const getAllProjectSlugs = () =>
+  projects.filter(hasProjectPage).map((project) => project.slug);
 
 /**
  * L2 作品墙数据：把所有项目的 frame 平铺，并回填所属项目信息
@@ -99,9 +110,10 @@ export const getAllProjectSlugs = () => projects.map((project) => project.slug);
  * @returns {Array} feed item 数组
  */
 export const getFeedFrames = ({ category, shuffle = true } = {}) => {
+  const pageProjects = projects.filter(hasProjectPage);
   const source = category
-    ? projects.filter((project) => project.category === category)
-    : projects;
+    ? pageProjects.filter((project) => project.category === category)
+    : pageProjects;
 
   const frames = source.flatMap((project) =>
     (project.frames || []).map((frame) => ({
@@ -162,7 +174,9 @@ export const getProjectFrames = (slug, tabKey) => {
  */
 export const getProjectNeighbors = (slug) => {
   // 与 getProjectsByCategory 同源：按分类展平为有序列表
-  const ordered = getProjectsByCategory().flatMap((group) => group.projects);
+  const ordered = getProjectsByCategory()
+    .flatMap((group) => group.projects)
+    .filter(hasProjectPage);
   const index = ordered.findIndex((project) => project.slug === slug);
   if (index === -1) return { prev: null, next: null, index: -1 };
   return {
@@ -187,6 +201,7 @@ export const getCommentTargetPath = (slug, frameId) =>
 export default {
   getCategories,
   getProjects,
+  hasProjectPage,
   getProjectsByCategory,
   getProjectBySlug,
   getAllProjectSlugs,

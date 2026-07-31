@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 /**
- * Figma 画板批量同步：REST API 导出 → webp 压缩 → 写入 portfolio.json
+ * Figma 页面组批量同步：REST API 导出 → webp 压缩 → 写入 portfolio.json
+ *
+ * 本脚本把链接节点明确视为“页面集合”，从其直接子节点抓取待发布页面
+ * （FRAME / COMPONENT / INSTANCE / GROUP / SECTION）。仅当用户提供的是组 link，
+ * 或 dry-run 结果确认这些直接子节点就是独立项目页时使用；单页请用 publish:figma-page。
  *
  * 从指定 Figma 节点下抓取所有子画板（FRAME / COMPONENT / INSTANCE / GROUP），
  * 按 PNG 2x 导出，压缩成 webp 落到 public/images/portfolio/<slug>/，
  * 最后把 frames 数组幂等写回 src/data/portfolio.json。
  *
  * 用法:
- *   node scripts/sync-figma-frames.mjs --url "<figma 链接>" --slug <项目 slug> \
+ *   npm run sync:figma-group -- --url "<figma 组链接>" --slug <项目 slug> \
  *     [--title-zh "中文名"] [--title-en "English"] [--category product] \
  *     [--period 2024.6] [--tab design] [--scale 2] [--force] [--dry-run]
  *
@@ -70,7 +74,11 @@ const dryRun = has('--dry-run');
 
 const usage = () => {
   console.log(`
-用法: node scripts/sync-figma-frames.mjs --url "<figma链接>" --slug <项目slug> [选项]
+用法: npm run sync:figma-group -- --url "<Figma 页面组链接>" --slug <项目slug> [选项]
+
+注意:
+  本命令会把目标节点的直接子节点当作独立页面。若链接指向单个完整页面，
+  即使内部含有 Frame / Component，也应改用 publish:figma-page。
 
 必填:
   --url          Figma 画板链接（含 node-id）
@@ -207,7 +215,7 @@ async function main() {
   });
 
   if (dryRun) {
-    console.log('\n[dry-run] 未执行导出与写入。');
+    console.log('\n[dry-run] 未执行导出与写入。请确认上方子节点确实分别代表独立项目页；若它们只是单页内部图层，请改用 publish:figma-page。');
     return;
   }
 

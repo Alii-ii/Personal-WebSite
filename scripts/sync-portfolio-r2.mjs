@@ -33,12 +33,17 @@ const CDN_BASE = (process.env.CDN_BASE || 'https://pub-1a0773e1cc80472bbfb854bca
   '',
 );
 
-const SLUGS = [
-  'nocode-for-pro',
-  'chatgpt-home-buying',
-  'undergraduate-thesis',
-  'laolao-service-design',
-];
+async function listPortfolioSlugs() {
+  try {
+    const entries = await readdir(IMG_ROOT, { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isDirectory() && entry.name !== 'covers')
+      .map((entry) => entry.name)
+      .sort();
+  } catch {
+    return [];
+  }
+}
 
 async function listWebp(dir) {
   try {
@@ -86,7 +91,9 @@ async function mapPool(items, concurrency, worker) {
 
 async function uploadAll() {
   const queue = [];
-  for (const slug of SLUGS) {
+  const slugs = await listPortfolioSlugs();
+  console.log(`发现 ${slugs.length} 个本地项目目录：${slugs.join(', ') || '无'}`);
+  for (const slug of slugs) {
     const fullDir = join(IMG_ROOT, slug);
     const thumbDir = join(fullDir, 'thumbs');
     for (const f of await listWebp(fullDir)) {

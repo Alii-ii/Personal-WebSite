@@ -18,6 +18,7 @@ import {
   getCommentTargetPath,
   getProjectBySlug,
   getProjectNeighbors,
+  hasProjectPage,
   getProjectsByCategory,
   pickLocale,
 } from '@/contexts/ProjectContext';
@@ -396,7 +397,7 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
   // 根据目标项目的首/末 visible tab 取边界帧 id，用于跨项目时衔接左右翻页体验。
   const getProjectEdgeFrameId = useCallback((targetSlug, edge) => {
     const targetProject = getProjectBySlug(targetSlug);
-    if (!targetProject) return null;
+    if (!hasProjectPage(targetProject)) return null;
 
     const allFrames = targetProject.frames || [];
     const vTabs = (targetProject.tabs || []).filter((tab) =>
@@ -413,7 +414,7 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
 
   const goProject = useCallback(
     (targetSlug, options = {}) => {
-      if (!targetSlug) return;
+      if (!targetSlug || !hasProjectPage(getProjectBySlug(targetSlug))) return;
 
       const search = new URLSearchParams();
       if (options.frameId) search.set('frame', options.frameId);
@@ -625,7 +626,7 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [router, goPrevPage, goNextPage, goProject, handleTabChange]);
 
-  if (!project) {
+  if (!hasProjectPage(project)) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-bg">
         <div className="flex flex-col items-center gap-4">

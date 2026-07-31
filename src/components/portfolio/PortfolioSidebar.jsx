@@ -3,7 +3,7 @@
 import CopyEmailButton from '@/components/CopyEmailButton';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { pickLocale } from '@/contexts/ProjectContext';
+import { hasProjectPage, pickLocale } from '@/contexts/ProjectContext';
 import { ChatsIcon, BilibiliIcon, FigmaIcon, XiaohongshuIcon } from '@/public/icons';
 
 /**
@@ -120,21 +120,25 @@ const PortfolioSidebar = ({
 
                 {/* 项目列表：对齐 L3 menu */}
                 <div className="flex flex-col gap-1 pb-1">
-                  {group.projects.map((project) => (
-                    <button
-                      key={project.slug}
-                      type="button"
-                      onClick={() => router.push(`/portfolio/${project.slug}`)}
-                      className="w-full flex flex-row items-start gap-1 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 hover:bg-hover"
-                    >
-                      <span className="w-fit font-regular text-[14px] leading-[24px] text-main truncate">
-                        {pickLocale(project.title, language)}
-                      </span>
-                      <span className="font-regular text-[14px] leading-[24px] text-tertiary opacity-50">
-                        {project.period}
-                      </span>
-                    </button>
-                  ))}
+                  {group.projects.map((project) => {
+                    const disabled = !hasProjectPage(project);
+                    return (
+                      <button
+                        key={project.slug}
+                        type="button"
+                        disabled={disabled}
+                        onClick={disabled ? undefined : () => router.push(`/portfolio/${project.slug}`)}
+                        className={`w-full flex flex-row items-start gap-1 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 ${disabled ? 'cursor-default' : 'hover:bg-hover'}`}
+                      >
+                        <span className={`w-fit font-regular text-[14px] leading-[24px] truncate ${disabled ? 'text-disabled' : 'text-main'}`}>
+                          {pickLocale(project.title, language)}
+                        </span>
+                        <span className="font-regular text-[14px] leading-[24px] text-tertiary opacity-50">
+                          {project.period}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             );

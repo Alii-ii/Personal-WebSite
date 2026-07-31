@@ -2,13 +2,16 @@
 
 > 状态：**进行中 — 已切 `pub-*.r2.dev` 作为临时 CDN；自定义域 `cdn.alii.work` 仍绑不上（10001）**
 > 产出时间：2026-07-28
-> 更新：2026-07-29 — 自定义域全挂（含新子域），改用 R2 公网域名；本地 `/images/portfolio/*` 作兜底。
+> 更新：2026-07-29 — 自定义域全挂（含新子域），改用 R2 公网域名；本地 `/images/portfolio/*` 作兜底。新增单节点封面发布命令与完整 SOP。
 >
 > 基础设施：
 > - R2 bucket：`illustration`
 > - 临时 CDN：`https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev`
 > - 目标 CDN（待恢复）：`https://cdn.alii.work`（Connect Domain 持续 10001）
 > - 上传脚本：`npm run sync:portfolio-r2`（`scripts/sync-portfolio-r2.mjs`）
+> - 单页发布（封面或任意页）：`npm run publish:figma-page`（`scripts/publish-figma-page.mjs`）
+> - 页面组同步：`npm run sync:figma-group`（`scripts/sync-figma-frames.mjs`）
+> - 完整流程：`.ai-dev-docs/portfolio-figma-cloudflare-sop.md`
 
 ## 目标
 
@@ -34,6 +37,8 @@ CDN_BASE=https://cdn.alii.work npm run sync:portfolio-r2 -- --json-only
 | 前端 `onError` 回退本地 | 已做（FrameRenderer / FeedCard / Masonry） |
 | 恢复 `cdn.alii.work` 自定义域 | **阻塞**（Dashboard + CLI 均 10001） |
 | Pages 重新部署（让 JSON/前端上线） | 上传完成后执行 |
+| Design Mode 封面导出 + R2 上传 + JSON 索引 | **已完成**（`portfolio/nocode-design-mode/cover.webp`） |
+| Figma Link → Cloudflare SOP（单页 / 页面组） | **已完成**（见 `portfolio-figma-cloudflare-sop.md`） |
 
 ## 常用命令
 

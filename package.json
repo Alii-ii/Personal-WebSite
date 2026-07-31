@@ -12,6 +12,8 @@
     "compress:images": "node scripts/compress-images.mjs",
     "thumbs:portfolio": "node scripts/generate-portfolio-thumbs.mjs",
     "publish:gallery": "node scripts/publish-gallery.mjs",
+    "publish:figma-page": "node scripts/publish-figma-page.mjs",
+    "sync:figma-group": "node scripts/sync-figma-frames.mjs",
     "sync:figma": "node scripts/sync-figma-frames.mjs",
     "sync:portfolio-r2": "node scripts/sync-portfolio-r2.mjs",
     "subset:fonts": "node scripts/subset-fonts.mjs"

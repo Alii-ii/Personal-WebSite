@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useDragControls, useReducedMotion } from 'moti
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { pickLocale } from '@/contexts/ProjectContext';
+import { hasProjectPage, pickLocale } from '@/contexts/ProjectContext';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
 
@@ -142,16 +142,18 @@ const MobileDrawer = ({ open, onOpenChange, groups = [], currentSlug, onSelect, 
 
                   {group.projects.map((project) => {
                     const isActive = project.slug === currentSlug;
+                    const disabled = !hasProjectPage(project);
                     return (
                       <button
                         key={project.slug}
                         type="button"
-                        onClick={() => onSelect?.(project.slug)}
+                        disabled={disabled}
+                        onClick={disabled ? undefined : () => onSelect?.(project.slug)}
                         className={`w-full flex items-center gap-1.5 px-2.5 py-2 rounded-[8px] text-left transition-colors duration-150 ${
-                          isActive ? 'bg-hover' : 'hover:bg-hover active:bg-hover/60'
+                          disabled ? 'cursor-default' : isActive ? 'bg-hover' : 'hover:bg-hover active:bg-hover/60'
                         }`}
                       >
-                        <span className="flex-1 font-regular text-[15px] leading-[24px] text-main truncate">
+                        <span className={`flex-1 font-regular text-[15px] leading-[24px] truncate ${disabled ? 'text-disabled' : 'text-main'}`}>
                           {pickLocale(project.title, language)}
                         </span>
                         <span className="font-regular text-[13px] leading-[24px] text-tertiary shrink-0">

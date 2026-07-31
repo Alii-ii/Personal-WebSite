@@ -45,18 +45,43 @@
       "slug": "nocode-design-mode",
       "category": "product",
       "order": 0,
-      "disabled": true,
       "title": {
         "zh": "NoCode Design Mode 0-1",
         "en": "NoCode Design Mode 0-1"
       },
-      "period": "2025",
+      "period": "2026.Q1",
       "summary": {
         "zh": "整理中",
         "en": "Coming soon"
       },
-      "tabs": [],
-      "frames": []
+      "tabs": [
+        {
+          "key": "overview",
+          "label": {
+            "zh": "项目概览",
+            "en": "Overview"
+          }
+        }
+      ],
+      "frames": [
+        {
+          "id": "nocode-design-mode-cover",
+          "tab": "overview",
+          "type": "image",
+          "title": {
+            "zh": "项目封面",
+            "en": "Project Cover"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-design-mode/cover.webp",
+          "alt": "NoCode Design Mode 0-1 - 项目封面",
+          "figmaNodeId": "2880:61731",
+          "srcLocal": "/images/portfolio/nocode-design-mode/cover.webp"
+        }
+      ]
     },
     {
       "slug": "nocode-for-pro",

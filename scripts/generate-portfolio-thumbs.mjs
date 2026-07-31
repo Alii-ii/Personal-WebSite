@@ -105,7 +105,10 @@ async function main() {
   }
 
   const entries = await readdir(SRC_ROOT, { withFileTypes: true });
-  const dirs = entries.filter((e) => e.isDirectory() && e.name !== THUMB_DIR_NAME);
+  // covers/ 仅服务固定简历卡片，不参与作品墙，不需要生成 thumbs。
+  const dirs = entries.filter(
+    (e) => e.isDirectory() && e.name !== THUMB_DIR_NAME && e.name !== 'covers',
+  );
 
   let totalBefore = 0;
   let totalAfter = 0;

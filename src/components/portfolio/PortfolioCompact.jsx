@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { pickLocale, getProjectsByCategory } from '@/contexts/ProjectContext';
+import { pickLocale, getProjectsByCategory, hasProjectPage } from '@/contexts/ProjectContext';
 import CopyEmailButton from '@/components/CopyEmailButton';
 import IconTextButton from '@/components/icon-text-botton';
 import { ChatsIcon, FigmaIcon, BilibiliIcon, XiaohongshuIcon, DownloadIcon } from '@/public/icons';
@@ -77,13 +77,16 @@ export function buildNavSections(groups, language, t, includeDisabled = true) {
 
   return [
     ...groups.map((group) => {
-      const items = filterDisabled(group.projects.map((p) => ({
-        key: p.slug,
-        label: pickLocale(p.title, language),
-        href: `/portfolio/${p.slug}`,
-        external: false,
-        disabled: !!p.disabled,
-      })));
+      const items = filterDisabled(group.projects.map((p) => {
+        const disabled = !hasProjectPage(p);
+        return {
+          key: p.slug,
+          label: pickLocale(p.title, language),
+          href: `/portfolio/${p.slug}`,
+          external: false,
+          disabled,
+        };
+      }));
       return { key: group.key, label: pickLocale(group.label, language), items };
     }),
     ...(WRITING_ITEMS.length > 0 ? [{
@@ -273,15 +276,18 @@ export default function PortfolioCompact() {
 
             {/* 作品集项目卡片 — 数据和顺序来自 portfolio.json */}
             {groups.flatMap((group) =>
-              group.projects.map((project) => (
-                <PortfolioCard
-                  key={project.slug}
-                  project={project}
-                  disabled={!!project.disabled}
-                  previewSrcs={getProjectPreviewSrcs(project)}
-                  onClick={project.disabled ? undefined : () => handleProjectClick(project.slug)}
-                />
-              )),
+              group.projects.map((project) => {
+                const disabled = !hasProjectPage(project);
+                return (
+                  <PortfolioCard
+                    key={project.slug}
+                    project={project}
+                    disabled={disabled}
+                    previewSrcs={getProjectPreviewSrcs(project)}
+                    onClick={disabled ? undefined : () => handleProjectClick(project.slug)}
+                  />
+                );
+              }),
             )}
           </div>
         </AnimatedContent>

@@ -2,7 +2,7 @@
 
 import UnfoldPanel from '@/components/motion/unfold-panel';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { pickLocale } from '@/contexts/ProjectContext';
+import { hasProjectPage, pickLocale } from '@/contexts/ProjectContext';
 
 /**
  * L3 项目菜单浮层
@@ -47,16 +47,18 @@ const ProjectMenu = ({ groups = [], currentSlug, open, onSelect, onClose }) => {
           <div className="flex flex-col gap-0.5 pb-1">
             {group.projects.map((project) => {
               const isActive = project.slug === currentSlug;
+              const disabled = !hasProjectPage(project);
               return (
                 <button
                   key={project.slug}
                   type="button"
-                  onClick={() => onSelect?.(project.slug)}
-                  className={`w-full flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] hover:bg-hover text-left transition-colors duration-150 ${
-                    isActive ? 'bg-press' : 'hover:bg-hover/60'
+                  disabled={disabled}
+                  onClick={disabled ? undefined : () => onSelect?.(project.slug)}
+                  className={`w-full flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 ${
+                    disabled ? 'cursor-default' : isActive ? 'bg-press' : 'hover:bg-hover/60'
                   }`}
                 >
-                  <span className="flex-1 font-regular text-[14px] leading-[24px] text-main truncate">
+                  <span className={`flex-1 font-regular text-[14px] leading-[24px] truncate ${disabled ? 'text-disabled' : 'text-main'}`}>
                     {pickLocale(project.title, language)}
                   </span>
                   <span className="font-regular text-[14px] leading-[24px] text-tertiary shrink-0">
