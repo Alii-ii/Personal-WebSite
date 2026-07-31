@@ -27,6 +27,7 @@ import { supabase } from '@/lib/supabase';
 export function useAuth() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // 查询 profile
@@ -50,8 +51,10 @@ export function useAuth() {
 
     const init = async () => {
       try {
-        const { data: { user: currentUser } } = await supabase.auth.getUser();
-        
+        const { data: { session } } = await supabase.auth.getSession();
+        const currentUser = session?.user;
+
+        if (mounted) setAccessToken(session?.access_token || null);
         if (mounted && currentUser) {
           setUser(currentUser);
           const p = await fetchProfile(currentUser.id);
@@ -66,15 +69,19 @@ export function useAuth() {
 
     init();
 
-    // 监听 auth 状态变化（登录/登出/token 刷新）
+    // Auth 回调内不 await Supabase 查询，避免占用 Auth 锁导致 getSession 超时。
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!mounted) return;
 
+        setAccessToken(session?.access_token || null);
         if (session?.user) {
           setUser(session.user);
-          const p = await fetchProfile(session.user.id);
-          if (mounted) setProfile(p);
+          setTimeout(() => {
+            fetchProfile(session.user.id).then((nextProfile) => {
+              if (mounted) setProfile(nextProfile);
+            });
+          }, 0);
         } else {
           setUser(null);
           setProfile(null);
@@ -103,27 +110,43 @@ export function useAuth() {
     return !data || data.length === 0;
   }, []);
 
-  // 匿名登录 + 创建 profile
+  // 首次匿名登录 + 创建 profile；已有设备 session 时只补齐 profile，不重复创建 Auth user。
   const signIn = useCallback(async (nickname) => {
     const trimmed = nickname?.trim();
     if (!trimmed || trimmed.length > 20) {
-      return { error: '昵称需要 1-20 个字符' };
+      return { error: '昵称需要 1-20 个字符', errorCode: 'chatNicknameInvalid' };
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const sessionUser = session?.user;
+    if (sessionUser) {
+      const existingProfile = await fetchProfile(sessionUser.id);
+      if (existingProfile) {
+        setUser(sessionUser);
+        setProfile(existingProfile);
+        return { profile: existingProfile };
+      }
     }
 
     // 昵称查重
     const available = await checkNicknameAvailable(trimmed);
     if (!available) {
-      return { error: '该昵称已被使用' };
+      return { error: '该昵称已被使用', errorCode: 'chatNicknameTaken' };
     }
 
     try {
-      // 1. 匿名登录
-      const { data: authData, error: authError } = await supabase.auth.signInAnonymously();
-      if (authError) {
-        return { error: '登录失败，请重试' };
+      // 1. 优先复用当前设备已持久化的匿名 user，仅在首次访问时创建。
+      let authUser = sessionUser;
+      if (!authUser) {
+        const { data: authData, error: authError } = await supabase.auth.signInAnonymously();
+        if (authError) {
+          return { error: '登录失败，请重试', errorCode: 'chatSignInFailed' };
+        }
+        authUser = authData.user;
+        setAccessToken(authData.session?.access_token || null);
       }
 
-      const userId = authData.user.id;
+      const userId = authUser.id;
 
       // 2. 创建 profile
       const { error: profileError } = await supabase
@@ -138,20 +161,21 @@ export function useAuth() {
         console.error('Create profile error:', profileError);
         // UNIQUE 约束冲突 (23505) 也返回友好提示
         if (profileError.code === '23505') {
-          return { error: '该昵称已被使用' };
+          return { error: '该昵称已被使用', errorCode: 'chatNicknameTaken' };
         }
-        return { error: '创建个人信息失败' };
+        return { error: '创建个人信息失败', errorCode: 'chatProfileCreateFailed' };
       }
 
       // 3. 更新本地状态
-      setUser(authData.user);
+      setUser(authUser);
+      if (session?.access_token) setAccessToken(session.access_token);
       setProfile({ nickname: trimmed, avatar_seed: userId });
       return {};
     } catch (err) {
       console.error('Sign in error:', err);
-      return { error: '登录失败，请重试' };
+      return { error: '登录失败，请重试', errorCode: 'chatSignInFailed' };
     }
-  }, [checkNicknameAvailable]);
+  }, [checkNicknameAvailable, fetchProfile]);
 
   // 更新昵称
   const updateNickname = useCallback(async (nickname) => {
@@ -234,6 +258,7 @@ export function useAuth() {
       }
 
       setUser(authData.user);
+      setAccessToken(authData.session?.access_token || null);
       const p = await fetchProfile(userId);
       setProfile(p);
       return { profile: p };
@@ -248,11 +273,13 @@ export function useAuth() {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    setAccessToken(null);
   }, []);
 
   return {
     user,
     profile,
+    accessToken,
     isLoading,
     isAuthenticated: !!user,
     hasProfile: !!profile,

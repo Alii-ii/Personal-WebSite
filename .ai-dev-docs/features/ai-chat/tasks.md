@@ -5,9 +5,9 @@
 ### 基础设施 Tasks
 
 - [ ] 1. Supabase 建表与配置
-    - [ ] 1.1 创建 `site_chat_conversations` 表（含索引、updated_at trigger）
-    - [ ] 1.2 创建 `site_chat_messages` 表（含索引、每日限额复合索引）
-    - [ ] 1.3 配置 RLS 策略（conversations 四策略 + messages 两策略）
+    - [x] 1.1 创建 `site_chat_conversations` 表（含索引、updated_at trigger）
+    - [x] 1.2 创建 `site_chat_messages` 表（含索引、每日限额复合索引）
+    - [x] 1.3 配置 RLS 策略（conversations 四策略 + messages 两策略）
     - [ ] 1.4 测试 RLS：验证用户只能读写自己的数据
 
 - [x] 2. Cloudflare Pages Function
@@ -20,9 +20,9 @@
     - [x] 2.7 环境变量配置约定（DEEPSEEK_API_KEY、SUPABASE_SERVICE_KEY、SUPABASE_URL；仅服务端）
 
 - [ ] 3. 部署配置调整
-    - [ ] 3.1 调整 GitHub Actions deploy.yml（deploy job 增加 checkout 步骤）
-    - [ ] 3.2 在 Cloudflare Dashboard 配置环境变量
-    - [ ] 3.3 本地验证 functions 目录被正确识别（`npx wrangler pages dev out`）
+    - [x] 3.1 调整 GitHub Actions deploy.yml（deploy job 已包含 checkout 步骤）
+    - [ ] 3.2 在 Cloudflare Dashboard 配置环境变量（2026-08-01 检查：production secrets 为空）
+    - [x] 3.3 验证 functions 目录被正确识别（线上 `/api/chat` POST 已命中 Function）
 
 ### 数据层 Tasks
 
@@ -116,6 +116,35 @@
     - [x] 16.4 统一 DeepSeek 失败文案为“Alii 走神了，晚点再来试试吧…”
 
 - [ ] 17. 部署与数据验收
-    - [ ] 17.1 执行并验证 `setup.sql`、RLS 与索引
-    - [ ] 17.2 配置线上 Cloudflare secrets
+    - [ ] 17.1 已执行 `setup.sql`；RLS 隔离与索引仍待独立验证
+    - [ ] 17.2 配置线上 Cloudflare secrets（当前缺失）
     - [ ] 17.3 端到端验证 SSE 与 assistant 消息持久化
+
+- [x] 18. 展开态消息列表
+    - [x] 18.1 在原 title 区域渲染当前会话的用户与 AI 消息
+    - [x] 18.2 实现用户右对齐气泡和 AI 左对齐正文
+    - [x] 18.3 设置 480px 宽、12px 内边距、4px 间距和 50vh 最大高度
+    - [x] 18.4 将 streamingContent 合并为末尾临时 AI 消息
+    - [x] 18.5 展开或流式更新时自动滚动到最新消息
+    - [x] 18.6 发送后立即展开并展示请求进行中的反馈
+    - [x] 18.7 集成 ShinyText，用于思考态与流式回复
+    - [x] 18.8 保持展开按钮自身 hover 独立，并在收起态隐藏
+    - [x] 18.9 将 560×420 放大输入框与 title 消息列表设为互斥状态
+    - [x] 18.10 放大态 title 仅展示最新消息的单行截断文本
+    - [x] 18.11 允许流式回复期间提前输入，并保持发送按钮禁用
+    - [x] 18.12 固定非放大聚焦态消息区为 30px title 行，修复布局
+    - [x] 18.13 提升 ShinyText 扫光频率和 token 明暗对比
+    - [x] 18.14 显式持久化设备 session，并在注册前复用已有 user/profile
+    - [x] 18.15 拦截输入法 composition 的 Enter，避免误提交昵称
+    - [x] 18.16 将生成态消息限制在 30px title 行内，修复文本越界
+    - [x] 18.17 将底部左一按钮接入显式创建新对话
+    - [x] 18.18 默认复用当前会话，仅由用户主动拆分
+    - [x] 18.19 发送阶段复用持久化 session，避免 Auth 读取超时
+    - [x] 18.20 消息列表支持纵向滚动、隐藏滚动条并自动跟随最新内容
+    - [x] 18.21 将完整或部分 AI 流式文本固化到 messages，折叠重开后继续保留且不重复
+    - [x] 18.22 将 ChatInput 提升到根布局，并限定在 Portfolio 与 Resume 共享单一实例
+    - [x] 18.23 补齐聊天 placeholder、状态、错误反馈和昵称错误码的中英文文案
+    - [x] 18.24 为开始新对话与历史对话按钮补充 Radix Tooltip
+    - [x] 18.25 添加 Pin 按钮和常驻输入态切换
+    - [x] 18.26 兼容静态导出末尾斜杠与客户端 pathname fallback，恢复全局 ChatInput 可见性
+    - [x] 18.27 将 Pin 保持 24×24 热区并缩放为 16×16 标准操作图标

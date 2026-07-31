@@ -495,7 +495,7 @@ Cloudflare Pages 内置对 `functions/` 目录的支持。只要项目根目录�
       --branch main
 ```
 
-这样 `wrangler pages deploy out` 执行时，当前工作目录中同时有 `out/` 和 `functions/`，Cloudflare Pages 会自动识别 `functions/` 并部署为 Workers。
+这样 `wrangler pages deploy out` 执行时，当前工作目录中同时有 `out/` 和 `functions/`，Cloudflare Pages 会自动识别 `functions/` 并部署为 Workers。2026-08-01 已通过线上 POST `/api/chat` 返回 Function JSON 错误确认路由部署成功；当前 production secrets 为空，因此接口返回 `500 server_error / 服务配置不完整`，需补齐环境变量后再做 SSE 与持久化验收。
 
 ---
 
@@ -515,7 +515,7 @@ MVP 不渲染用户消息气泡或完整消息列表。`streamingContent` 与最
 
 ### 控件与主题
 
-展开/收起按钮复用 `IconTextButton` 与项目已有 Radix Tooltip。按钮热区为 24×24，图标为 16×16。SVG 使用 `currentColor`，通过 `text-tertiary`、`text-disabled` 等 token 适配浅色和深色主题。聊天相关 tooltip、aria-label 与昵称引导文案由 `LanguageContext` 提供。
+展开/收起使用单一 24×24 button 与项目已有 Radix Tooltip。输入框收起时按钮隐藏；输入框展开时默认只显示右上 12×12 的圆角软提示，hover 后软提示消失并显示 16×16 图标。非放大态使用 ExpandIcon，放大态使用 CollapseIcon。SVG 使用 `currentColor`，通过前景 token 适配浅色和深色主题。聊天相关 tooltip、aria-label 与昵称引导文案由 `LanguageContext` 提供。
 
 ### 本地 API 路由
 
@@ -545,6 +545,48 @@ data: {"content":"","done":true}
 ### Supabase 406 处理
 
 PostgREST `.single()` 在查询或插入返回 0 行时会返回 406。profile 查询、会话创建与用户消息插入改为数组结果加 `limit(1)`，由前端显式处理空结果，避免正常的暂时无数据状态触发 406。
+
+### 设备身份恢复与昵称提交保护
+
+Supabase 客户端显式启用 `persistSession`、`autoRefreshToken` 和 `detectSessionInUrl`。匿名注册生成的 session 存储在当前浏览器设备；后续访问由 `useAuth` 初始化阶段通过 `getUser()` 恢复同一个 user，并读取 `site_profiles`。`signIn` 在创建匿名 user 前再次检查当前 session：若 profile 已存在则直接恢复本地状态；若只有 user 没有 profile，则复用该 user 补建 profile，避免重复调用 `signInAnonymously()` 误创多个 id。清除浏览器站点数据、无痕窗口、主动登出或更换浏览器/设备仍会被视为新的设备身份。
+
+昵称 textarea 监听 `compositionstart` 与 `compositionend`。Enter 发生在组合输入期间、浏览器报告 `isComposing`、keyCode 为 229，或昵称模式下刚结束 composition 的 300ms 内时，仅阻止默认换行而不提交。这样输入法用于确认候选词的 Enter 不会误触注册；昵称校验仍只做首尾 trim，允许中间空格。
+
+### 会话创建与 Auth 读取
+
+MVP 默认恢复并持续复用最近的 `currentConversation`；只有当用户点击底部操作区左一按钮时才调用 `createConversation()`，将新会话设为当前会话并清空消息与输入内容。回复生成期间和昵称模式下禁用该按钮，避免并发切换或在登录前创建会话。左二历史会话入口暂不启用。
+
+`AuthContext` 同时缓存已恢复的 `user` 与 `accessToken`，并传入 `useChat`。创建会话、用户消息持久化、发送前身份判定和 Function Authorization 均复用这些内存状态，发送链路不再调用 `getUser()` 或 `getSession()`，因此不会因 Supabase Auth 锁等待而触发登录读取超时。`onAuthStateChange` 回调只同步内存状态，profile 查询异步移出回调，避免占用 Auth 锁。
+
+### 页面稳定性
+
+会话初始化只在 `authUser.id` 确定或变化时执行。`loadConversations` 不再依赖 `currentConversation`，通过 ref 记录当前会话，避免设置最近会话后重新创建 callback、再次触发 effect 和重复查询。展开/收起与新建会话不再主动调用 textarea `.focus()`，只有用户明确按页面 Enter 快捷键或点击输入区域时才聚焦，避免重渲染期间抢占其他窗口/控件焦点。
+
+### 展开态消息列表
+
+消息展示按输入框聚焦后的尺寸分支处理。title 区和输入框区域都进入外框的正常 flex 文档流，不使用 absolute 定位；外框以 `min-height` 保留三种基础尺寸，并由 title 的实际高度向上增长。480×129 非放大态的 title 区使用 `h-fit max-h-[50vh] overflow-hidden`，消息列 `justify-end` 底部对齐，超过 50vh 时裁切顶部较早消息并保持最新消息可见。560×420 放大态不展示列表，只在文档流顶部保留 30px 单行 title，读取最新一条消息并通过 `overflow-hidden`、`whitespace-nowrap` 和 `truncate` 防止越界。
+
+用户消息采用右对齐布局，左侧预留 48px，并以 `bg-press` token、8px 圆角和 4px/8px 内边距形成气泡；AI 消息采用左对齐无背景正文，右侧预留 48px。所有消息统一使用 14px 字号、24px 行高和 `text-main` token，保留换行并允许长文本断行。
+
+发送有效消息后，组件立即设置本地 `isSubmittingMessage` 并进入 480×129 输入态，避免 Supabase 写入和 SSE 建连期间没有任何视觉反馈。该状态与 `useChat.isStreaming` 合并为 `isMessagePending`，在首个片段到达前展示“Alii 正在想…”。
+
+SSE 期间不提前写入正式消息，而是在渲染层将 `streamingContent` 合成为末尾临时 assistant 消息。思考提示和临时 assistant 消息使用 React Bits `ShinyText`：基础色使用 `--neutral-fg-quaternary`，高光使用 `--neutral-fg-main`，将动画周期提升至约 0.8～0.9 秒，以加强深浅主题下的亮度对比和扫光频率；流结束并写入正式消息后恢复普通文本。消息容器使用 `overflow-y-auto overflow-x-hidden` 和全局 `no-scrollbar` 工具类，在保留纵向滚动能力的同时隐藏各浏览器滚动条；历史消息变化或流式内容更新后，通过容器 ref 将 `scrollTop` 更新为 `scrollHeight`，使 480×129 输入态持续跟随最新内容。未登录的昵称模式继续保留原 title 引导，不展示消息列表。
+
+`useChat` 在单次发送请求作用域内记录是否已固化 assistant 内容。收到 SSE `done` 时立即把累计文本加入 `messages`；流未发送 `done` 而自然关闭时同样固化；超时或连接中断时，`finally` 将仍在 `streamingContent` 中的部分文本兜底加入 `messages`。已完成路径会清空临时流状态但不重复追加，因此 ChatInput 折叠后再次打开时仍从正式 `messages` 渲染用户与 AI 内容。
+
+输入框的 560×420 放大态和 title 消息列表展开态互斥。放大输入框时不渲染消息滚动层，而是恢复 30px title 行，只读取 `visibleMessages` 的最后一条消息并用单行 `truncate` 展示其行首文本；缩回 480×129 后重新渲染完整消息列表。发送消息会主动退出 560×420 放大态，进入 480×129 输入态，以便立即展示用户消息与请求反馈。
+
+模型回复期间 textarea 不跟随 `isMessagePending` 禁用，用户可提前输入下一条消息；发送按钮仍以 `isMessagePending` 作为禁用条件，并关闭指针事件。textarea 内按 Enter 仍会进入 `handleSubmit`，但该函数通过 `isStreaming` 拦截重复请求，因此输入内容会保留，回复结束后按钮自动恢复。
+
+输入框内部只有一个展开/收起按钮，统一承载点击、Tooltip 和 aria-label。输入框收起时通过 `pointer-events-none` 与 opacity 隐藏；输入框展开后，24×24 热区默认只绘制右上 12×12 软提示，其上、右边为 1.5px `border-stroke`。hover 时软提示淡出、按钮显示 `bg-hover`，并根据 `isExpanded` 显示 ExpandIcon 或 CollapseIcon。按钮 hover 独立于输入框容器。
+
+### 跨页面挂载、Tooltip、Pin 与 i18n
+
+`PortfolioChatInput` 提升至根 `layout.js`，放在 `AuthProvider`、`LanguageProvider` 与 `TooltipProvider` 内，只创建一个长期存活的组件实例。组件优先使用 `usePathname()`，并在客户端 mount 后以 `window.location.pathname` 兜底；路径统一移除末尾斜杠后，仅在 `/portfolio` 和 `/resume` 返回 Portal 内容。路由切换时组件本身不卸载，因此 textarea 输入、收展、Pin、`useChat` 会话、消息及 SSE 状态全部在两个页面间保持同步。Portfolio 页面移除原局部挂载，防止双实例和重复请求。
+
+底部按钮按 Pin、开始新对话、历史对话顺序排列。Pin 使用 24×24 按钮热区、16×16 SVG 图标、用户提供的 24×24 viewBox 路径和 `currentColor`，与同组操作按钮的视觉尺寸一致；`isPinned` 纳入 `isOpen` 判定，启用后即使失焦、鼠标移出且无输入也保持 480×129 输入态，再次点击取消。三个按钮均使用 Radix Tooltip；disabled button 外包可接收指针事件的 span，使历史对话入口暂未启用时仍可展示说明。
+
+ChatInput 的 placeholder、标题、思考态、昵称校验、限额、会话/消息保存错误、请求超时和网络错误均使用 `LanguageContext` key。`useAuth.signIn()` 为聊天相关失败补充稳定的 `errorCode`，组件优先翻译该 code；`useChat` 在错误消息中保存稳定的 `contentKey`，渲染时再调用当前语言的 `t()`，因此切换语言后已有前端状态反馈也会同步更新。服务端原始 message 不再直接作为界面文案，避免中文错误绕过语言状态。
 
 ### 本地限额开关
 

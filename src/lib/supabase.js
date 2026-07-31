@@ -4,8 +4,14 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://iebesloxnjjrbrwkyhpu.supabase.co';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_ZkRiJ65_9cx7yrK6LtPSMA_njKVdfch';
 
-// 创建 Supabase 客户端
-export const supabase = createClient(supabaseUrl, supabaseKey);
+// 创建 Supabase 客户端。匿名访客 session 持久化在当前浏览器设备，后续访问自动恢复。
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+});
 
 /**
  * 从 Supabase Storage 获取指定文件夹下的所有图片

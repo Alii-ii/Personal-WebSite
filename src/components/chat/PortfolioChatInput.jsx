@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { usePathname } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import IconTextButton from '@/components/icon-text-botton';
+import ShinyText from '@/components/ShinyText';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/tooltip';
 import { useChat } from '@/hooks/useChat';
-
-const PLACEHOLDER = 'Ask me anything…';
 
 function CollapseIcon() {
   return (
@@ -35,6 +34,18 @@ function SendIcon({ size = 16 }) {
   );
 }
 
+function PinIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4.08611 18.9781L8.47039 14.6489L5.98557 12.1953C5.72208 11.9351 5.54688 11.6293 5.45984 11.2778C5.37822 10.9478 5.38372 10.6175 5.4764 10.2869C5.56915 9.95646 5.73654 9.67046 5.97848 9.42889C6.23623 9.1717 6.54585 8.99849 6.90732 8.90925L9.79456 8.19649C10.0612 8.13066 10.2916 8.0018 10.4858 7.80998L13.03 5.29774L11.4517 3.73925C11.1612 3.45237 11.1611 2.98716 11.4517 2.70021C11.7422 2.41332 12.2134 2.41339 12.5039 2.70028L21.6232 11.7051C21.9138 11.992 21.9138 12.4571 21.6232 12.744C21.3326 13.031 20.8616 13.031 20.571 12.744L18.9927 11.1855L16.4485 13.6978C16.2542 13.8896 16.1238 14.1171 16.0571 14.3804L15.3353 17.2314C15.2449 17.5883 15.0695 17.894 14.809 18.1485C14.5644 18.3875 14.2748 18.5528 13.94 18.6443C13.6053 18.7359 13.2708 18.7413 12.9366 18.6607C12.5806 18.5748 12.2709 18.4017 12.0075 18.1416L9.52262 15.6879L5.13834 20.0172C4.84778 20.3041 4.37667 20.3041 4.08611 20.0172C3.79556 19.7303 3.79555 19.2651 4.08611 18.9781ZM14.0823 6.33678L11.5381 8.84902C11.1495 9.23273 10.6886 9.49039 10.1555 9.62205L7.26822 10.3347C7.08116 10.3809 6.96191 10.4957 6.91053 10.6792C6.85901 10.8626 6.90146 11.0217 7.03779 11.1563L13.0597 17.1026C13.196 17.2372 13.357 17.2791 13.5428 17.2282C13.7286 17.1774 13.8449 17.0597 13.8916 16.875L14.6134 14.024C14.7467 13.4975 15.0077 13.0424 15.3963 12.6587L17.9404 10.1465L14.0823 6.33678Z"
+        fill="currentColor"
+        fillOpacity="0.65"
+      />
+    </svg>
+  );
+}
+
 function LoginIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -52,7 +63,20 @@ function HistoryIcon() {
 }
 
 export default function PortfolioChatInput() {
+  const nextPathname = usePathname();
+  const [browserPathname, setBrowserPathname] = useState('');
+
+  useEffect(() => {
+    setBrowserPathname(window.location.pathname);
+  }, []);
+
+  const pathname = nextPathname || browserPathname;
+  const normalizedPathname = pathname?.replace(/\/+$/, '') || '/';
+  const isChatRoute =
+    normalizedPathname === '/portfolio' || normalizedPathname === '/resume';
   const {
+    user,
+    accessToken,
     isAuthenticated,
     hasProfile,
     isLoading: isAuthLoading,
@@ -65,21 +89,29 @@ export default function PortfolioChatInput() {
     streamingContent,
     isRateLimited,
     rateLimitMessage,
+    createConversation,
     sendMessage,
-  } = useChat();
+  } = useChat(user, accessToken);
 
   const [value, setValue] = useState('');
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isSubmittingNickname, setIsSubmittingNickname] = useState(false);
+  const [isSubmittingMessage, setIsSubmittingMessage] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
   const textareaRef = useRef(null);
+  const messageListRef = useRef(null);
+  const isComposingRef = useRef(false);
+  const lastCompositionEndRef = useRef(0);
 
   useEffect(() => setIsMounted(true), []);
 
   useEffect(() => {
+    if (!isChatRoute) return undefined;
+
     const focusChatInput = (event) => {
       const target = event.target;
       const isEditableTarget =
@@ -104,30 +136,45 @@ export default function PortfolioChatInput() {
 
     document.addEventListener('keydown', focusChatInput);
     return () => document.removeEventListener('keydown', focusChatInput);
-  }, []);
+  }, [isChatRoute]);
 
   const hasInput = value.trim().length > 0;
-  const isOpen = isExpanded || isHovered || isFocused || hasInput || isStreaming;
-
-  const latestAssistantReply = useMemo(() => {
-    for (let index = messages.length - 1; index >= 0; index -= 1) {
-      if (messages[index].role === 'assistant') return messages[index].content;
-    }
-    return '';
-  }, [messages]);
-
-  const responseText = streamingContent || latestAssistantReply;
+  const isMessagePending = isSubmittingMessage || isStreaming;
+  const isOpen = isPinned || isExpanded || isHovered || isFocused || hasInput || isMessagePending;
   const isNicknameMode = !isAuthLoading && (!isAuthenticated || !hasProfile);
   const titleText = isRateLimited
-    ? rateLimitMessage
+    ? t(rateLimitMessage)
     : isNicknameMode
       ? isSubmittingNickname
         ? t('chatNicknameSubmitting')
         : nicknameError || t('chatNicknameTitle')
-      : responseText || '和 Alii 聊天';
+      : t('chatRegionLabel');
+  const visibleMessages = streamingContent
+    ? [
+        ...messages,
+        {
+          id: 'streaming-assistant',
+          role: 'assistant',
+          content: streamingContent,
+        },
+      ]
+    : messages;
+  const latestVisibleMessage = visibleMessages[visibleMessages.length - 1];
+  const latestTitleText = isMessagePending && !streamingContent
+    ? t('chatThinking')
+    : latestVisibleMessage?.contentKey
+      ? t(latestVisibleMessage.contentKey)
+      : latestVisibleMessage?.content || titleText;
   const placeholder = isNicknameMode && isOpen
     ? t('chatNicknamePlaceholder')
-    : PLACEHOLDER;
+    : t('chatPlaceholder');
+
+  useEffect(() => {
+    if (isExpanded || !isOpen) return;
+    const messageList = messageListRef.current;
+    if (!messageList) return;
+    messageList.scrollTop = messageList.scrollHeight;
+  }, [isExpanded, isOpen, messages, streamingContent]);
 
   const handleSubmit = async () => {
     const content = value.trim();
@@ -135,7 +182,7 @@ export default function PortfolioChatInput() {
 
     if (isNicknameMode) {
       if (content.length > 20) {
-        setNicknameError('昵称需要 1-20 个字符');
+        setNicknameError(t('chatNicknameInvalid'));
         return;
       }
 
@@ -145,7 +192,7 @@ export default function PortfolioChatInput() {
       setIsSubmittingNickname(false);
 
       if (result?.error) {
-        setNicknameError(result.error);
+        setNicknameError(result.errorCode ? t(result.errorCode) : result.error);
         return;
       }
 
@@ -154,23 +201,51 @@ export default function PortfolioChatInput() {
     }
 
     setValue('');
-    await sendMessage(content);
+    setIsExpanded(false);
+    setIsSubmittingMessage(true);
+    try {
+      await sendMessage(content);
+    } finally {
+      setIsSubmittingMessage(false);
+    }
   };
 
   const handleKeyDown = (event) => {
     event.stopPropagation();
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      handleSubmit();
-    }
+    if (event.key !== 'Enter' || event.shiftKey) return;
+
+    event.preventDefault();
+    const isConfirmingComposition =
+      event.nativeEvent?.isComposing ||
+      isComposingRef.current ||
+      event.keyCode === 229;
+    const justFinishedComposition =
+      isNicknameMode && Date.now() - lastCompositionEndRef.current < 300;
+
+    if (isConfirmingComposition || justFinishedComposition) return;
+    handleSubmit();
   };
 
   const handleToggleExpanded = () => {
     setIsExpanded((current) => !current);
-    requestAnimationFrame(() => textareaRef.current?.focus());
   };
 
-  if (!isMounted) return null;
+  const handleCreateConversation = async () => {
+    if (isNicknameMode || isMessagePending) return;
+
+    setIsSubmittingMessage(true);
+    try {
+      const conversation = await createConversation();
+      if (conversation) {
+        setValue('');
+        setIsExpanded(false);
+      }
+    } finally {
+      setIsSubmittingMessage(false);
+    }
+  };
+
+  if (!isMounted || !isChatRoute) return null;
 
   return createPortal(
     <section
@@ -179,83 +254,128 @@ export default function PortfolioChatInput() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
-        if (!hasInput && !isFocused && !isExpanded && !isStreaming) textareaRef.current?.blur();
+        if (!hasInput && !isFocused && !isExpanded && !isMessagePending) textareaRef.current?.blur();
       }}
     >
       <div
         className={[
-          'flex flex-col overflow-visible rounded-[16px] font-system',
+          'relative flex flex-col justify-end overflow-hidden rounded-[16px] font-system',
           'bg-[hsl(var(--neutral-bg-card)/0.8)] backdrop-blur-[24px]',
           'shadow-[0_4px_36px_12px_hsl(var(--neutral-fg-main)/0.1)]',
-          'transition-[width,height,background-color,border-color] duration-[360ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
+          'transition-[width,min-height,background-color,border-color] duration-[360ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
           isOpen
             ? 'border border-divider bg-[hsl(var(--neutral-others-bg))]'
             : 'border-[1.5px] border-divider',
-          isExpanded ? 'w-[560px] h-[420px]' : isOpen ? 'w-[480px] h-[129px]' : 'w-[360px] h-[51px]',
+          isExpanded ? 'w-[560px] min-h-[420px]' : isOpen ? 'w-[480px] min-h-[129px]' : 'w-[360px] min-h-[51px]',
         ].join(' ')}
       >
-        <header
-          className={[
-            'absolute left-0 right-0 top-0 z-10 flex h-[30px] items-center gap-1 overflow-hidden',
-            'px-4 pt-1 pb-0.5 text-[14px] leading-6 text-secondary',
-            'transition-[opacity,transform] duration-200 ease-out',
-            isOpen
-              ? 'translate-y-0 opacity-100 delay-100'
-              : 'pointer-events-none -translate-y-1 opacity-0 delay-0',
-          ].join(' ')}
-        >
-          <p className="min-w-0 flex-1 truncate" aria-live="polite">
-            {isStreaming && !streamingContent ? 'Alii 正在想…' : titleText}
-          </p>
-        </header>
+        {/* 展开分支: 聊天消息区域 */}
+        {!isExpanded && isOpen && !isNicknameMode && (visibleMessages.length > 0 || isMessagePending) ? (
+          <div
+            ref={messageListRef}
+            className="no-scrollbar relative z-10 flex h-fit max-h-[50vh] w-full min-w-0 flex-col items-start gap-2 overflow-y-auto overflow-x-hidden p-2 text-[14px] leading-6 text-main"
+            aria-live="polite"
+            aria-label={t('chatRegionLabel')}
+          >
+            {visibleMessages.map((message) => (
+              <div
+                key={message.id}
+                className={[
+                  'flex w-full shrink-0',
+                  message.role === 'user'
+                    ? 'flex-col items-end justify-center gap-1 pl-12'
+                    : 'flex-row items-start gap-1 pl-2 pr-12',
+                ].join(' ')}
+              >
+                {message.role === 'user' ? (
+                  <p className="max-w-full whitespace-pre-wrap break-words rounded-[8px] bg-divider px-2 py-1">
+                    {message.content}
+                  </p>
+                ) : message.id === 'streaming-assistant' ? (
+                  <ShinyText
+                    text={message.content}
+                    speed={1}
+                    color="hsl(var(--neutral-fg-quaternary))"
+                    shineColor="hsl(var(--neutral-fg-main))"
+                    spread={120}
+                    className="block min-w-0 max-w-full flex-1 whitespace-pre-wrap break-words"
+                  />
+                ) : (
+                  <p className="min-w-0 flex-1 whitespace-pre-wrap break-words">
+                    {message.contentKey ? t(message.contentKey) : message.content}
+                  </p>
+                )}
+              </div>
+            ))}
 
+            {isMessagePending && !streamingContent ? (
+              <p className="w-full min-w-0 overflow-hidden pl-2 pl-12">
+                <ShinyText
+                  text={t('chatThinking')}
+                  speed={1}
+                  color="hsl(var(--neutral-fg-quaternary))"
+                  shineColor="hsl(var(--neutral-fg-main))"
+                  spread={120}
+                />
+              </p>
+            ) : null}
+
+          </div>
+        ) : (
+          <header
+            className={[
+              'relative z-10 flex h-[30px] w-full shrink-0 items-center gap-1 overflow-hidden',
+              'px-2 pt-1 pb-0.5 text-[14px] leading-6 text-secondary',
+              'transition-[opacity,transform] duration-200 ease-out',
+              isOpen
+                ? 'translate-y-0 opacity-100 delay-100'
+                : 'pointer-events-none hidden -translate-y-1 opacity-0 delay-0',
+            ].join(' ')}
+          >
+            {/* 折叠分支: 仅标题状态 */}
+            <p className="min-w-0 flex-1 truncate px-2" aria-live="polite">
+              {latestTitleText}
+            </p>
+          </header>
+        )}
+
+        {/* 输入框区域 */}
         <div
           className={[
-            'absolute bottom-0 left-0 right-0 flex flex-col rounded-[15px]',
-            'bg-[hsl(var(--neutral-bg-card)/0.8)] px-3 py-3',
+            'relative flex w-full shrink-0 flex-col rounded-[15px]',
+            'bg-[hsl(var(--neutral-bg-card)/0.8)] px-3 py-3 border-t border-divider border-t-[0.5px]',
             'transition-[height,border-radius] duration-[360ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
             isExpanded ? 'h-[390px]' : isOpen ? 'h-[99px]' : 'h-[48px]',
           ].join(' ')}
         >
+          {/* 单一展开/收起开关：收起隐藏，展开态默认软提示，hover 显示完整图标按钮 */}
           <Tooltip delayDuration={200}>
             <TooltipTrigger asChild>
               <button
                 type="button"
                 onClick={handleToggleExpanded}
                 className={[
-                  'absolute right-0 top-0 z-10 h-3 w-3 rounded-tr-[8px]',
-                  'border-r-[1.5px] border-t-[1.5px] border-divider',
-                  'transition-opacity duration-150',
-                  isOpen ? 'pointer-events-none opacity-0' : 'opacity-100 delay-100',
+                  'group/toggle absolute right-3 top-3 z-10 h-6 w-6 rounded-[6px]',
+                  'text-tertiary transition-[background-color,color,opacity,transform] duration-150',
+                  'before:absolute before:right-0 before:top-0 before:h-3 before:w-3 before:rounded-tr-[8px]',
+                  'before:border-r-[1.5px] before:border-t-[1.5px] before:border-stroke',
+                  'before:transition-opacity before:duration-150 hover:before:opacity-0',
+                  'hover:bg-hover hover:text-main',
+                  isOpen
+                    ? 'scale-100 opacity-100 delay-100'
+                    : 'pointer-events-none scale-90 opacity-0 delay-0',
                 ].join(' ')}
-                aria-label={t('chatExpand')}
-              />
+                aria-label={isExpanded ? t('chatCollapse') : t('chatExpand')}
+              >
+                <span className="flex h-full w-full items-center justify-center opacity-0 transition-opacity duration-150 group-hover/toggle:opacity-100">
+                  {isExpanded ? <CollapseIcon /> : <ExpandIcon />}
+                </span>
+              </button>
             </TooltipTrigger>
             <TooltipContent side="top" className="z-[9999]">
-              {t('chatExpand')}
+              {isExpanded ? t('chatCollapse') : t('chatExpand')}
             </TooltipContent>
           </Tooltip>
-
-          <div
-            className={[
-              'absolute right-3 top-3 z-10 transition-[opacity,transform] duration-200 ease-out',
-              isOpen
-                ? 'scale-100 opacity-100 delay-100'
-                : 'pointer-events-none scale-90 opacity-0 delay-0',
-            ].join(' ')}
-          >
-            <IconTextButton
-              icon={isExpanded ? <CollapseIcon /> : <ExpandIcon />}
-              text=""
-              variant="ghost"
-              size="sm"
-              tooltip={isExpanded ? t('chatCollapse') : t('chatExpand')}
-              tooltipSide="top"
-              onClick={handleToggleExpanded}
-              className="h-6 w-6 rounded-[6px] p-1 text-tertiary [&>span]:!size-4 [&>span]:opacity-100"
-              aria-label={isExpanded ? t('chatCollapse') : t('chatExpand')}
-            />
-          </div>
 
           <textarea
             ref={textareaRef}
@@ -266,15 +386,23 @@ export default function PortfolioChatInput() {
             }}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            onCompositionStart={() => {
+              isComposingRef.current = true;
+            }}
+            onCompositionEnd={() => {
+              isComposingRef.current = false;
+              lastCompositionEndRef.current = Date.now();
+            }}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            disabled={isStreaming || isRateLimited || isSubmittingNickname}
+            disabled={isRateLimited || isSubmittingNickname}
             maxLength={isNicknameMode ? 20 : undefined}
             rows={1}
             className="w-full flex-1 resize-none bg-transparent pb-6 pl-1 pr-7 text-[16px] leading-6 text-main outline-none placeholder:text-quaternary disabled:cursor-not-allowed"
             aria-label={t('chatInputLabel')}
           />
 
+          {/* 底部左侧按钮组 */}
           <div
             className={[
               'absolute bottom-3 left-3 right-3 flex h-6 items-center justify-between',
@@ -285,34 +413,83 @@ export default function PortfolioChatInput() {
             ].join(' ')}
           >
             <div className="flex h-6 items-center gap-1 text-disabled">
-              <button
-                type="button"
-                onClick={() => textareaRef.current?.focus()}
-                className="flex h-6 w-6 items-center justify-center rounded-[6px] text-disabled transition-colors hover:bg-hover hover:text-tertiary"
-                aria-label={t('chatLogin')}
-              >
-                <LoginIcon />
-              </button>
-              <button
-                type="button"
-                className="flex h-6 w-6 items-center justify-center rounded-[6px] text-disabled"
-                aria-label={t('chatHistory')}
-                disabled
-              >
-                <HistoryIcon />
-              </button>
+
+              {/* Pin按钮 */}
+              <Tooltip delayDuration={200}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => setIsPinned((current) => !current)}
+                    className={[
+                      'flex h-6 w-6 items-center justify-center rounded-[6px] transition-colors',
+                      isPinned
+                        ? 'bg-hover text-main'
+                        : 'text-disabled hover:bg-hover hover:text-tertiary',
+                    ].join(' ')}
+                    aria-pressed={isPinned}
+                    aria-label={isPinned ? t('chatUnpin') : t('chatPin')}
+                  >
+                    <PinIcon />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="z-[9999]">
+                  {isPinned ? t('chatUnpin') : t('chatPin')}
+                </TooltipContent>
+              </Tooltip>
+
+              {/* 新建对话 */}
+              <Tooltip delayDuration={200}>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex h-6 w-6">
+                    <button
+                      type="button"
+                      onClick={handleCreateConversation}
+                      disabled={isNicknameMode || isMessagePending}
+                      className="flex h-6 w-6 items-center justify-center rounded-[6px] text-disabled transition-colors hover:bg-hover hover:text-tertiary disabled:pointer-events-none disabled:opacity-35"
+                      aria-label={t('chatNewConversation')}
+                    >
+                      <LoginIcon />
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="z-[9999]">
+                  {t('chatNewConversation')}
+                </TooltipContent>
+              </Tooltip>
+
+              {/* 历史对话 */}
+              <Tooltip delayDuration={200}>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex h-6 w-6">
+                    <button
+                      type="button"
+                      className="flex h-6 w-6 items-center justify-center rounded-[6px] text-disabled opacity-35"
+                      aria-label={t('chatHistory')}
+                      disabled
+                    >
+                      <HistoryIcon />
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="z-[9999]">
+                  {t('chatHistory')}
+                </TooltipContent>
+              </Tooltip>
+
             </div>
+
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!hasInput || isStreaming || isRateLimited || isSubmittingNickname}
-              className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-hover text-tertiary transition-colors hover:bg-press hover:text-main disabled:opacity-35"
+              disabled={!hasInput || isMessagePending || isRateLimited || isSubmittingNickname}
+              className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-hover text-tertiary transition-colors hover:bg-press hover:text-main disabled:pointer-events-none disabled:opacity-35"
               aria-label={t('chatSend')}
             >
               <SendIcon size={16} />
             </button>
           </div>
 
+          {/* 底部右侧发送按钮 */}
           <button
             type="button"
             onClick={() => {
@@ -330,6 +507,7 @@ export default function PortfolioChatInput() {
           >
             <SendIcon size={16} />
           </button>
+
         </div>
       </div>
 

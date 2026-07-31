@@ -236,6 +236,21 @@ WHEN 用户未认证或尚未创建 profile, THE SYSTEM SHALL 复用 ChatInput �
 - AND 成功后进入正常聊天模式
 - AND 失败原因展示在 title 区域
 
+#### Scenario: 设备自动登录
+- GIVEN 当前浏览器设备已完成过匿名注册且本地 session 未被清除
+- WHEN 用户后续再次访问站点
+- THEN Supabase 自动恢复同一个匿名 Auth user
+- AND 系统加载该 user 对应的 profile 与聊天数据
+- AND 不再次调用匿名注册或创建新的 user id
+
+#### Scenario: 输入法确认不误提交昵称
+- GIVEN 用户正在使用中文等输入法组合昵称
+- WHEN 用户按 Enter 确认候选文字
+- THEN 仅完成输入法 composition，不提交昵称
+- AND composition 结束后的短暂窗口内忽略同一次 Enter
+- AND 用户可再次明确按 Enter 或点击发送按钮提交昵称
+- AND 昵称自身仍允许包含空格
+
 ### Requirement: 键盘、Tooltip 与国际化
 
 WHEN 页面当前焦点不在可编辑控件内且用户按 Enter, THE SYSTEM SHALL 展开 ChatInput 并聚焦 textarea。
@@ -262,6 +277,112 @@ WHEN 本地联调需要关闭每日 25 条限制, THE SYSTEM SHALL 同时支持�
 
 WHEN DeepSeek API 请求失败或前端无法解析服务端错误响应, THE SYSTEM SHALL 展示“Alii 走神了，晚点再来试试吧…”。
 
+### Requirement: MVP 会话创建与延续
+
+WHEN 已登录用户直接发送消息, THE SYSTEM SHALL 默认复用当前会话，并持续追加消息，不自动拆分新的对话。
+
+#### Scenario: 显式创建新对话
+- GIVEN 用户已登录且当前没有正在生成的回复
+- WHEN 用户点击底部操作区左一按钮
+- THEN 创建新的空会话并将其设为当前会话
+- AND 清空当前展示的消息与输入内容
+- AND 后续消息写入新会话
+
+#### Scenario: 默认连续对话
+- GIVEN 当前已有会话
+- WHEN 用户继续发送消息且未点击左一按钮
+- THEN 复用同一 conversation_id
+- AND 携带该会话最近消息作为上下文
+
+### Requirement: 展开态消息列表
+
+WHEN ChatInput 处于 480×129 输入态且用户已完成昵称登录, THE SYSTEM SHALL 在输入框上方的 title 区域展示当前会话的用户消息与 AI 消息。
+
+#### Scenario: 消息视觉层级
+- GIVEN 当前会话存在消息
+- WHEN 展开 ChatInput
+- THEN 消息区限制在 480×129 外框顶部预留的 30px title 行内
+- AND 用户消息右对齐，左侧预留 48px，使用 8px 圆角气泡
+- AND AI 消息左对齐，右侧预留 48px，以无气泡正文形式展示
+- AND 消息文本使用 14px 字号和 24px 行高
+
+#### Scenario: 消息滚动
+- GIVEN 消息内容超过可视范围
+- WHEN 展开 ChatInput 或收到新的流式内容
+- THEN 消息区允许纵向滚动且隐藏可见滚动条，不得越出 ChatInput 外框
+- AND 视图自动跟随至最新消息
+
+#### Scenario: AI 消息跨收展保留
+- GIVEN 当前回复已经收到完整或部分 AI 文本
+- WHEN SSE 发送完成标记、直接关闭、超时或连接中断
+- THEN 已收到的 AI 文本固化到当前会话的前端消息状态且只追加一次
+- AND 用户折叠 ChatInput 后再次打开时，用户消息与 AI 消息按原顺序继续展示
+
+#### Scenario: 流式回复
+- GIVEN 用户提交了一条有效消息
+- WHEN 请求正在进行或收到 SSE 内容片段
+- THEN ChatInput 立即进入 480×129 输入态并展开 title 消息列表，展示“Alii 正在想…”
+- AND 收到片段后将其作为末尾 AI 消息持续更新
+- AND 思考提示与流式 AI 消息使用高频、高对比 token 的 ShinyText 动效，完成后恢复普通文本
+
+#### Scenario: 回复期间预先输入
+- GIVEN AI 正在生成上一条消息的回复
+- WHEN 用户继续在 textarea 中输入下一条消息
+- THEN textarea 保持可编辑并保存当前输入内容
+- AND 发送按钮保持禁用，Enter 不触发重复发送
+- AND 当前回复完成后发送按钮根据输入内容恢复可用
+
+#### Scenario: 聚焦态消息展示分支
+- GIVEN 输入框已聚焦且用户已登录
+- WHEN 输入框处于 480×129 非放大态
+- THEN title 区在外框 flex 文档流中展开完整消息列表，不使用 absolute
+- AND title 区使用 h-fit、最大高度 50vh 和 overflow hidden
+- AND 输入框区域保持 99px，外框包裹 title 与输入框区域的合计高度
+- AND 超过最大高度时裁切较早消息，底部最新消息保持可见
+- WHEN 输入框处于 560×420 放大态
+- THEN title 区保持 30px 单行高度
+- AND 只显示当前最新一条消息的行首文本
+- AND 超出可用宽度的文本使用单行 truncate
+
+#### Scenario: 展开开关 hover 独立
+- GIVEN ChatInput 处于输入态或展开态
+- WHEN 指针 hover 展开/收起开关
+- THEN 开关仅使用自身按钮的 hover 状态
+- AND 不通过 group hover 继承输入框容器的 hover 样式
+- AND ChatInput 收起时隐藏该开关，仅保留角标式展开控件
+
+### Requirement: 跨页面同步、操作提示与常驻状态
+
+WHEN 用户位于 `/portfolio` 或 `/resume`, THE SYSTEM SHALL 展示同一 ChatInput 实例，并在两个页面之间共享输入、收展、会话、消息和流式状态。
+
+#### Scenario: 跨页面保持状态
+- GIVEN 用户已在 `/portfolio` 或 `/resume` 打开 ChatInput、输入文本或发起回复
+- WHEN 用户在这两个页面之间导航
+- THEN ChatInput 保持相同位置和视觉状态
+- AND 当前输入、会话、消息、流式回复与常驻状态不重置
+- AND 路径判断兼容静态导出的末尾斜杠，并在客户端 hydration 后使用浏览器 pathname 兜底
+- AND 其他路由不展示 ChatInput
+
+#### Scenario: 操作按钮提示
+- GIVEN ChatInput 处于输入态
+- WHEN 用户 hover 新对话或历史对话按钮
+- THEN 使用项目 Radix Tooltip 分别展示本地化的“开始新对话”和“历史对话”
+- AND disabled 的历史对话按钮仍可触发 Tooltip
+
+#### Scenario: 常驻展开
+- GIVEN ChatInput 处于输入态
+- WHEN 用户点击底部操作区最左侧 Pin 按钮
+- THEN ChatInput 保持输入态，不因失焦或鼠标移出而收起
+- AND Pin 按钮使用 24×24 热区与 16×16 图标，与同组操作按钮尺寸一致
+- AND Pin 按钮展示选中状态及本地化 Tooltip
+- WHEN 用户再次点击 Pin 按钮
+- THEN 取消常驻，并恢复原有自动收起规则
+
+#### Scenario: Chat 静态文案国际化
+- GIVEN 用户切换中英文语言
+- WHEN ChatInput 展示 placeholder、思考态、昵称校验、限额或错误反馈
+- THEN 所有用户可见静态文案均通过 LanguageContext 输出对应语言
+
 ### 范围说明
 
-本迭代不实现全站入口、移动端适配、用户消息气泡、完整历史会话面板和多会话切换 UI；这些能力保留为后续范围。
+本迭代不实现全站入口、移动端适配、完整历史会话面板和多会话切换 UI；ChatInput 当前仅在 `/portfolio` 与 `/resume` 桌面端展示。

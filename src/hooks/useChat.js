@@ -12,6 +12,17 @@ const CHAT_API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL
     : '/api/chat');
 const IS_RATE_LIMIT_DISABLED =
   process.env.NEXT_PUBLIC_CHAT_DISABLE_RATE_LIMIT === 'true';
+const CHAT_RESPONSE_TIMEOUT_MS = 30000;
+const CHAT_SETUP_TIMEOUT_MS = 10000;
+
+function withTimeout(promise, timeoutMs, label) {
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(`${label}_timeout`)), timeoutMs);
+  });
+
+  return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+}
 
 /**
  * AI Chat Hook
@@ -35,7 +46,7 @@ const IS_RATE_LIMIT_DISABLED =
  *   refresh: () => Promise<void>,
  * }}
  */
-export function useChat() {
+export function useChat(authUser = null, accessToken = null) {
   const [conversations, setConversations] = useState([]);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -50,6 +61,7 @@ export function useChat() {
   const dailyCountRef = useRef(0);
   // abort controller for SSE
   const abortRef = useRef(null);
+  const currentConversationRef = useRef(null);
 
   // ─── 会话列表 ────────────────────────────────────
 
@@ -69,8 +81,9 @@ export function useChat() {
       setConversations(nextConversations);
 
       // 当前 MVP 只展示一条对话：恢复最近会话，让用户刷新后可直接继续聊。
-      if (!currentConversation && nextConversations.length > 0) {
+      if (!currentConversationRef.current && nextConversations.length > 0) {
         const latest = nextConversations[0];
+        currentConversationRef.current = latest;
         setCurrentConversation(latest);
         setIsLoadingMessages(true);
 
@@ -92,22 +105,30 @@ export function useChat() {
     } finally {
       setIsLoadingConversations(false);
     }
-  }, [currentConversation]);
+  }, []);
 
-  // 初始化加载
+  // 只在认证用户确定后初始化一次，避免 currentConversation 更新触发重复查询和重渲染。
   useEffect(() => {
+    if (!authUser) {
+      currentConversationRef.current = null;
+      setConversations([]);
+      setCurrentConversation(null);
+      setMessages([]);
+      setIsLoadingConversations(false);
+      return;
+    }
+
     loadConversations();
-  }, [loadConversations]);
+  }, [authUser?.id, loadConversations]);
 
   // ─── 创建会话 ────────────────────────────────────
 
   const createConversation = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+    if (!authUser) return null;
 
     const { data, error } = await supabase
       .from('site_chat_conversations')
-      .insert({ user_id: user.id, title: '新对话' })
+      .insert({ user_id: authUser.id, title: '新对话' })
       .select('id, title, created_at, updated_at')
       .limit(1);
 
@@ -118,10 +139,11 @@ export function useChat() {
     }
 
     setConversations(prev => [conversation, ...prev]);
+    currentConversationRef.current = conversation;
     setCurrentConversation(conversation);
     setMessages([]);
     return conversation;
-  }, []);
+  }, [authUser]);
 
   // ─── 选择会话 ────────────────────────────────────
 
@@ -129,6 +151,7 @@ export function useChat() {
     const conv = conversations.find(c => c.id === id);
     if (!conv) return;
 
+    currentConversationRef.current = conv;
     setCurrentConversation(conv);
     setIsLoadingMessages(true);
     setStreamingContent('');
@@ -169,6 +192,7 @@ export function useChat() {
     setConversations(prev => prev.filter(c => c.id !== id));
 
     if (currentConversation?.id === id) {
+      currentConversationRef.current = null;
       setCurrentConversation(null);
       setMessages([]);
     }
@@ -183,18 +207,42 @@ export function useChat() {
     // 生产环境限额检查（前端乐观）；本地联调可通过环境变量关闭。
     if (!IS_RATE_LIMIT_DISABLED && dailyCountRef.current >= DAILY_LIMIT) {
       setIsRateLimited(true);
-      setRateLimitMessage('今天聊得够多啦，明天再来吧 ☕');
+      setRateLimitMessage('chatRateLimited');
       return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!authUser) {
+      setMessages(prev => [...prev, {
+        id: `error-${Date.now()}`,
+        role: 'assistant',
+        contentKey: 'chatSessionExpired',
+        created_at: new Date().toISOString(),
+        _isError: true,
+      }]);
+      return;
+    }
 
     // 确保有当前会话
     let convId = currentConversation?.id;
     if (!convId) {
-      const newConv = await createConversation();
-      if (!newConv) return;
+      const newConv = await withTimeout(
+        createConversation(),
+        CHAT_SETUP_TIMEOUT_MS,
+        'conversation'
+      ).catch((error) => {
+        console.error('Create conversation timeout:', error);
+        return null;
+      });
+      if (!newConv) {
+        setMessages(prev => [...prev, {
+          id: `error-${Date.now()}`,
+          role: 'assistant',
+          contentKey: 'chatConversationTimeout',
+          created_at: new Date().toISOString(),
+          _isError: true,
+        }]);
+        return;
+      }
       convId = newConv.id;
     }
 
@@ -208,22 +256,44 @@ export function useChat() {
     setMessages(prev => [...prev, tempUserMsg]);
 
     // 写入用户消息到 Supabase
-    const { data: insertedMessages, error: insertError } = await supabase
-      .from('site_chat_messages')
-      .insert({
-        conversation_id: convId,
-        user_id: user.id,
-        role: 'user',
-        content: trimmed,
-      })
-      .select('id, role, content, created_at')
-      .limit(1);
+    let insertedMessages;
+    let insertError;
+    try {
+      const insertResult = await withTimeout(
+        supabase
+          .from('site_chat_messages')
+          .insert({
+            conversation_id: convId,
+            user_id: authUser.id,
+            role: 'user',
+            content: trimmed,
+          })
+          .select('id, role, content, created_at')
+          .limit(1),
+        CHAT_SETUP_TIMEOUT_MS,
+        'message_insert'
+      );
+      insertedMessages = insertResult.data;
+      insertError = insertResult.error;
+    } catch (error) {
+      insertError = error;
+    }
 
     const savedMsg = insertedMessages?.[0];
     if (insertError || !savedMsg) {
       console.error('Insert message error:', insertError || 'No message returned');
-      // 回退乐观更新
-      setMessages(prev => prev.filter(m => m.id !== tempUserMsg.id));
+      setMessages(prev => [
+        ...prev.filter(m => m.id !== tempUserMsg.id),
+        {
+          id: `error-${Date.now()}`,
+          role: 'assistant',
+          contentKey: insertError?.message?.includes('timeout')
+            ? 'chatMessageSaveTimeout'
+            : 'chatMessageSaveFailed',
+          created_at: new Date().toISOString(),
+          _isError: true,
+        },
+      ]);
       return;
     }
 
@@ -249,16 +319,27 @@ export function useChat() {
     }
 
     // 构造历史上下文
-    const allMessages = [...messages.filter(m => m.id !== tempUserMsg.id), savedMsg];
+    const allMessages = [
+      ...messages.filter(m => m.id !== tempUserMsg.id && !m._isError),
+      savedMsg,
+    ];
     const history = allMessages
       // 当前消息会由 API 作为 message 单独追加，history 不能重复携带。
       .slice(0, -1)
       .slice(-MAX_HISTORY_MESSAGES)
       .map(m => ({ role: m.role, content: m.content }));
 
-    // 获取 JWT
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) return;
+    // 直接复用 AuthContext 已缓存的 token，发送链路不再等待 Supabase Auth 锁。
+    if (!accessToken) {
+      setMessages(prev => [...prev, {
+        id: `error-${Date.now()}`,
+        role: 'assistant',
+        contentKey: 'chatSessionExpired',
+        created_at: new Date().toISOString(),
+        _isError: true,
+      }]);
+      return;
+    }
 
     // 发起 SSE 请求
     setIsStreaming(true);
@@ -266,13 +347,30 @@ export function useChat() {
 
     const abortController = new AbortController();
     abortRef.current = abortController;
+    let receivedAssistantContent = '';
+    let assistantMessageSaved = false;
+    const saveReceivedAssistant = (messageId) => {
+      if (!receivedAssistantContent || assistantMessageSaved) return;
+      assistantMessageSaved = true;
+      setMessages(prev => [...prev, {
+        id: messageId || `ai-${Date.now()}`,
+        role: 'assistant',
+        content: receivedAssistantContent,
+        created_at: new Date().toISOString(),
+      }]);
+    };
+    let timeoutId = setTimeout(() => abortController.abort('response_timeout'), CHAT_RESPONSE_TIMEOUT_MS);
+    const resetResponseTimeout = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => abortController.abort('response_timeout'), CHAT_RESPONSE_TIMEOUT_MS);
+    };
 
     try {
       const resp = await fetch(CHAT_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           conversation_id: convId,
@@ -289,13 +387,13 @@ export function useChat() {
 
         if (errData.error === 'rate_limit') {
           setIsRateLimited(true);
-          setRateLimitMessage(errData.message || '今天聊得够多啦，明天再来吧 ☕');
+          setRateLimitMessage('chatRateLimited');
         } else {
           // 添加一个错误提示消息
           setMessages(prev => [...prev, {
             id: `error-${Date.now()}`,
             role: 'assistant',
-            content: errData.message || 'Alii 走神了，晚点再来试试吧…',
+            contentKey: 'chatRequestFailed',
             created_at: new Date().toISOString(),
             _isError: true,
           }]);
@@ -306,15 +404,18 @@ export function useChat() {
       }
 
       // 流式读取 SSE
+      resetResponseTimeout();
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
       let accumulated = '';
+      let streamCompleted = false;
 
-      while (true) {
+      readStream: while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
+        resetResponseTimeout();
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
         buffer = lines.pop() || '';
@@ -327,16 +428,14 @@ export function useChat() {
             const parsed = JSON.parse(trimmedLine.slice(6));
 
             if (parsed.done) {
-              // 流结束 — 将 streaming content 移入 messages
-              setMessages(prev => [...prev, {
-                id: parsed.message_id || `ai-${Date.now()}`,
-                role: 'assistant',
-                content: accumulated,
-                created_at: new Date().toISOString(),
-              }]);
+              // 收到业务完成标记后立即结束本地读取，不继续等待连接关闭。
+              saveReceivedAssistant(parsed.message_id);
               setStreamingContent('');
+              streamCompleted = true;
+              break readStream;
             } else if (parsed.content) {
               accumulated += parsed.content;
+              receivedAssistantContent = accumulated;
               setStreamingContent(accumulated);
             }
           } catch {
@@ -344,22 +443,40 @@ export function useChat() {
           }
         }
       }
+
+      if (!streamCompleted && accumulated) {
+        // 部分代理会直接关闭流而不发送 done，仍需把已收到的 AI 文本固化到 messages。
+        saveReceivedAssistant();
+        setStreamingContent('');
+      }
+
+      if (streamCompleted) {
+        await reader.cancel().catch(() => {});
+      }
     } catch (err) {
-      if (err.name !== 'AbortError') {
+      const isTimeout = abortController.signal.reason === 'response_timeout';
+      saveReceivedAssistant();
+
+      if (isTimeout || err.name !== 'AbortError') {
         console.error('Chat SSE error:', err);
         setMessages(prev => [...prev, {
           id: `error-${Date.now()}`,
           role: 'assistant',
-          content: '网络连接中断，请检查网络后重试',
+          contentKey: isTimeout
+            ? 'chatResponseTimeout'
+            : 'chatNetworkInterrupted',
           created_at: new Date().toISOString(),
           _isError: true,
         }]);
       }
     } finally {
+      clearTimeout(timeoutId);
+      saveReceivedAssistant();
+      setStreamingContent('');
       setIsStreaming(false);
       abortRef.current = null;
     }
-  }, [isStreaming, currentConversation, messages, createConversation]);
+  }, [isStreaming, currentConversation, messages, createConversation, authUser, accessToken]);
 
   // ─── 初始化每日计数 ─────────────────────────────
 
@@ -367,8 +484,7 @@ export function useChat() {
     if (IS_RATE_LIMIT_DISABLED) return;
 
     async function initDailyCount() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!authUser) return;
 
       const today = new Date();
       today.setUTCHours(0, 0, 0, 0);
@@ -376,7 +492,7 @@ export function useChat() {
       const { count, error } = await supabase
         .from('site_chat_messages')
         .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
+        .eq('user_id', authUser.id)
         .eq('role', 'user')
         .gte('created_at', today.toISOString());
 
@@ -384,13 +500,13 @@ export function useChat() {
         dailyCountRef.current = count;
         if (count >= DAILY_LIMIT) {
           setIsRateLimited(true);
-          setRateLimitMessage('今天聊得够多啦，明天再来吧 ☕');
+          setRateLimitMessage('chatRateLimited');
         }
       }
     }
 
     initDailyCount();
-  }, []);
+  }, [authUser?.id]);
 
   // ─── 刷新 ──────────────────────────────────────
 
