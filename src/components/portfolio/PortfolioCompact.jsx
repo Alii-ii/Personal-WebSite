@@ -136,6 +136,7 @@ export default function PortfolioCompact() {
     <div className="w-full flex-1 flex justify-center relative z-10">
       {/* 居中容器，最大宽度对齐 Figma 1440px 画板 */}
       <div className="w-full max-w-[960px] flex flex-col md:flex-row items-start px-6 md:px-0">
+        
         {/* ═══════ 左侧信息栏（移动端隐藏，移入菜单） ═══════ */}
         <aside className="hidden md:block md:w-[240px] shrink-0 self-start">
           <div className="flex flex-col gap-4 pt-8 md:pt-[80px] pb-4 md:fixed md:top-0 md:left-0 md:w-[240px] md:ml-[max(64px,calc((100vw-960px)/2))] md:h-screen md:z-10">
@@ -254,7 +255,7 @@ export default function PortfolioCompact() {
           delay={0.6}
           immediate={true}
           flex={true}
-          className="w-full flex-1 min-w-0"
+          className="w-full flex-1 min-w-0 md:mr-[64px] m-0"
         >
           {/* 卡片组容器 — menu 同款投影 + 圆角 */}
           <div
