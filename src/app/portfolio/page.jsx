@@ -11,6 +11,7 @@ import PortfolioCompact from '@/components/portfolio/PortfolioCompact';
 import PortfolioMenu from '@/components/portfolio/PortfolioMenu';
 import MobileDrawer from '@/components/portfolio/MobileDrawer';
 import FeedCard from '@/components/portfolio/FeedCard';
+import PortfolioChatInput from '@/components/chat/PortfolioChatInput';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getFeedFrames, getProjectsByCategory } from '@/contexts/ProjectContext';
 
@@ -190,6 +191,8 @@ export default function Portfolio() {
           />
         </>
       )}
+
+      <PortfolioChatInput />
 
       <Footer
         isGallery={true}

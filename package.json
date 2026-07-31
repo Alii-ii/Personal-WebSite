@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:full": "npx --yes wrangler pages dev --proxy 3000 --port 8788 --env-file .env --compatibility-date 2026-05-03",
     "build": "node scripts/get-last-commit-date.js && node scripts/generate-portfolio-thumbs.mjs && node scripts/subset-fonts.mjs && next build",
     "build:clean": "rm -rf .next out && npm run build",
     "start": "next start",

@@ -35,16 +35,13 @@ export function useAuth() {
       .from('site_profiles')
       .select('nickname, avatar_seed')
       .eq('id', userId)
-      .single();
+      .limit(1);
 
     if (error) {
-      // PGRST116 = no rows found，正常情况（新用户还没建 profile）
-      if (error.code !== 'PGRST116') {
-        console.error('Failed to fetch profile:', error);
-      }
+      console.error('Failed to fetch profile:', error);
       return null;
     }
-    return data;
+    return data?.[0] || null;
   }, []);
 
   // 初始化：恢复 session + 监听 auth 变化

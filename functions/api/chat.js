@@ -44,7 +44,7 @@ async function verifyJWT(authHeader, supabaseUrl, supabaseServiceKey) {
 /**
  * 查询用户今日消息计数
  */
-async function getDailyMessageCount(supabaseUrl, supabaseServiceKey, userId) {
+async function getDailyMessageCount(supabaseUrl, supabaseApiKey, accessToken, userId) {
   // 获取今天零点（UTC）
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
@@ -58,8 +58,8 @@ async function getDailyMessageCount(supabaseUrl, supabaseServiceKey, userId) {
 
   const resp = await fetch(url.toString(), {
     headers: {
-      'apikey': supabaseServiceKey,
-      'Authorization': `Bearer ${supabaseServiceKey}`,
+      'apikey': supabaseApiKey,
+      'Authorization': `Bearer ${accessToken}`,
       'Prefer': 'count=exact',
       'Range-Unit': 'items',
       'Range': '0-0',
@@ -139,8 +139,10 @@ export async function onRequestPost(context) {
   const DEEPSEEK_API_KEY = env.DEEPSEEK_API_KEY;
   const SUPABASE_URL = env.SUPABASE_URL || 'https://iebesloxnjjrbrwkyhpu.supabase.co';
   const SUPABASE_SERVICE_KEY = env.SUPABASE_SERVICE_KEY;
+  const SUPABASE_API_KEY = env.SUPABASE_ANON_KEY || SUPABASE_SERVICE_KEY;
+  const IS_RATE_LIMIT_DISABLED = env.DISABLE_CHAT_RATE_LIMIT === 'true';
 
-  if (!DEEPSEEK_API_KEY || !SUPABASE_SERVICE_KEY) {
+  if (!DEEPSEEK_API_KEY || !SUPABASE_API_KEY) {
     return new Response(
       JSON.stringify({ error: 'server_error', message: '服务配置不完整' }),
       { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
@@ -151,7 +153,7 @@ export async function onRequestPost(context) {
   const authResult = await verifyJWT(
     request.headers.get('Authorization'),
     SUPABASE_URL,
-    SUPABASE_SERVICE_KEY
+    SUPABASE_API_KEY
   );
 
   if (authResult.error) {
@@ -161,7 +163,7 @@ export async function onRequestPost(context) {
     );
   }
 
-  const { userId } = authResult;
+  const { userId, token: accessToken } = authResult;
 
   // 2. 解析请求体
   let body;
@@ -183,14 +185,21 @@ export async function onRequestPost(context) {
     );
   }
 
-  // 3. 限额检查
-  const dailyCount = await getDailyMessageCount(SUPABASE_URL, SUPABASE_SERVICE_KEY, userId);
-
-  if (dailyCount >= DAILY_LIMIT) {
-    return new Response(
-      JSON.stringify({ error: 'rate_limit', message: '今天聊得够多啦，明天再来吧 ☕' }),
-      { status: 429, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+  // 3. 生产环境限额检查；本地联调可通过环境变量关闭。
+  if (!IS_RATE_LIMIT_DISABLED) {
+    const dailyCount = await getDailyMessageCount(
+      SUPABASE_URL,
+      SUPABASE_API_KEY,
+      accessToken,
+      userId
     );
+
+    if (dailyCount >= DAILY_LIMIT) {
+      return new Response(
+        JSON.stringify({ error: 'rate_limit', message: '今天聊得够多啦，明天再来吧 ☕' }),
+        { status: 429, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
   }
 
   // 4. 拼装 DeepSeek 请求
@@ -219,7 +228,7 @@ export async function onRequestPost(context) {
   } catch (err) {
     console.error('DeepSeek API error:', err);
     return new Response(
-      JSON.stringify({ error: 'server_error', message: 'AI 暂时走神了，请稍后再试' }),
+      JSON.stringify({ error: 'server_error', message: 'Alii 走神了，晚点再来试试吧…' }),
       { status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
@@ -228,7 +237,7 @@ export async function onRequestPost(context) {
     const errText = await deepseekResp.text();
     console.error('DeepSeek API error:', deepseekResp.status, errText);
     return new Response(
-      JSON.stringify({ error: 'server_error', message: 'AI 暂时走神了，请稍后再试' }),
+      JSON.stringify({ error: 'server_error', message: 'Alii 走神了，晚点再来试试吧…' }),
       { status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
@@ -287,8 +296,9 @@ export async function onRequestPost(context) {
     } finally {
       await writer.close();
 
-      // 6. 流结束后保存 AI 回复
-      if (fullResponse) {
+      // 6. 流结束后保存 AI 回复。纯本地调试可以不配置 service key，
+      // 此时链路仍可正常返回，只跳过 assistant 消息持久化。
+      if (fullResponse && SUPABASE_SERVICE_KEY) {
         await saveAssistantMessage(
           SUPABASE_URL,
           SUPABASE_SERVICE_KEY,

@@ -438,7 +438,7 @@ src/
 | JWT 过期 | 捕获 401，触发 Supabase session refresh，自动重试一次 | 验证 JWT 失败返回 401 |
 | 每日限额已满 | 展示友好提示，禁用输入框 | 返回 429 + rate_limit error |
 | 用户消息写入 DB 失败 | 保留输入内容，提示"发送失败，请重试" | — |
-| DeepSeek API 请求失败 | 展示"AI 暂时走神了，请稍后再试" | 返回 502 + server_error |
+| DeepSeek API 请求失败 | 展示"Alii 走神了，晚点再来试试吧…" | 返回 502 + server_error |
 | DeepSeek API 返回内容违规 | 渲染 API 返回的内容（DS 自带内容过滤） | 透传 DS 的回复 |
 | SSE 连接中断 | 保留已收到的部分回复，展示"回复中断"提示，允许重新发送 | — |
 | AI 回复写入 DB 失败 | 前端已展示了流式内容，不影响用户体验；下次加载可能缺失该回复 | 日志记录错误，不阻塞 SSE |
@@ -496,3 +496,56 @@ Cloudflare Pages 内置对 `functions/` 目录的支持。只要项目根目录�
 ```
 
 这样 `wrangler pages deploy out` 执行时，当前工作目录中同时有 `out/` 和 `functions/`，Cloudflare Pages 会自动识别 `functions/` 并部署为 Workers。
+
+---
+
+## 设计更新 - 2026-07-31
+
+### Portfolio MVP 架构
+
+当前首版不在全局 layout 挂载完整聊天窗口，而是在 `src/app/portfolio/page.jsx` 中挂载 `PortfolioChatInput`。组件通过 `createPortal(..., document.body)` 避免页面祖先 transform 破坏 fixed 定位，仅在 `md` 及以上显示，水平居中并距视口底部 48px。
+
+ChatInput 有三种明确尺寸：收起态 360×51、输入态 480×129、展开态 560×420。hover、focus、有输入或 streaming 触发输入态，`isExpanded` 触发展开态。外框和内输入容器使用明确起止尺寸同步插值，title 与底部操作区绝对定位，只做透明度和位移动画，避免 flex/grid 中间帧造成高度回弹。
+
+MVP 不渲染用户消息气泡或完整消息列表。`streamingContent` 与最近一条 assistant 消息只显示在顶部 title 区域。
+
+### 昵称模式
+
+`PortfolioChatInput` 通过 `isAuthenticated` 与 `hasProfile` 判断昵称模式，直接复用 textarea 调用 `AuthContext.signIn(nickname)`。昵称限制 1～20 个字符，提交态与错误态均显示在 title 区域，不再打开 `NicknameDialog`。
+
+### 控件与主题
+
+展开/收起按钮复用 `IconTextButton` 与项目已有 Radix Tooltip。按钮热区为 24×24，图标为 16×16。SVG 使用 `currentColor`，通过 `text-tertiary`、`text-disabled` 等 token 适配浅色和深色主题。聊天相关 tooltip、aria-label 与昵称引导文案由 `LanguageContext` 提供。
+
+### 本地 API 路由
+
+Next dev 不会加载根目录 `functions/api/chat.js`。开发模式下若前端使用相对 `/api/chat`，请求会落到 Next dev（例如 3000/3001）并返回 404。因此 `useChat` 的地址策略为：
+
+```js
+const CHAT_API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL
+  || (process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8788/api/chat'
+    : '/api/chat');
+```
+
+本地由 Wrangler Pages dev 在 8788 加载 Function；线上 Cloudflare Pages 使用同源 `/api/chat`。`NEXT_PUBLIC_CHAT_API_URL` 可覆盖默认地址。
+
+### SSE 实际协议
+
+Function 将 DeepSeek SSE 转换为增量事件：
+
+```text
+data: {"content":"增量文本","done":false}
+
+data: {"content":"","done":true}
+```
+
+前端通过 `ReadableStream.getReader()`、`TextDecoder` 与跨 chunk buffer 解析。当前完成事件不保证包含 `message_id`。配置 `SUPABASE_SERVICE_KEY` 时，Function 在流结束后持久化 assistant 消息；本地未配置 service key 时仍允许流式响应完成，但跳过 assistant 持久化。
+
+### Supabase 406 处理
+
+PostgREST `.single()` 在查询或插入返回 0 行时会返回 406。profile 查询、会话创建与用户消息插入改为数组结果加 `limit(1)`，由前端显式处理空结果，避免正常的暂时无数据状态触发 406。
+
+### 本地限额开关
+
+前端 `NEXT_PUBLIC_CHAT_DISABLE_RATE_LIMIT=true` 跳过计数初始化和乐观拦截；Function `DISABLE_CHAT_RATE_LIMIT=true` 跳过服务端限额检查。两端必须同时启用才能完整关闭本地限额，生产默认保持每日 25 条。

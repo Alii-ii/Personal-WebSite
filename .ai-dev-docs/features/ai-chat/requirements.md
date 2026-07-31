@@ -195,3 +195,73 @@ WHEN 项目构建和部署, THE SYSTEM SHALL 在现有 Cloudflare Pages 静态�
 | 每日对话限制 | 90% | 数字（25条/天）已确认，具体限流机制待设计 |
 | 服务端 API 代理 | 95% | Cloudflare Functions 方案明确 |
 | 部署架构调整 | 85% | 需验证 `wrangler pages deploy` 对 functions 目录的支持方式 |
+
+---
+
+## 迭代 2 - 2026-07-31
+
+### Requirement: Portfolio-only MVP
+
+WHEN 用户访问 `/portfolio`, THE SYSTEM SHALL 仅在桌面端展示固定于浏览器窗口底部的 AI ChatInput；其他页面和移动端暂不展示。
+
+#### Scenario: 三态布局
+- GIVEN 用户位于 `/portfolio` 桌面端
+- WHEN ChatInput 无输入、未聚焦且鼠标移出
+- THEN 展示 360×51 收起态
+- WHEN 用户 hover、聚焦、有输入或 AI 正在回复
+- THEN 展示 480×129 输入态
+- WHEN 用户点击展开按钮
+- THEN 展示 560×420 展开态
+- AND ChatInput 水平居中、距视口底部 48px
+
+#### Scenario: 内容呈现范围
+- GIVEN 用户正在进行首版对话
+- WHEN 用户发送消息或 AI 流式回复
+- THEN 暂不展示用户消息气泡和完整消息列表
+- AND AI 回复仅显示在顶部 title 区域
+
+### Requirement: 昵称内联录入
+
+WHEN 用户未认证或尚未创建 profile, THE SYSTEM SHALL 复用 ChatInput 的 textarea 录入昵称，不打开独立弹窗。
+
+#### Scenario: 输入昵称
+- GIVEN 用户未完成身份识别
+- WHEN ChatInput 处于收起态
+- THEN placeholder 仍展示默认文案 `Ask me anything…`
+- WHEN ChatInput 展开
+- THEN title 展示“取个昵称再开始聊天吧”
+- AND placeholder 展示“1~20个字符内, 账号基于访问设备记录哦…”
+- WHEN 用户按 Enter 或点击发送按钮
+- THEN 提交 1～20 个字符昵称
+- AND 成功后进入正常聊天模式
+- AND 失败原因展示在 title 区域
+
+### Requirement: 键盘、Tooltip 与国际化
+
+WHEN 页面当前焦点不在可编辑控件内且用户按 Enter, THE SYSTEM SHALL 展开 ChatInput 并聚焦 textarea。
+
+WHEN 用户 hover 展开或收起控件, THE SYSTEM SHALL 使用项目已有的 Radix Tooltip 展示提示，并通过 LanguageContext 提供中英文文案及 aria-label。
+
+### Requirement: 本地 API 联调
+
+WHEN 应用运行于 Next.js 开发模式, THE SYSTEM SHALL 默认将聊天请求发送至 `http://localhost:8788/api/chat`，避免请求落到不加载 Pages Functions 的 Next dev 端口。
+
+WHEN 应用部署到 Cloudflare Pages, THE SYSTEM SHALL 使用同源 `/api/chat`。
+
+THE SYSTEM SHALL 允许通过 `NEXT_PUBLIC_CHAT_API_URL` 显式覆盖聊天 API 地址。
+
+WHEN 开发者运行本地联调, THE SYSTEM SHALL 启动 Next dev 与 Wrangler Pages dev，并确保 Wrangler 命中 `functions/api/chat.js`。
+
+### Requirement: 开发限额开关
+
+WHEN 本地联调需要关闭每日 25 条限制, THE SYSTEM SHALL 同时支持：前端 `NEXT_PUBLIC_CHAT_DISABLE_RATE_LIMIT=true` 与 Function `DISABLE_CHAT_RATE_LIMIT=true`。
+
+生产环境未显式配置上述开关时，THE SYSTEM SHALL 保持每日限额。
+
+### Requirement: MVP 错误文案
+
+WHEN DeepSeek API 请求失败或前端无法解析服务端错误响应, THE SYSTEM SHALL 展示“Alii 走神了，晚点再来试试吧…”。
+
+### 范围说明
+
+本迭代不实现全站入口、移动端适配、用户消息气泡、完整历史会话面板和多会话切换 UI；这些能力保留为后续范围。

@@ -6,6 +6,12 @@ import { SYSTEM_PROMPT } from '@/data/system-prompt';
 
 const MAX_HISTORY_MESSAGES = 20;
 const DAILY_LIMIT = 25;
+const CHAT_API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL
+  || (process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8788/api/chat'
+    : '/api/chat');
+const IS_RATE_LIMIT_DISABLED =
+  process.env.NEXT_PUBLIC_CHAT_DISABLE_RATE_LIMIT === 'true';
 
 /**
  * AI Chat Hook
@@ -59,13 +65,34 @@ export function useChat() {
         return;
       }
 
-      setConversations(data || []);
+      const nextConversations = data || [];
+      setConversations(nextConversations);
+
+      // 当前 MVP 只展示一条对话：恢复最近会话，让用户刷新后可直接继续聊。
+      if (!currentConversation && nextConversations.length > 0) {
+        const latest = nextConversations[0];
+        setCurrentConversation(latest);
+        setIsLoadingMessages(true);
+
+        const { data: latestMessages, error: messageError } = await supabase
+          .from('site_chat_messages')
+          .select('id, role, content, created_at')
+          .eq('conversation_id', latest.id)
+          .order('created_at', { ascending: true });
+
+        if (messageError) {
+          console.error('Load latest messages error:', messageError);
+        } else {
+          setMessages(latestMessages || []);
+        }
+        setIsLoadingMessages(false);
+      }
     } catch (err) {
       console.error('Load conversations error:', err);
     } finally {
       setIsLoadingConversations(false);
     }
-  }, []);
+  }, [currentConversation]);
 
   // 初始化加载
   useEffect(() => {
@@ -81,18 +108,19 @@ export function useChat() {
     const { data, error } = await supabase
       .from('site_chat_conversations')
       .insert({ user_id: user.id, title: '新对话' })
-      .select()
-      .single();
+      .select('id, title, created_at, updated_at')
+      .limit(1);
 
-    if (error) {
-      console.error('Create conversation error:', error);
+    const conversation = data?.[0];
+    if (error || !conversation) {
+      console.error('Create conversation error:', error || 'No conversation returned');
       return null;
     }
 
-    setConversations(prev => [data, ...prev]);
-    setCurrentConversation(data);
+    setConversations(prev => [conversation, ...prev]);
+    setCurrentConversation(conversation);
     setMessages([]);
-    return data;
+    return conversation;
   }, []);
 
   // ─── 选择会话 ────────────────────────────────────
@@ -152,8 +180,8 @@ export function useChat() {
     const trimmed = content?.trim();
     if (!trimmed || isStreaming) return;
 
-    // 限额检查（前端乐观）
-    if (dailyCountRef.current >= DAILY_LIMIT) {
+    // 生产环境限额检查（前端乐观）；本地联调可通过环境变量关闭。
+    if (!IS_RATE_LIMIT_DISABLED && dailyCountRef.current >= DAILY_LIMIT) {
       setIsRateLimited(true);
       setRateLimitMessage('今天聊得够多啦，明天再来吧 ☕');
       return;
@@ -180,7 +208,7 @@ export function useChat() {
     setMessages(prev => [...prev, tempUserMsg]);
 
     // 写入用户消息到 Supabase
-    const { data: savedMsg, error: insertError } = await supabase
+    const { data: insertedMessages, error: insertError } = await supabase
       .from('site_chat_messages')
       .insert({
         conversation_id: convId,
@@ -189,10 +217,11 @@ export function useChat() {
         content: trimmed,
       })
       .select('id, role, content, created_at')
-      .single();
+      .limit(1);
 
-    if (insertError) {
-      console.error('Insert message error:', insertError);
+    const savedMsg = insertedMessages?.[0];
+    if (insertError || !savedMsg) {
+      console.error('Insert message error:', insertError || 'No message returned');
       // 回退乐观更新
       setMessages(prev => prev.filter(m => m.id !== tempUserMsg.id));
       return;
@@ -222,6 +251,8 @@ export function useChat() {
     // 构造历史上下文
     const allMessages = [...messages.filter(m => m.id !== tempUserMsg.id), savedMsg];
     const history = allMessages
+      // 当前消息会由 API 作为 message 单独追加，history 不能重复携带。
+      .slice(0, -1)
       .slice(-MAX_HISTORY_MESSAGES)
       .map(m => ({ role: m.role, content: m.content }));
 
@@ -237,7 +268,7 @@ export function useChat() {
     abortRef.current = abortController;
 
     try {
-      const resp = await fetch('/api/chat', {
+      const resp = await fetch(CHAT_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -264,7 +295,7 @@ export function useChat() {
           setMessages(prev => [...prev, {
             id: `error-${Date.now()}`,
             role: 'assistant',
-            content: errData.message || 'AI 暂时走神了，请稍后再试',
+            content: errData.message || 'Alii 走神了，晚点再来试试吧…',
             created_at: new Date().toISOString(),
             _isError: true,
           }]);
@@ -333,6 +364,8 @@ export function useChat() {
   // ─── 初始化每日计数 ─────────────────────────────
 
   useEffect(() => {
+    if (IS_RATE_LIMIT_DISABLED) return;
+
     async function initDailyCount() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;

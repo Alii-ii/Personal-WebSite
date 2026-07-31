@@ -26,6 +26,18 @@ const translations = {
     wechatCopied: "已复制到粘贴板~",
     emailTooltip: "get 邮箱", 
     emailCopied: "已复制到粘贴板~",
+
+    // AI Chat
+    chatExpand: "展开",
+    chatCollapse: "收起",
+    chatSend: "发送",
+    chatLogin: "登录",
+    chatHistory: "历史对话",
+    chatInputLabel: "输入你想对 Alii 说的话",
+    chatRegionLabel: "和 Alii 聊天",
+    chatNicknameTitle: "取个昵称再开始聊天吧",
+    chatNicknamePlaceholder: "1~20个字符内, 账号基于访问设备记录哦…",
+    chatNicknameSubmitting: "正在记录昵称…",
     
     // 控制台日志
     copySuccess: "复制成功，更新状态",
@@ -61,6 +73,18 @@ const translations = {
     wechatCopied: "Copied to clipboard~",
     emailTooltip: "get Email",
     emailCopied: "Copied to clipboard~",
+
+    // AI Chat
+    chatExpand: "Expand",
+    chatCollapse: "Collapse",
+    chatSend: "Send",
+    chatLogin: "Log in",
+    chatHistory: "Chat history",
+    chatInputLabel: "Type a message to Alii",
+    chatRegionLabel: "Chat with Alii",
+    chatNicknameTitle: "Choose a nickname to start chatting",
+    chatNicknamePlaceholder: "1–20 characters; your account stays on this device…",
+    chatNicknameSubmitting: "Saving your nickname…",
     
     // Console logs
     copySuccess: "Copy successful, updating state",

@@ -29,9 +29,9 @@ export default function RootLayout({ children }) {
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
         {/* 字体 preload：提前发起请求，避免等 CSS 解析后才加载 */}
-        <link rel="preload" href="/fonts/AlibabaPuHuiTi-2-55-Regular.woff2?v=7d80103e" as="font" type="font/woff2" crossOrigin="anonymous" />
-        <link rel="preload" href="/fonts/AlibabaPuHuiTi-2-45-Light.woff2?v=7d80103e" as="font" type="font/woff2" crossOrigin="anonymous" />
-        <link rel="preload" href="/fonts/DingTalk-JinBuTi.woff2?v=7d80103e" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/AlibabaPuHuiTi-2-55-Regular.woff2?v=289fdc21" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/AlibabaPuHuiTi-2-45-Light.woff2?v=289fdc21" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/DingTalk-JinBuTi.woff2?v=289fdc21" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>
       <body className="font-alibaba-regular antialiased m-0 p-0">
         {/* 主题防闪烁脚本，见上 themeInitScript */}
