@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/get-last-commit-date.js && node scripts/generate-portfolio-thumbs.mjs && next build",
+    "build": "node scripts/get-last-commit-date.js && node scripts/generate-portfolio-thumbs.mjs && node scripts/subset-fonts.mjs && next build",
     "build:clean": "rm -rf .next out && npm run build",
     "start": "next start",
     "update-date": "node scripts/get-last-commit-date.js",

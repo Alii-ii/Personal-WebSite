@@ -64,7 +64,7 @@ const CommentForm = ({ onSubmit, placeholder = '写下你的想法…' }) => {
         className={[
           'w-full resize-none rounded-[8px] px-3 py-2',
           'bg-press border border-stroke',
-          'font-regular text-[13px] leading-[20px] text-main',
+          'font-system text-[13px] leading-[20px] text-main',
           'placeholder:text-quaternary',
           'transition-colors focus:outline-none focus:border-divider',
           'disabled:opacity-60',

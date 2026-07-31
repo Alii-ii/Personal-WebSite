@@ -73,7 +73,7 @@ const CommentItem = ({ comment, currentUser, onDelete }) => {
     <li className="group flex flex-col gap-1 py-3 border-b border-divider last:border-b-0">
       {/* 头部：昵称 + 时间 + 删除 */}
       <div className="flex items-center gap-2">
-        <span className="font-regular text-[13px] leading-[20px] text-secondary truncate min-w-0">
+        <span className="font-system text-[13px] leading-[20px] text-secondary truncate min-w-0">
           {nickname}
         </span>
         <span className="font-light text-[11px] leading-[16px] text-quaternary flex-shrink-0">
@@ -100,7 +100,7 @@ const CommentItem = ({ comment, currentUser, onDelete }) => {
       </div>
 
       {/* 正文：保留用户换行，长串字符强制断行避免撑破窄栏 */}
-      <p className="font-regular text-[13px] leading-[20px] text-main whitespace-pre-wrap break-words">
+      <p className="font-system text-[13px] leading-[20px] text-main whitespace-pre-wrap break-words">
         {comment?.content}
       </p>
 
