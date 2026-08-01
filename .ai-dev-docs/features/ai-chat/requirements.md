@@ -261,11 +261,15 @@ WHEN 用户 hover 展开或收起控件, THE SYSTEM SHALL 使用项目已有的 
 
 WHEN 应用运行于 Next.js 开发模式, THE SYSTEM SHALL 默认将聊天请求发送至 `http://localhost:8788/api/chat`，避免请求落到不加载 Pages Functions 的 Next dev 端口。
 
+WHEN 本地只启动 Next.js 前端且 `localhost:8788` 无法连接, THE SYSTEM SHALL 自动重试线上 `https://alii.work/api/chat`，保证聊天能力可用。
+
+WHEN 本地 Wrangler 已启动但返回业务错误响应, THE SYSTEM SHALL 保留该响应而不切换线上服务，避免掩盖本地 Function 问题。
+
 WHEN 应用部署到 Cloudflare Pages, THE SYSTEM SHALL 使用同源 `/api/chat`。
 
-THE SYSTEM SHALL 允许通过 `NEXT_PUBLIC_CHAT_API_URL` 显式覆盖聊天 API 地址。
+THE SYSTEM SHALL 允许通过 `NEXT_PUBLIC_CHAT_API_URL` 显式覆盖聊天 API 地址；显式配置后不启用自动兜底。
 
-WHEN 开发者运行本地联调, THE SYSTEM SHALL 启动 Next dev 与 Wrangler Pages dev，并确保 Wrangler 命中 `functions/api/chat.js`。
+WHEN 开发者需要完整本地联调, THE SYSTEM SHALL 启动 Next dev 与 Wrangler Pages dev，并确保 Wrangler 命中 `functions/api/chat.js`。
 
 ### Requirement: 开发限额开关
 

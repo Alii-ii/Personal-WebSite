@@ -6,10 +6,15 @@ import { SYSTEM_PROMPT } from '@/data/system-prompt';
 
 const MAX_HISTORY_MESSAGES = 20;
 const DAILY_LIMIT = 25;
-const CHAT_API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL
-  || (process.env.NODE_ENV === 'development'
-    ? 'http://localhost:8788/api/chat'
-    : '/api/chat');
+const CONFIGURED_CHAT_API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL;
+const LOCAL_CHAT_API_URL = 'http://localhost:8788/api/chat';
+const PRODUCTION_CHAT_API_URL = 'https://alii.work/api/chat';
+const CHAT_API_URL = CONFIGURED_CHAT_API_URL
+  || (process.env.NODE_ENV === 'development' ? LOCAL_CHAT_API_URL : '/api/chat');
+const CHAT_API_FALLBACK_URL =
+  !CONFIGURED_CHAT_API_URL && process.env.NODE_ENV === 'development'
+    ? PRODUCTION_CHAT_API_URL
+    : null;
 const IS_RATE_LIMIT_DISABLED =
   process.env.NEXT_PUBLIC_CHAT_DISABLE_RATE_LIMIT === 'true';
 const CHAT_RESPONSE_TIMEOUT_MS = 30000;
@@ -384,7 +389,7 @@ export function useChat(authUser = null, accessToken = null) {
     };
 
     try {
-      const resp = await fetch(CHAT_API_URL, {
+      const requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -397,7 +402,15 @@ export function useChat(authUser = null, accessToken = null) {
           history,
         }),
         signal: abortController.signal,
-      });
+      };
+
+      let resp;
+      try {
+        resp = await fetch(CHAT_API_URL, requestOptions);
+      } catch (error) {
+        if (!CHAT_API_FALLBACK_URL || abortController.signal.aborted) throw error;
+        resp = await fetch(CHAT_API_FALLBACK_URL, requestOptions);
+      }
 
       // 处理非流式错误响应
       if (!resp.ok) {

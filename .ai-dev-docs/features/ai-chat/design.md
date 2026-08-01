@@ -495,7 +495,7 @@ Cloudflare Pages 内置对 `functions/` 目录的支持。只要项目根目录�
       --branch main
 ```
 
-这样 `wrangler pages deploy out` 执行时，当前工作目录中同时有 `out/` 和 `functions/`，Cloudflare Pages 会自动识别 `functions/` 并部署为 Workers。2026-08-01 已通过线上 POST `/api/chat` 返回 Function JSON 错误确认路由部署成功；当前 production secrets 为空，因此接口返回 `500 server_error / 服务配置不完整`，需补齐环境变量后再做 SSE 与持久化验收。
+这样 `wrangler pages deploy out` 执行时，当前工作目录中同时有 `out/` 和 `functions/`，Cloudflare Pages 会自动识别 `functions/` 并部署为 Workers。2026-08-01 已验证线上 `/api/chat` 命中 Function；同步与本地一致的 `DEEPSEEK_API_KEY`、`SUPABASE_URL` 和 `SUPABASE_ANON_KEY` 并重新部署后，匿名 JWT 验证恢复，接口返回 `200 text/event-stream` 且可收到 DeepSeek 流式内容。
 
 ---
 
@@ -519,16 +519,9 @@ MVP 不渲染用户消息气泡或完整消息列表。`streamingContent` 与最
 
 ### 本地 API 路由
 
-Next dev 不会加载根目录 `functions/api/chat.js`。开发模式下若前端使用相对 `/api/chat`，请求会落到 Next dev（例如 3000/3001）并返回 404。因此 `useChat` 的地址策略为：
+Next dev 不会加载根目录 `functions/api/chat.js`。开发模式下若前端使用相对 `/api/chat`，请求会落到 Next dev（例如 3000/3001）并返回 404。因此 `useChat` 默认优先请求 Wrangler Pages dev 的 `http://localhost:8788/api/chat`；若请求在网络层无法建立连接，且没有显式配置 `NEXT_PUBLIC_CHAT_API_URL`，则以相同请求体和 JWT 自动重试 `https://alii.work/api/chat`。这样只启动 Next 前端时仍可使用线上服务，完整本地联调时仍优先验证本地 Function。
 
-```js
-const CHAT_API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL
-  || (process.env.NODE_ENV === 'development'
-    ? 'http://localhost:8788/api/chat'
-    : '/api/chat');
-```
-
-本地由 Wrangler Pages dev 在 8788 加载 Function；线上 Cloudflare Pages 使用同源 `/api/chat`。`NEXT_PUBLIC_CHAT_API_URL` 可覆盖默认地址。
+自动兜底只处理 `fetch` 抛出的连接失败，不处理 4xx/5xx 响应。本地 Function 一旦返回业务错误，前端直接展示该错误路径，不用线上成功响应掩盖本地问题。线上 Cloudflare Pages 始终使用同源 `/api/chat`；`NEXT_PUBLIC_CHAT_API_URL` 显式配置时完全覆盖默认地址并关闭自动兜底。
 
 ### SSE 实际协议
 

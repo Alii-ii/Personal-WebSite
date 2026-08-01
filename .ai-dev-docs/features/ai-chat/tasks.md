@@ -117,8 +117,8 @@
 
 - [ ] 17. 部署与数据验收
     - [ ] 17.1 已执行 `setup.sql`；RLS 隔离与索引仍待独立验证
-    - [ ] 17.2 配置线上 Cloudflare secrets（当前缺失）
-    - [ ] 17.3 端到端验证 SSE 与 assistant 消息持久化
+    - [x] 17.2 配置线上 Cloudflare secrets，并同步与本地一致的 DeepSeek/Supabase 公共配置
+    - [ ] 17.3 已验证生产 JWT 与 DeepSeek SSE；assistant 消息持久化仍待独立核对
 
 - [x] 18. 展开态消息列表
     - [x] 18.1 在原 title 区域渲染当前会话的用户与 AI 消息
@@ -148,3 +148,4 @@
     - [x] 18.25 添加 Pin 按钮和常驻输入态切换
     - [x] 18.26 兼容静态导出末尾斜杠与客户端 pathname fallback，恢复全局 ChatInput 可见性
     - [x] 18.27 将 Pin 保持 24×24 热区并缩放为 16×16 标准操作图标
+    - [x] 18.28 本地 Wrangler 无法连接时自动回退线上 Chat API，显式 URL 配置保持最高优先级

@@ -32,7 +32,7 @@
 | 网络离线时展示友好提示 | 人工-交互 | P2 | - |
 | 对话列表加载失败展示重试按钮 | 人工-交互 | P2 | - |
 | 展开/收起对话框有过渡动画 | 人工-视觉 | P2 | - |
-| 部署后 Cloudflare Pages 正确识别 functions 目录 | 人工-逻辑 | P0 | 已验证：线上 POST `/api/chat` 命中 Function；因 secrets 缺失返回 500 |
+| 部署后 Cloudflare Pages 正确识别 functions 目录 | 人工-逻辑 | P0 | 已验证：线上 POST `/api/chat` 命中 Function |
 | RLS 策略验证：用户不能读写他人数据 | 人工-逻辑 | P0 | - |
 
 ---
@@ -55,9 +55,10 @@
 | 展开/收起复用单一 button 与 Radix Tooltip，Tooltip 支持 i18n | 人工-交互 | P1 | 已实现，待人工复验 |
 | 展开/收起按钮热区 24×24、图标 16×16 | 人工-视觉 | P1 | 已实现，待人工复验 |
 | 聊天图标使用 token/currentColor，浅色与深色主题显示正确 | 人工-视觉 | P1 | 已实现，待人工复验 |
-| 开发环境从任意 Next 端口请求 `http://localhost:8788/api/chat` | 人工-逻辑 | P0 | 已实现，待联调 |
-| 生产环境使用同源 `/api/chat`，DeepSeek Key 不进入前端 | 人工-逻辑 | P0 | Function 路由已部署；Cloudflare production secrets 当前为空 |
-| Cloudflare Function 返回的 SSE 可在 title 区逐步显示 | 人工-交互 | P0 | 待端到端联调 |
+| 开发环境优先请求 `http://localhost:8788/api/chat`，连接失败时回退线上 API | 人工-逻辑 | P0 | 已实现，待本地仅前端模式复验 |
+| 显式配置 `NEXT_PUBLIC_CHAT_API_URL` 后不触发自动回退 | 人工-逻辑 | P1 | 已实现，待配置复验 |
+| 生产环境使用同源 `/api/chat`，DeepSeek Key 不进入前端 | 人工-逻辑 | P0 | Cloudflare secrets 已配置并完成生产部署 |
+| Cloudflare Function 返回的 SSE 可在 title 区逐步显示 | 人工-交互 | P0 | 已验证 API 返回 200 `text/event-stream` 和增量内容 |
 | profile、conversation 和 message 空结果不再触发 406 | 人工-逻辑 | P0 | 已修复，待联调 |
 | 本地前后端限额开关同时开启时不执行每日限额 | 人工-逻辑 | P1 | 已实现，待联调 |
 | DeepSeek 失败时展示“Alii 走神了，晚点再来试试吧…” | 人工-交互 | P1 | 已实现，待联调 |

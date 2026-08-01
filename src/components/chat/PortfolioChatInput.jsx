@@ -464,95 +464,70 @@ export default function PortfolioChatInput() {
             aria-label={t('chatInputLabel')}
           />
 
-          {/* 底部按钮组 */}
+          {/* 左侧工具栏：仅展开时显示；Pin 常驻，新建/历史仅登录后显示 */}
           <div
             className={[
-              'absolute bottom-3 left-3 right-3 flex h-6 items-center justify-between',
+              'absolute bottom-3 left-3 flex h-6 items-center gap-1 text-disabled',
               'transition-[opacity,transform] duration-200 ease-out',
               isOpen
                 ? 'translate-y-0 opacity-100 delay-100'
                 : 'pointer-events-none translate-y-1 opacity-0 delay-0',
             ].join(' ')}
           >
-            {/* 左侧：Pin 常驻；新建/历史仅登录后显示 */}
-            <div className="flex h-6 items-center gap-1 text-disabled">
-
-              {/* Pin按钮 */}
-              <IconTextButton
-                icon={<PinIcon />}
-                variant="ghost"
-                size="sm"
-                tooltip={isPinned ? t('chatUnpin') : t('chatPin')}
-                onClick={() => setIsPinned((current) => !current)}
-                className={[
-                  'h-6 w-6 text-disabled [&>span]:opacity-100 hover:text-tertiary',
-                  isPinned ? 'bg-hover text-main hover:bg-hover hover:text-main' : '',
-                ].join(' ')}
-                aria-pressed={isPinned}
-                aria-label={isPinned ? t('chatUnpin') : t('chatPin')}
-              />
-
-              {isLoggedIn ? (
-                <>
-                  {/* 新建对话 */}
-                  <IconTextButton
-                    icon={<LoginIcon />}
-                    variant="ghost"
-                    size="sm"
-                    tooltip={t('chatNewConversation')}
-                    onClick={handleCreateConversation}
-                    disabled={isMessagePending}
-                    className="h-6 w-6 text-disabled [&>span]:opacity-100 hover:text-tertiary disabled:opacity-35"
-                    aria-label={t('chatNewConversation')}
-                  />
-
-                  {/* 历史对话 */}
-                  <IconTextButton
-                    icon={<HistoryIcon />}
-                    variant="ghost"
-                    size="sm"
-                    tooltip={t('chatHistory')}
-                    disabled
-                    className="h-6 w-6 text-disabled opacity-35 [&>span]:opacity-100 disabled:opacity-35"
-                    aria-label={t('chatHistory')}
-                  />
-                </>
-              ) : null}
-
-            </div>
-
-            {/* 右侧: 展开态发送按钮 — 可发送时用 CTA 配色 */}
+            {/* Pin按钮 */}
             <IconTextButton
-              icon={<SendIcon size={16} />}
-              variant={canSend ? 'CTA' : 'default'}
+              icon={<PinIcon />}
+              variant="ghost"
               size="sm"
-              onClick={handleSubmit}
-              disabled={!canSend}
+              tooltip={isPinned ? t('chatUnpin') : t('chatPin')}
+              onClick={() => setIsPinned((current) => !current)}
               className={[
-                'h-6 w-6 [&>span]:opacity-100 disabled:opacity-35',
-                // 禁用态保持弱化底色，避免套用 CTA
-                canSend ? '' : 'bg-hover text-tertiary hover:bg-hover hover:text-tertiary',
+                'h-6 w-6 text-disabled [&>span]:opacity-100 hover:text-tertiary',
+                isPinned ? 'bg-hover text-main hover:bg-hover hover:text-main' : '',
               ].join(' ')}
-              aria-label={t('chatSend')}
+              aria-pressed={isPinned}
+              aria-label={isPinned ? t('chatUnpin') : t('chatPin')}
             />
+
+            {isLoggedIn ? (
+              <>
+                {/* 新建对话 */}
+                <IconTextButton
+                  icon={<LoginIcon />}
+                  variant="ghost"
+                  size="sm"
+                  tooltip={t('chatNewConversation')}
+                  onClick={handleCreateConversation}
+                  disabled={isMessagePending}
+                  className="h-6 w-6 text-disabled [&>span]:opacity-100 hover:text-tertiary disabled:opacity-35"
+                  aria-label={t('chatNewConversation')}
+                />
+
+                {/* 历史对话 */}
+                <IconTextButton
+                  icon={<HistoryIcon />}
+                  variant="ghost"
+                  size="sm"
+                  tooltip={t('chatHistory')}
+                  disabled
+                  className="h-6 w-6 text-disabled opacity-35 [&>span]:opacity-100 disabled:opacity-35"
+                  aria-label={t('chatHistory')}
+                />
+              </>
+            ) : null}
           </div>
 
-          {/* 收起态右侧发送按钮 */}
+          {/* 发送按钮：可发送时用 CTA 配色 */}
           <IconTextButton
             icon={<SendIcon size={16} />}
-            variant="ghost"
+            variant={canSend ? 'CTA' : 'default'}
             size="sm"
-            onClick={() => {
-              if (hasInput) handleSubmit();
-              else textareaRef.current?.focus();
-            }}
+            onClick={handleSubmit}
+            disabled={!canSend}
             className={[
-              'absolute right-3 top-1/2 h-6 w-6 -translate-y-1/2',
-              'bg-transparent text-tertiary [&>span]:opacity-100 hover:bg-transparent hover:text-tertiary',
-              'transition-[opacity,transform] duration-150 ease-out',
-              isOpen
-                ? 'pointer-events-none translate-x-1 opacity-0'
-                : 'translate-x-0 opacity-100 delay-100',
+              'absolute bottom-3 right-3 h-6 w-6 [&>span]:opacity-100 disabled:opacity-35',
+              // 禁用态保持弱化底色，避免套用 CTA
+              canSend ? '' : 'bg-hover text-tertiary hover:bg-hover hover:text-tertiary',
             ].join(' ')}
             aria-label={t('chatSend')}
           />
