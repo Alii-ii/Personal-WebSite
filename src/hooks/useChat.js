@@ -461,6 +461,15 @@ export function useChat(authUser = null, accessToken = null) {
             if (parsed.done) {
               // 收到业务完成标记后立即结束本地读取，不继续等待连接关闭。
               saveReceivedAssistant(parsed.message_id);
+              if (parsed.error === 'persistence_failed') {
+                setMessages(prev => [...prev, {
+                  id: `error-${Date.now()}`,
+                  role: 'assistant',
+                  contentKey: 'chatResponseSaveFailed',
+                  created_at: new Date().toISOString(),
+                  _isError: true,
+                }]);
+              }
               setStreamingContent('');
               streamCompleted = true;
               break readStream;

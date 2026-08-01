@@ -101,7 +101,9 @@ async function saveAssistantMessage(supabaseUrl, supabaseServiceKey, conversatio
   });
 
   if (!resp.ok) {
-    console.error('Failed to save assistant message:', await resp.text());
+    const errorText = await resp.text();
+    console.error('Failed to save assistant message:', errorText);
+    throw new Error(`Failed to save assistant message (${resp.status})`);
   }
 
   return resp;
@@ -263,6 +265,7 @@ export async function onRequestPost(context) {
     const reader = deepseekResp.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
+    let upstreamCompleted = false;
 
     try {
       while (true) {
@@ -279,10 +282,8 @@ export async function onRequestPost(context) {
 
           const data = trimmed.slice(6);
           if (data === '[DONE]') {
-            // 发送完成标记
-            await writer.write(
-              encoder.encode(`data: ${JSON.stringify({ content: '', done: true })}\n\n`)
-            );
+            // 等模型回复持久化完成后再通知前端结束，避免前端取消读取时中断写库。
+            upstreamCompleted = true;
             continue;
           }
 
@@ -303,20 +304,41 @@ export async function onRequestPost(context) {
     } catch (err) {
       console.error('Stream processing error:', err);
     } finally {
-      await writer.close();
-
-      // 6. 流结束后保存 AI 回复。纯本地调试可以不配置 service key，
-      // 此时链路仍可正常返回，只跳过 assistant 消息持久化。
-      if (fullResponse && SUPABASE_SERVICE_KEY) {
-        await saveAssistantMessage(
-          SUPABASE_URL,
-          SUPABASE_SERVICE_KEY,
-          conversation_id,
-          userId,
-          fullResponse
-        );
-        await touchConversation(SUPABASE_URL, SUPABASE_SERVICE_KEY, conversation_id);
+      // 6. 先保存 AI 回复，再发送完成标记。前端收到 done 后会取消读取，
+      // 因此持久化必须发生在 done 之前，不能放到 writer.close() 之后。
+      let persistenceError = null;
+      if (fullResponse) {
+        if (!SUPABASE_SERVICE_KEY) {
+          persistenceError = new Error('SUPABASE_SERVICE_KEY is missing');
+          console.error('Assistant message persistence error:', persistenceError);
+        } else {
+          try {
+            await saveAssistantMessage(
+              SUPABASE_URL,
+              SUPABASE_SERVICE_KEY,
+              conversation_id,
+              userId,
+              fullResponse
+            );
+            await touchConversation(SUPABASE_URL, SUPABASE_SERVICE_KEY, conversation_id);
+          } catch (error) {
+            persistenceError = error;
+            console.error('Assistant message persistence error:', error);
+          }
+        }
       }
+
+      if (upstreamCompleted) {
+        await writer.write(
+          encoder.encode(`data: ${JSON.stringify({
+            content: '',
+            done: true,
+            persisted: !persistenceError,
+            error: persistenceError ? 'persistence_failed' : undefined,
+          })}\n\n`)
+        );
+      }
+      await writer.close();
     }
   })();
 

@@ -3,10 +3,10 @@
 // 项目详情底部页数轴：用竖条展示当前 frame 位置，桌面端支持点击跳页。
 /**
  * L3 底部进度条（对应设计稿 catalog）
- * 每个 frame 一根竖条，当前项 32h，其余 16h
+ * 每个 frame 一根竖条，当前项 32h，其余 16h；默认 2px 宽
  *
- * 桌面端可点击跳转；移动端为纯展示 —— 每根条只有 1px 宽，
- * 点击热区对手指过小，误触率高于命中率，故不提供交互。
+ * 桌面端可点击跳转；移动端 interactive=false —— 热区对手指过小，
+ * 仅禁点（pointer-events-none），样式与桌面共用。
  *
  * @param {number} total - frame 总数
  * @param {number} activeIndex - 当前 frame 下标
@@ -21,36 +21,26 @@ const SlideProgress = ({ total = 0, activeIndex = 0, onSelect, interactive = tru
     return { index, isActive };
   });
 
-  // 纯展示：不渲染 button，避免无效热区抢占触摸事件
-  if (!interactive) {
-    return (
-      <div className="flex items-center gap-0 select-none pointer-events-none" aria-hidden="true">
-        {bars.map(({ index, isActive }) => (
-          <span key={index} className="px-1.5 py-1 flex items-center">
-            <span
-              className={`block w-px rounded-full transition-all duration-300 ${
-                isActive ? 'h-8 bg-main' : 'h-4 bg-stroke'
-              }`}
-            />
-          </span>
-        ))}
-      </div>
-    );
-  }
-
+  // 间距 hover 按整体；竖条加粗/加长按单条
   return (
-    <div className="flex items-center gap-0 select-none">
+    <div
+      className={`group/track flex items-center gap-0 select-none ${interactive ? '' : 'pointer-events-none'}`}
+      aria-hidden={interactive ? undefined : true}
+    >
       {bars.map(({ index, isActive }) => (
         <button
           key={index}
           type="button"
           aria-label={`第 ${index + 1} 页`}
-          onClick={() => onSelect?.(index)}
-          className="px-1.5 py-1 group"
+          tabIndex={interactive ? undefined : -1}
+          onClick={() => interactive && onSelect?.(index)}
+          className="group/bar px-1 py-1 transition-[padding] duration-300 group-hover/track:px-1.5"
         >
           <span
-            className={`block w-px rounded-full transition-all duration-300 ${
-              isActive ? 'h-8 bg-main' : 'h-4 bg-stroke group-hover:bg-tertiary'
+            className={`block w-0.5 rounded-full transition-all duration-300 group-hover/bar:w-[3px] ${
+              isActive
+                ? 'h-8 bg-main group-hover/bar:h-9'
+                : 'h-4 bg-stroke group-hover/bar:h-5 group-hover/bar:bg-tertiary'
             }`}
           />
         </button>

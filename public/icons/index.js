@@ -7,3 +7,12 @@ export { default as FigmaIcon } from './figma-icon';
 export { default as GlobeIcon } from './globe-icon';
 export { default as DownloadIcon } from './download-icon';
 export { default as XiaohongshuIcon } from './xiaohongshu-icon';
+export {
+  BackIcon,
+  CollapseIcon,
+  ExpandIcon,
+  HistoryIcon,
+  LoginIcon,
+  PinIcon,
+  SendIcon,
+} from './chat-input-icons';

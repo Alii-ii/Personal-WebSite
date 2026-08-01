@@ -100,7 +100,8 @@ export const ProjectFooter = ({
 }) => (
   <footer className="absolute inset-x-0 bottom-0 z-20 isolate px-12 md:px-16 pb-12 md:pb-8 pt-2 pointer-events-auto">
     <EdgeMask from="bottom" height="300%" className="md:hidden" />
-    <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 md:translate-y-[-50%] translate-y-[calc(-50%-12px)]">
+
+    <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 md:translate-y-[calc(-50%-10px)] translate-y-[calc(-50%-12px)]">
       <SlideProgress
         total={framesCount}
         activeIndex={activeIndex}
