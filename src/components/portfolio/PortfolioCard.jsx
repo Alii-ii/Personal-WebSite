@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
 import EdgeMask from '@/components/EdgeMask';
+import ImageLoadingIndicator from '@/components/ImageLoadingIndicator';
 
 /**
  * 作品集卡片组件 — 匹配 Figma protfolio_set 组件 (node 11272:7373)
@@ -15,12 +16,61 @@ import EdgeMask from '@/components/EdgeMask';
  */
 const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, disabled = false }) => {
   const { language } = useLanguage();
-  const [imgError, setImgError] = useState(false);
+  const [imageStatus, setImageStatus] = useState({});
   const [hovered, setHovered] = useState(false);
 
   const title = isResume ? '查看简历' : (project ? pickLocale(project.title, language) : '');
   const subtitle = disabled && project ? pickLocale(project.summary, language) : '';
   const coverSrc = previewSrcs[0] || '';
+
+  const getImageStatus = (src) => {
+    if (!src) return 'error';
+    return imageStatus[src] || 'loading';
+  };
+
+  const setSrcStatus = (src, status) => {
+    if (!src) return;
+    setImageStatus((previous) => (
+      previous[src] === status ? previous : { ...previous, [src]: status }
+    ));
+  };
+
+  const renderImage = ({ src, alt, isMain = false, objectTop = true }) => {
+    const status = getImageStatus(src);
+    const isLoaded = status === 'loaded';
+    const isError = status === 'error';
+
+    return (
+      <>
+        {!isError && (
+          <img
+            ref={(image) => {
+              if (!image?.complete) return;
+              setSrcStatus(src, image.naturalWidth > 0 ? 'loaded' : 'error');
+            }}
+            src={src}
+            alt={alt}
+            loading={isResume && isMain ? 'eager' : 'lazy'}
+            className={`w-full h-full object-cover ${objectTop ? 'object-top' : ''} transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+            style={{ transform: 'translateZ(0)' }}
+            onLoad={() => setSrcStatus(src, 'loaded')}
+            onError={() => setSrcStatus(src, 'error')}
+            aria-hidden={isMain ? undefined : 'true'}
+          />
+        )}
+        {status === 'loading' && (
+          <div className="absolute inset-0 bg-press flex items-center justify-center">
+            <ImageLoadingIndicator />
+          </div>
+        )}
+        {isError && (
+          <div className="absolute inset-0 bg-press flex items-center justify-center">
+            {isMain && <span className="text-disabled font-regular text-[14px]">{title}</span>}
+          </div>
+        )}
+      </>
+    );
+  };
 
   /* ─── 卡片布局参数 ─── */
   const W = 562;
@@ -110,20 +160,7 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, d
         style={{ aspectRatio: `${W} / ${H}` }}
       >
         <div className="absolute top-0 left-0 w-full h-full rounded-[12px] overflow-hidden">
-          {imgError ? (
-            <div className="absolute inset-0 bg-press flex items-center justify-center">
-              <span className="text-disabled font-regular text-[14px]">{title}</span>
-            </div>
-          ) : (
-            <img
-              src={coverSrc}
-              alt={title}
-              loading="eager"
-              className="w-full h-full object-cover object-top"
-              style={{ transform: 'translateZ(0)' }}
-              onError={() => setImgError(true)}
-            />
-          )}
+          {renderImage({ src: coverSrc, alt: title, isMain: true })}
           {strokeOverlay}
         </div>
         {hoverMask}
@@ -169,14 +206,7 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, d
               transition: 'left 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
-            <img
-              src={layerSrc}
-              alt=""
-              loading="lazy"
-              className="w-full h-full object-cover object-top"
-              style={{ transform: 'translateZ(0)' }}
-              aria-hidden="true"
-            />
+            {renderImage({ src: layerSrc, alt: '' })}
             {/* bg-card 渐变遮罩 — 从四周边缘向内渐隐 */}
             <div
               className="absolute inset-0 pointer-events-none"
@@ -206,20 +236,7 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, d
           zIndex: backLayers.length + 1,
         }}
       >
-        {imgError ? (
-          <div className="absolute inset-0 bg-press flex items-center justify-center">
-            <span className="text-disabled font-regular text-[14px]">{title}</span>
-          </div>
-        ) : (
-          <img
-            src={coverSrc}
-            alt={title}
-            loading="lazy"
-            className="w-full h-full object-cover object-top"
-            style={{ transform: 'translateZ(0)' }}
-            onError={() => setImgError(true)}
-          />
-        )}
+        {renderImage({ src: coverSrc, alt: title, isMain: true })}
         {/* 0.5px 描边 */}
         {strokeOverlay}
       </div>
