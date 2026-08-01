@@ -226,18 +226,27 @@ export async function onRequestPost(context) {
       }),
     });
   } catch (err) {
-    console.error('DeepSeek API error:', err);
+    const upstreamError = err instanceof Error ? err.name : 'UnknownError';
+    console.error('DeepSeek API network error:', upstreamError);
     return new Response(
-      JSON.stringify({ error: 'server_error', message: 'Alii 走神了，晚点再来试试吧…' }),
+      JSON.stringify({
+        error: 'deepseek_network_error',
+        upstream_error: upstreamError,
+        message: 'Alii 走神了，晚点再来试试吧…',
+      }),
       { status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
 
   if (!deepseekResp.ok) {
-    const errText = await deepseekResp.text();
-    console.error('DeepSeek API error:', deepseekResp.status, errText);
+    console.error('DeepSeek API HTTP error:', deepseekResp.status);
+    await deepseekResp.body?.cancel();
     return new Response(
-      JSON.stringify({ error: 'server_error', message: 'Alii 走神了，晚点再来试试吧…' }),
+      JSON.stringify({
+        error: 'deepseek_http_error',
+        upstream_status: deepseekResp.status,
+        message: 'Alii 走神了，晚点再来试试吧…',
+      }),
       { status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
