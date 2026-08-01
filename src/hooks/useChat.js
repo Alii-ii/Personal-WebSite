@@ -62,6 +62,17 @@ export function useChat(authUser = null, accessToken = null) {
   // abort controller for SSE
   const abortRef = useRef(null);
   const currentConversationRef = useRef(null);
+  const messagesRef = useRef([]);
+  const isLoadingMessagesRef = useRef(false);
+
+  // 同步到 ref，供 createConversation 判断「当前是否已是空对话」
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  useEffect(() => {
+    isLoadingMessagesRef.current = isLoadingMessages;
+  }, [isLoadingMessages]);
 
   // ─── 会话列表 ────────────────────────────────────
 
@@ -125,6 +136,13 @@ export function useChat(authUser = null, accessToken = null) {
 
   const createConversation = useCallback(async () => {
     if (!authUser) return null;
+
+    // 当前已是空对话时复用，避免重复 insert 空 chat
+    // 消息仍在加载时不复用，避免把「尚未拉回消息的旧会话」误判为空
+    const current = currentConversationRef.current;
+    if (current && !isLoadingMessagesRef.current && messagesRef.current.length === 0) {
+      return current;
+    }
 
     const { data, error } = await supabase
       .from('site_chat_conversations')

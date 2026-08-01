@@ -143,10 +143,12 @@ const IconTextButton = ({
     return renderButton();
   }
 
-  // 有提示文案时，包装 Tooltip
+  // 有提示文案时，包装 Tooltip；禁用态包一层 span，避免 pointer-events-none 导致无法触发
   return (
     <Tooltip delayDuration={200} open={forceTooltipOpen ? true : undefined}>
-      <TooltipTrigger asChild>{renderButton()}</TooltipTrigger>
+      <TooltipTrigger asChild>
+        {disabled ? <span className="inline-flex size-fit">{renderButton()}</span> : renderButton()}
+      </TooltipTrigger>
 
       <TooltipContent side={tooltipSide} className="z-[9999]">
         <div className="flex items-center gap-1">

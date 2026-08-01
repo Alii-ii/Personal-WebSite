@@ -41,7 +41,7 @@ const translations = {
     chatNicknameTitle: "取个昵称再开始聊天吧",
     chatNicknamePlaceholder: "1~20个字符内, 账号基于访问设备记录哦…",
     chatNicknameSubmitting: "正在记录昵称…",
-    chatPlaceholder: "问我任何问题…",
+    chatPlaceholder: "Ask me anything…",
     chatThinking: "Alii 正在想…",
     chatNicknameInvalid: "昵称需要 1-20 个字符",
     chatNicknameTaken: "该昵称已被使用",
