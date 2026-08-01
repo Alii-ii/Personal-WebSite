@@ -55,6 +55,15 @@ const translations = {
     chatRequestFailed: "Alii 走神了，晚点再来试试吧…",
     chatResponseTimeout: "Alii 想太久了，这次先重试一下吧…",
     chatNetworkInterrupted: "网络连接中断，请检查网络后重试",
+    chatHistoryPlaceholder: "↑ ↓ 切换, ↵ 选择, esc 返回",
+    chatBack: "返回",
+    timeJustNow: "刚刚",
+    timeMinutesAgo: "{n}分钟前",
+    timeHoursAgo: "{n}小时前",
+    timeDaysAgo: "{n}天前",
+    timeWeeksAgo: "{n}周前",
+    timeMonthsAgo: "{n}月前",
+    timeYearsAgo: "{n}年前",
     
     // 控制台日志
     copySuccess: "复制成功，更新状态",
@@ -119,6 +128,15 @@ const translations = {
     chatRequestFailed: "Alii got distracted. Please try again later…",
     chatResponseTimeout: "Alii took too long to think. Please try again…",
     chatNetworkInterrupted: "The connection was interrupted. Check your network and try again",
+    chatHistoryPlaceholder: "↑ ↓ to navigate, ↵ to select, esc to go back",
+    chatBack: "Back",
+    timeJustNow: "just now",
+    timeMinutesAgo: "{n} min ago",
+    timeHoursAgo: "{n} hr ago",
+    timeDaysAgo: "{n} days ago",
+    timeWeeksAgo: "{n} wk ago",
+    timeMonthsAgo: "{n} mo ago",
+    timeYearsAgo: "{n} yr ago",
     
     // Console logs
     copySuccess: "Copy successful, updating state",

@@ -63,6 +63,43 @@ function HistoryIcon() {
   );
 }
 
+function BackIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fillRule="evenodd" clipRule="evenodd" d="M2.94085 7.49984L7.68942 3.0306C7.78982 2.93611 7.84672 2.80437 7.84672 2.6665C7.84672 2.39036 7.62285 2.1665 7.34672 2.1665C7.21935 2.1665 7.09678 2.21512 7.00405 2.30241L1.59528 7.393C1.24568 7.72204 1.24568 8.27764 1.59528 8.60667L7.00405 13.6973C7.09678 13.7846 7.21935 13.8332 7.34672 13.8332C7.62285 13.8332 7.84672 13.6093 7.84672 13.3332C7.84672 13.1953 7.78982 13.0636 7.68942 12.9691L2.94085 8.49984L14.2839 8.49984C14.56 8.49984 14.7839 8.27597 14.7839 7.99984C14.7839 7.7237 14.56 7.49984 14.2839 7.49984L2.94085 7.49984Z" fill="currentColor"/>
+    </svg>
+  );
+}
+
+function EnterIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fillRule="evenodd" clipRule="evenodd" d="M13.0592 8.50016L8.31058 12.9694C8.21018 13.0639 8.15328 13.1956 8.15328 13.3335C8.15328 13.6096 8.37715 13.8335 8.65328 13.8335C8.78065 13.8335 8.90322 13.7849 8.99595 13.6976L14.4047 8.607C14.7543 8.27796 14.7543 7.72236 14.4047 7.39333L8.99595 2.30274C8.90322 2.21545 8.78065 2.16683 8.65328 2.16683C8.37715 2.16683 8.15328 2.3907 8.15328 2.66683C8.15328 2.8047 8.21018 2.93644 8.31058 3.03093L13.0592 7.50016H1.71606C1.43992 7.50016 1.21606 7.72403 1.21606 8.00016C1.21606 8.2763 1.43992 8.50016 1.71606 8.50016H13.0592Z" fill="currentColor"/>
+    </svg>
+  );
+}
+
+function getRelativeTime(dateString, t) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+  const diffWeek = Math.floor(diffDay / 7);
+  const diffMonth = Math.floor(diffDay / 30);
+  const diffYear = Math.floor(diffDay / 365);
+
+  if (diffSec < 60) return t('timeJustNow');
+  if (diffMin < 60) return t('timeMinutesAgo').replace('{n}', diffMin);
+  if (diffHour < 24) return t('timeHoursAgo').replace('{n}', diffHour);
+  if (diffDay < 7) return t('timeDaysAgo').replace('{n}', diffDay);
+  if (diffDay < 30) return t('timeWeeksAgo').replace('{n}', diffWeek);
+  if (diffDay < 365) return t('timeMonthsAgo').replace('{n}', diffMonth);
+  return t('timeYearsAgo').replace('{n}', diffYear);
+}
+
 export default function PortfolioChatInput() {
   const nextPathname = usePathname();
   const [browserPathname, setBrowserPathname] = useState('');
@@ -85,12 +122,14 @@ export default function PortfolioChatInput() {
   } = useAuthContext();
   const { t } = useLanguage();
   const {
+    conversations,
     messages,
     isStreaming,
     streamingContent,
     isRateLimited,
     rateLimitMessage,
     createConversation,
+    selectConversation,
     sendMessage,
   } = useChat(user, accessToken);
 
@@ -105,8 +144,13 @@ export default function PortfolioChatInput() {
   const [isSubmittingNickname, setIsSubmittingNickname] = useState(false);
   const [isSubmittingMessage, setIsSubmittingMessage] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
+  const [isHistoryMode, setIsHistoryMode] = useState(false);
+  const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
+  const [savedValue, setSavedValue] = useState('');
   const textareaRef = useRef(null);
   const messageListRef = useRef(null);
+  const historyListRef = useRef(null);
+  const historyItemRefs = useRef([]);
   const isComposingRef = useRef(false);
   const lastCompositionEndRef = useRef(0);
 
@@ -139,6 +183,7 @@ export default function PortfolioChatInput() {
     if (!isChatRoute) return undefined;
 
     const focusChatInput = (event) => {
+      if (isHistoryMode) return;
       const target = event.target;
       const isEditableTarget =
         target instanceof HTMLInputElement ||
@@ -162,13 +207,50 @@ export default function PortfolioChatInput() {
 
     document.addEventListener('keydown', focusChatInput);
     return () => document.removeEventListener('keydown', focusChatInput);
-  }, [isChatRoute]);
+  }, [isChatRoute, isHistoryMode]);
+
+  // History mode keyboard navigation
+  useEffect(() => {
+    if (!isHistoryMode || conversations.length === 0) return undefined;
+
+    const handleHistoryKeyDown = (event) => {
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        setSelectedHistoryIndex((prev) => Math.max(0, prev - 1));
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        setSelectedHistoryIndex((prev) => Math.min(conversations.length - 1, prev + 1));
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const conv = conversations[selectedHistoryIndex];
+        if (conv) {
+          selectConversation(conv.id).then(() => {
+            setIsHistoryMode(false);
+            setValue(savedValue);
+            setSavedValue('');
+          });
+        }
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        setIsHistoryMode(false);
+        setValue(savedValue);
+        setSavedValue('');
+      }
+    };
+
+    document.addEventListener('keydown', handleHistoryKeyDown);
+    return () => document.removeEventListener('keydown', handleHistoryKeyDown);
+  }, [isHistoryMode, conversations, selectedHistoryIndex, savedValue, selectConversation]);
 
   const hasInput = value.trim().length > 0;
   const isMessagePending = isSubmittingMessage || isStreaming;
   // 展开态发送按钮是否可点（同时决定 CTA / 弱化配色）
   const canSend = hasInput && !isMessagePending && !isRateLimited && !isSubmittingNickname;
-  const isOpen = isPinned || isExpanded || isHovered || isFocused || hasInput || isMessagePending;
+  const isOpen = isPinned || isExpanded || isHovered || isFocused || hasInput || isMessagePending || isHistoryMode;
   const isNicknameMode = !isAuthLoading && (!isAuthenticated || !hasProfile);
   // 已完成登录且设置昵称后，才展示新建/历史入口
   const isLoggedIn = Boolean(isAuthenticated && hasProfile);
@@ -280,6 +362,28 @@ export default function PortfolioChatInput() {
     }
   };
 
+  const handleEnterHistoryMode = () => {
+    if (conversations.length === 0 || isMessagePending) return;
+    setSavedValue(value);
+    setValue('');
+    setIsExpanded(false);
+    setIsHistoryMode(true);
+    setSelectedHistoryIndex(0);
+  };
+
+  const handleExitHistoryMode = () => {
+    setIsHistoryMode(false);
+    setValue(savedValue);
+    setSavedValue('');
+  };
+
+  const handleSelectHistoryConversation = async (conversationId) => {
+    await selectConversation(conversationId);
+    setIsHistoryMode(false);
+    setValue(savedValue);
+    setSavedValue('');
+  };
+
   if (!isMounted || !isChatRoute) return null;
 
   return createPortal(
@@ -296,7 +400,9 @@ export default function PortfolioChatInput() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
-        if (!hasInput && !isFocused && !isExpanded && !isMessagePending) textareaRef.current?.blur();
+        if (!hasInput && !isFocused && !isExpanded && !isMessagePending && !isHistoryMode) {
+          textareaRef.current?.blur();
+        }
       }}
     >
       <div
@@ -323,8 +429,40 @@ export default function PortfolioChatInput() {
             transitionTimingFunction: EASE_OUT_CSS,
           }}
         >
-          <div className="min-h-0 overflow-hidden">
-            {showMessagePanel ? (
+        <div className="min-h-0 overflow-hidden">
+          {isHistoryMode ? (
+            <div
+              ref={historyListRef}
+              className={[
+                'no-scrollbar relative z-10 flex h-fit max-h-[50vh] w-full min-w-0 flex-col',
+                'overflow-y-auto overflow-x-hidden py-1 text-[14px] leading-6 text-main',
+                'transition-opacity duration-200',
+                isOpen ? 'opacity-100 delay-75' : 'opacity-0',
+              ].join(' ')}
+              style={{ transitionTimingFunction: EASE_OUT_CSS }}
+            >
+              {conversations.map((conversation, index) => (
+                <button
+                  key={conversation.id}
+                  ref={(el) => { historyItemRefs.current[index] = el; }}
+                  className={[
+                    'flex w-full items-center justify-between gap-2 px-3 py-2 text-left',
+                    'transition-colors duration-150',
+                    index === selectedHistoryIndex
+                      ? 'bg-hover'
+                      : 'hover:bg-hover/50',
+                  ].join(' ')}
+                  onClick={() => handleSelectHistoryConversation(conversation.id)}
+                  onMouseEnter={() => setSelectedHistoryIndex(index)}
+                >
+                  <span className="min-w-0 flex-1 truncate">{conversation.title}</span>
+                  <span className="shrink-0 text-[13px] text-tertiary">
+                    {getRelativeTime(conversation.updated_at, t)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : showMessagePanel ? (
               <div
                 ref={messageListRef}
                 className={[
