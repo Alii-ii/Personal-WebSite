@@ -1,5 +1,6 @@
 "use client";
 
+// ProjectDetail 页面入口：组合项目导航、展示舞台、顶部/底部控件和浮层。
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   getCommentTargetPath,

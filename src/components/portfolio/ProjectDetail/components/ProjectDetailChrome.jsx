@@ -1,15 +1,17 @@
 "use client";
 
+// 页面固定控件：包含顶部标题与目录、底部页数轴与快捷栏、评论抽屉。
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
 import EdgeMask from '@/components/EdgeMask';
 import MenuButton from '@/components/MenuButton';
-import ProjectMenu from '@/components/portfolio/ProjectMenu';
-import ShortcutBar from '@/components/portfolio/ShortcutBar';
-import SlideProgress from '@/components/portfolio/SlideProgress';
 import CommentSection from '@/components/comments/CommentSection';
+import ProjectMenu from './ProjectMenu';
+import ShortcutBar from './ShortcutBar';
+import SlideProgress from './SlideProgress';
 import { pickLocale } from '@/contexts/ProjectContext';
 
+// 顶部栏片段：项目目录入口、标题、周期和 tab 切换。
 export const ProjectHeader = ({
   projectTitle,
   period,
@@ -82,6 +84,7 @@ export const ProjectHeader = ({
   </header>
 );
 
+// 底部栏片段：页数轴（SlideProgress）、翻页/切项目快捷栏、主题与语言开关。
 export const ProjectFooter = ({
   framesCount,
   activeIndex,
@@ -135,6 +138,7 @@ export const ProjectFooter = ({
   </footer>
 );
 
+// 评论抽屉片段：按需挂载当前项目的评论内容。
 export const CommentDrawer = ({ open, language, targetPath, onClose }) => (
   <aside
     className={`fixed top-0 right-0 h-full w-full md:w-[380px] bg-card border-l border-stroke z-50 transition-transform duration-300 ease-out flex flex-col ${

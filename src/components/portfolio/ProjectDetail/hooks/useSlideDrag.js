@@ -1,5 +1,6 @@
 "use client";
 
+// 幻灯片手势 hook：区分点击选帧与横向拖拽，并按位移阈值触发前后翻页。
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const EMPTY_DRAG = { active: false, startX: 0, dx: 0, captured: false, hitIndex: -1 };

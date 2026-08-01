@@ -1,5 +1,6 @@
 "use client";
 
+// 媒体适配 hooks：监听移动端断点，并探测、缓存项目图片的真实宽高比。
 import { useEffect, useState } from 'react';
 
 const ratioCache = new Map();

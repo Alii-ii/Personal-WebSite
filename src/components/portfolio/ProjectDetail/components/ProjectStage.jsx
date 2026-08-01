@@ -1,5 +1,6 @@
 "use client";
 
+// 项目展示舞台：连接轨道定位、拖拽手势与 ProjectSlides 的实际渲染。
 import ProjectSlides from './ProjectSlides';
 import { useProjectTrack } from '../hooks/useProjectTrack';
 import { useSlideDrag } from '../hooks/useSlideDrag';

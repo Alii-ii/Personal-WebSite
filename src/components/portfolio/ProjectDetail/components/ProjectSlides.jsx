@@ -1,6 +1,7 @@
 "use client";
 
-import FrameRenderer from '@/components/portfolio/FrameRenderer';
+// 项目帧列表：分别渲染桌面端横向幻灯片和移动端纵向内容流。
+import FrameRenderer from './FrameRenderer';
 
 const STAGE_SHRINK = 56 / 68;
 

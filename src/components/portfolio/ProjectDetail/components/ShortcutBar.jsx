@@ -1,5 +1,6 @@
 "use client";
 
+// 项目详情底部快捷栏：提供返回、翻页、切项目和评论操作的键盘提示与点击入口。
 import { useLanguage } from '@/contexts/LanguageContext';
 
 /**

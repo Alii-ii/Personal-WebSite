@@ -1,5 +1,6 @@
 "use client";
 
+// 项目导航 hook：管理项目数据、tab/页码状态，以及跨 tab、跨项目的前后翻页。
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {

@@ -1,5 +1,6 @@
 "use client";
 
+// 舞台轨道 hook：测量可用高度、居中活动帧、同步移动端进度并播放进入动画。
 import { useEffect, useRef, useState } from 'react';
 
 export const useProjectTrack = ({

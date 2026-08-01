@@ -1,5 +1,6 @@
 "use client";
 
+// 全局快捷键 hook：处理退出层级、翻页、切项目、切 tab、目录和评论开关。
 import { useEffect, useRef } from 'react';
 
 export const useProjectShortcuts = ({

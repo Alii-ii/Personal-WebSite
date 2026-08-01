@@ -1,5 +1,6 @@
 "use client";
 
+// 项目详情目录浮层：展示分组项目，并将可访问项目交给详情页导航。
 import UnfoldPanel from '@/components/motion/unfold-panel';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { hasProjectPage, pickLocale } from '@/contexts/ProjectContext';

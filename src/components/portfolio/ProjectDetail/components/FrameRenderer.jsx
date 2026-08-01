@@ -1,5 +1,6 @@
 "use client";
 
+// 项目帧内容渲染器：按 image、prototype、rich 等 frame 类型选择具体展示方式。
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
