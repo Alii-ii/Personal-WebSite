@@ -14,7 +14,7 @@ import {
 } from '@/public/icons';
 import { EASE_OUT_CSS } from '@/lib/ease';
 
-const CHAT_TOOLTIP_DELAY = 2000;
+const CHAT_TOOLTIP_DELAY = 1000;
 
 export default function ChatComposer({
   textareaRef,
@@ -68,8 +68,8 @@ export default function ChatComposer({
           'before:absolute before:right-0 before:top-0 before:h-3 before:w-3 before:rounded-tr-[8px]',
           'before:border-r-[1.5px] before:border-t-[1.5px] before:border-stroke',
           'before:transition-opacity before:duration-150 hover:before:opacity-0',
-          // 覆盖组件默认 opacity-80：收起时藏图标，hover 再显
-          '[&>span]:opacity-0 [&>span]:transition-opacity [&>span]:duration-150 hover:[&>span]:opacity-100',
+          // 图标与按钮外壳同步显示，避免外壳出现后内部仍短暂空白
+          '[&>span]:opacity-100',
           // 外壳显隐（组件只有 transition-colors）
           'transition-[opacity,transform] duration-150',
           isOpen
