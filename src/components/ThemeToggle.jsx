@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useReducedMotion } from "motion/react";
 import { ActionSwapIcon } from "@/components/motion/action-swap";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/tooltip";
 
 // ---------- View Transition CSS (from beui) ----------
 const VT_STYLE_ID = "beui-theme-toggle-vt";
@@ -139,10 +140,16 @@ const ThemeToggle = () => {
     start: "bottom-right",
   });
 
-  // 键盘快捷键 Shift + C
+  // 键盘快捷键 Shift + C（不允许同时按下其他修饰键）
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.shiftKey && event.key === "C") {
+      const isThemeShortcut =
+        event.shiftKey &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !event.altKey &&
+        event.code === "KeyC";
+      if (isThemeShortcut) {
         event.preventDefault();
         toggle();
       }
@@ -153,22 +160,23 @@ const ThemeToggle = () => {
   }, [toggle]);
 
   return (
-    <div
-      onClick={toggle}
-      className="flex flex-row justify-center items-center p-0.5 gap-[2px] size-fit rounded-[6px] cursor-pointer relative border border-[0.5px] border-stroke bg-press overflow-hidden"
-      title="点击切换主题 (快捷键: Shift + C)"
-      role="button"
-      tabIndex={0}
-      aria-label={
-        mounted && isDark ? "Switch to light mode" : "Switch to dark mode"
-      }
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          toggle();
-        }
-      }}
-    >
+    <Tooltip delayDuration={1000}>
+      <TooltipTrigger asChild>
+        <div
+          onClick={toggle}
+          className="flex flex-row justify-center items-center p-0.5 gap-[2px] size-fit rounded-[6px] cursor-pointer relative border border-[0.5px] border-stroke bg-press overflow-hidden"
+          role="button"
+          tabIndex={0}
+          aria-label={
+            mounted && isDark ? "Switch to light mode" : "Switch to dark mode"
+          }
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              toggle();
+            }
+          }}
+        >
       {/* Light icon with swap animation */}
       <div className="z-10 flex flex-row justify-center items-center p-1 size-fit rounded-[4px] hover:opacity-80 cursor-pointer">
         {mounted ? (
@@ -200,12 +208,15 @@ const ThemeToggle = () => {
       </div>
 
       {/* Sliding indicator */}
-      <div
-        className={`absolute top-0.5 size-6 rounded-[4px] z-0 bg-card ${
-          mounted ? "transition-all duration-200" : ""
-        } ${isDark && mounted ? "left-[28px]" : "left-0.5"}`}
-      />
-    </div>
+          <div
+            className={`absolute top-0.5 size-6 rounded-[4px] z-0 bg-card ${
+              mounted ? "transition-all duration-200" : ""
+            } ${isDark && mounted ? "left-[28px]" : "left-0.5"}`}
+          />
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>⇧ + C</TooltipContent>
+    </Tooltip>
   );
 };
 
