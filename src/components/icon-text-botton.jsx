@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
  * @param {string} props.tooltip - 提示文案
  * @param {string} props.shortcut - 快捷键文本
  * @param {string} props.tooltipSide - 提示框位置 ('top' | 'bottom' | 'left' | 'right')
+ * @param {number} props.tooltipDelay - Tooltip 悬停延迟（毫秒）
  * @param {React.ReactNode} props.rightIcon - 右侧图标元素
  * @param {Object} props.buttonProps - 传递给按钮的其他属性
  * 
@@ -71,6 +72,7 @@ const IconTextButton = ({
   tooltip,
   shortcut,
   tooltipSide = "top",
+  tooltipDelay = 200,
   rightIcon,
   forceTooltipOpen = false, // 新增：强制 tooltip 保持打开状态
   ...buttonProps
@@ -145,7 +147,7 @@ const IconTextButton = ({
 
   // 有提示文案时，包装 Tooltip；禁用态包一层 span，避免 pointer-events-none 导致无法触发
   return (
-    <Tooltip delayDuration={200} open={forceTooltipOpen ? true : undefined}>
+    <Tooltip delayDuration={tooltipDelay} open={forceTooltipOpen ? true : undefined}>
       <TooltipTrigger asChild>
         {disabled ? <span className="inline-flex size-fit">{renderButton()}</span> : renderButton()}
       </TooltipTrigger>

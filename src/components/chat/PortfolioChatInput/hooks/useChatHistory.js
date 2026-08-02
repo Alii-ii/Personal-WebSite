@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function useChatHistory({
   conversations,
-  currentConversationId,
+  userId,
   value,
   setValue,
   selectConversation,
@@ -15,15 +15,38 @@ export default function useChatHistory({
   const [isHistoryMode, setIsHistoryMode] = useState(false);
   const [selectedHistoryIndex, setSelectedHistoryIndex] = useState(0);
   const [savedValue, setSavedValue] = useState('');
+  const [knownConversations, setKnownConversations] = useState([]);
   const historyListRef = useRef(null);
   const historyItemRefs = useRef([]);
 
+  useEffect(() => {
+    setKnownConversations([]);
+    setIsHistoryMode(false);
+    setSelectedHistoryIndex(0);
+    setSavedValue('');
+  }, [userId]);
+
+  // 独立维护稳定的历史目录。上游会话状态即使在切换期间短暂变化，
+  // 已加载的正式会话也不会因此从列表中消失。
+  useEffect(() => {
+    setKnownConversations((previous) => {
+      const merged = new Map(previous.map((conversation) => [conversation.id, conversation]));
+      conversations.forEach((conversation) => {
+        merged.set(conversation.id, {
+          ...merged.get(conversation.id),
+          ...conversation,
+        });
+      });
+      return Array.from(merged.values());
+    });
+  }, [conversations]);
+
   const historyConversations = useMemo(
     () =>
-      conversations
-        .filter((conversation) => conversation.id !== currentConversationId)
-        .sort((first, second) => new Date(first.updated_at) - new Date(second.updated_at)),
-    [conversations, currentConversationId],
+      [...knownConversations].sort(
+        (first, second) => new Date(first.updated_at) - new Date(second.updated_at),
+      ),
+    [knownConversations],
   );
 
   const exitHistory = () => {

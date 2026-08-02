@@ -2,6 +2,7 @@
 
 // 聊天输入区：负责展开开关、textarea、固定/新建/历史工具栏和发送按钮。
 import IconTextButton from '@/components/icon-text-botton';
+import { TooltipProvider } from '@/components/tooltip';
 import {
   BackIcon,
   CollapseIcon,
@@ -12,6 +13,8 @@ import {
   SendIcon,
 } from '@/public/icons';
 import { EASE_OUT_CSS } from '@/lib/ease';
+
+const CHAT_TOOLTIP_DELAY = 2000;
 
 export default function ChatComposer({
   textareaRef,
@@ -44,8 +47,9 @@ export default function ChatComposer({
   t,
 }) {
   return (
-    <div
-      className={`relative flex w-full shrink-0 flex-col rounded-[15px] border-t border-divider border-t-[0.5px] bg-[hsl(var(--neutral-bg-card)/0.8)] px-3 py-3 transition-[height,border-radius] duration-[360ms] ${
+    <TooltipProvider delayDuration={CHAT_TOOLTIP_DELAY} skipDelayDuration={0}>
+      <div
+        className={`relative flex w-full shrink-0 flex-col rounded-[15px] border-t border-divider border-t-[0.5px] bg-[hsl(var(--neutral-bg-card)/0.8)] px-3 py-3 transition-[height,border-radius] duration-[360ms] ${
         isExpanded ? 'h-[390px]' : isOpen ? 'h-[99px]' : 'h-[48px]'
       }`}
       style={{ transitionTimingFunction: EASE_OUT_CSS }}
@@ -56,6 +60,7 @@ export default function ChatComposer({
         variant="ghost"
         size="sm"
         tooltip={isExpanded ? t('chatCollapse') : t('chatExpand')}
+        tooltipDelay={CHAT_TOOLTIP_DELAY}
         onClick={onToggleExpanded}
         className={[
           'absolute right-3 top-3 z-10 text-tertiary hover:text-main',
@@ -104,6 +109,7 @@ export default function ChatComposer({
             variant="ghost"
             size="sm"
             tooltip={t('chatBack')}
+            tooltipDelay={CHAT_TOOLTIP_DELAY}
             onClick={onExitHistory}
             className="text-disabled [&>span]:opacity-100 hover:text-tertiary"
             aria-label={t('chatBack')}
@@ -115,6 +121,7 @@ export default function ChatComposer({
               variant="ghost"
               size="sm"
               tooltip={isPinned ? t('chatUnpin') : t('chatPin')}
+              tooltipDelay={CHAT_TOOLTIP_DELAY}
               onClick={onTogglePinned}
               className={`text-disabled [&>span]:opacity-100 hover:text-tertiary ${
                 isPinned ? 'bg-hover text-main hover:bg-hover hover:text-main' : ''
@@ -130,6 +137,7 @@ export default function ChatComposer({
                   variant="ghost"
                   size="sm"
                   tooltip={t('chatNewConversation')}
+                  tooltipDelay={CHAT_TOOLTIP_DELAY}
                   onClick={onCreateConversation}
                   disabled={isMessagePending}
                   className="text-disabled [&>span]:opacity-100 hover:text-tertiary disabled:opacity-35"
@@ -141,6 +149,7 @@ export default function ChatComposer({
                     variant="ghost"
                     size="sm"
                     tooltip={t('chatHistory')}
+                    tooltipDelay={CHAT_TOOLTIP_DELAY}
                     onClick={onEnterHistory}
                     disabled={isMessagePending}
                     className="text-disabled [&>span]:opacity-100 hover:text-tertiary disabled:opacity-35"
@@ -153,19 +162,20 @@ export default function ChatComposer({
         )}
       </div>
 
-      {!isHistoryMode ? (
-        <IconTextButton
-          icon={<SendIcon size={16} />}
-          variant={canSend ? 'CTA' : 'default'}
-          size="sm"
-          onClick={onSubmit}
-          disabled={!canSend}
-          className={`absolute bottom-3 right-3 [&>span]:opacity-100 disabled:opacity-35 ${
-            canSend ? '' : 'bg-hover text-tertiary hover:bg-hover hover:text-tertiary'
-          }`}
-          aria-label={t('chatSend')}
-        />
-      ) : null}
-    </div>
+        {!isHistoryMode ? (
+          <IconTextButton
+            icon={<SendIcon size={16} />}
+            variant={canSend ? 'CTA' : 'default'}
+            size="sm"
+            onClick={onSubmit}
+            disabled={!canSend}
+            className={`absolute bottom-3 right-3 [&>span]:opacity-100 disabled:opacity-35 ${
+              canSend ? '' : 'bg-hover text-tertiary hover:bg-hover hover:text-tertiary'
+            }`}
+            aria-label={t('chatSend')}
+          />
+        ) : null}
+      </div>
+    </TooltipProvider>
   );
 }

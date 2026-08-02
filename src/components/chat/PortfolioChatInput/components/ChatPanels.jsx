@@ -89,7 +89,7 @@ const MessagePanel = ({ messages, isPending, streamingContent, listRef, t }) => 
     ))}
 
     {isPending && !streamingContent ? (
-      <p className="w-full min-w-0 overflow-hidden pl-12">
+      <p className="w-full min-w-0 overflow-hidden pl-2 pr-12">
         <ShinyText
           text={t('chatThinking')}
           speed={1}
@@ -128,7 +128,12 @@ export default function ChatPanels({
   t,
 }) {
   return (
-    <div className="min-h-0 overflow-hidden">
+    <div
+      className="min-h-0 overflow-hidden"
+      style={{
+        textShadow: '0 0.5px 0 rgb(0 0 0 / 0.4), 0 -0.5px 0 rgb(255 255 255 / 0.35)',
+      }}
+    >
       {isHistoryMode ? (
         <HistoryPanel
           conversations={historyConversations}

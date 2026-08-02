@@ -45,6 +45,7 @@ function withTimeout(promise, timeoutMs, label) {
  *   isRateLimited: boolean,
  *   rateLimitMessage: string|null,
  *   createConversation: () => Promise<Object>,
+ *   startNewConversation: () => void,
  *   selectConversation: (id: string) => Promise<void>,
  *   deleteConversation: (id: string) => Promise<void>,
  *   sendMessage: (content: string) => Promise<void>,
@@ -67,18 +68,6 @@ export function useChat(authUser = null, accessToken = null) {
   // abort controller for SSE
   const abortRef = useRef(null);
   const currentConversationRef = useRef(null);
-  const messagesRef = useRef([]);
-  const isLoadingMessagesRef = useRef(false);
-
-  // 同步到 ref，供 createConversation 判断「当前是否已是空对话」
-  useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
-
-  useEffect(() => {
-    isLoadingMessagesRef.current = isLoadingMessages;
-  }, [isLoadingMessages]);
-
   // ─── 会话列表 ────────────────────────────────────
 
   const loadConversations = useCallback(async () => {
@@ -93,10 +82,34 @@ export function useChat(authUser = null, accessToken = null) {
         return;
       }
 
-      const nextConversations = data || [];
+      const loadedConversations = data || [];
+      let nextConversations = loadedConversations;
+
+      // 仅将至少发出过一条用户消息的会话视为正式会话。
+      // 这也会隐藏旧版本曾提前创建但从未发送消息的空会话。
+      if (loadedConversations.length > 0) {
+        const { data: sentMessages, error: sentMessagesError } = await supabase
+          .from('site_chat_messages')
+          .select('conversation_id')
+          .in('conversation_id', loadedConversations.map(conversation => conversation.id))
+          .eq('role', 'user');
+
+        if (sentMessagesError) {
+          console.error('Load sent conversations error:', sentMessagesError);
+          nextConversations = [];
+        } else {
+          const sentConversationIds = new Set(
+            (sentMessages || []).map(message => message.conversation_id)
+          );
+          nextConversations = loadedConversations.filter(
+            conversation => sentConversationIds.has(conversation.id)
+          );
+        }
+      }
+
       setConversations(nextConversations);
 
-      // 当前 MVP 只展示一条对话：恢复最近会话，让用户刷新后可直接继续聊。
+      // 恢复最近一条正式会话，让用户刷新后可直接继续聊。
       if (!currentConversationRef.current && nextConversations.length > 0) {
         const latest = nextConversations[0];
         currentConversationRef.current = latest;
@@ -142,13 +155,6 @@ export function useChat(authUser = null, accessToken = null) {
   const createConversation = useCallback(async () => {
     if (!authUser) return null;
 
-    // 当前已是空对话时复用，避免重复 insert 空 chat
-    // 消息仍在加载时不复用，避免把「尚未拉回消息的旧会话」误判为空
-    const current = currentConversationRef.current;
-    if (current && !isLoadingMessagesRef.current && messagesRef.current.length === 0) {
-      return current;
-    }
-
     const { data, error } = await supabase
       .from('site_chat_conversations')
       .insert({ user_id: authUser.id, title: '新对话' })
@@ -161,7 +167,7 @@ export function useChat(authUser = null, accessToken = null) {
       return null;
     }
 
-    setConversations(prev => [conversation, ...prev]);
+    // 此时只建立消息写入所需的父记录；成功写入首条用户消息后再加入正式会话列表。
     currentConversationRef.current = conversation;
     setCurrentConversation(conversation);
     setMessages([]);
@@ -169,6 +175,14 @@ export function useChat(authUser = null, accessToken = null) {
   }, [authUser]);
 
   // ─── 选择会话 ────────────────────────────────────
+
+  // 进入本地新对话草稿态；首条消息真正发送时才调用 createConversation 持久化。
+  const startNewConversation = useCallback(() => {
+    currentConversationRef.current = null;
+    setCurrentConversation(null);
+    setMessages([]);
+    setStreamingContent('');
+  }, []);
 
   const selectConversation = useCallback(async (id) => {
     const conv = conversations.find(c => c.id === id);
@@ -245,8 +259,9 @@ export function useChat(authUser = null, accessToken = null) {
       return;
     }
 
-    // 确保有当前会话
+    // 确保有当前会话。新建入口本身不写库，首条消息发送时才创建会话。
     let convId = currentConversation?.id;
+    let createdConversation = null;
     if (!convId) {
       const newConv = await withTimeout(
         createConversation(),
@@ -266,6 +281,7 @@ export function useChat(authUser = null, accessToken = null) {
         }]);
         return;
       }
+      createdConversation = newConv;
       convId = newConv.id;
     }
 
@@ -305,6 +321,19 @@ export function useChat(authUser = null, accessToken = null) {
     const savedMsg = insertedMessages?.[0];
     if (insertError || !savedMsg) {
       console.error('Insert message error:', insertError || 'No message returned');
+
+      // 首条消息写入失败时回收刚创建的空会话，避免产生无消息的历史记录。
+      if (createdConversation) {
+        await supabase
+          .from('site_chat_conversations')
+          .delete()
+          .eq('id', createdConversation.id);
+        if (currentConversationRef.current?.id === createdConversation.id) {
+          currentConversationRef.current = null;
+          setCurrentConversation(null);
+        }
+      }
+
       setMessages(prev => [
         ...prev.filter(m => m.id !== tempUserMsg.id),
         {
@@ -332,12 +361,22 @@ export function useChat(authUser = null, accessToken = null) {
         .update({ title: newTitle })
         .eq('id', convId)
         .then(() => {
-          setConversations(prev =>
-            prev.map(c => c.id === convId ? { ...c, title: newTitle } : c)
-          );
-          setCurrentConversation(prev =>
-            prev?.id === convId ? { ...prev, title: newTitle } : prev
-          );
+          const titledConversation = {
+            ...(createdConversation || currentConversationRef.current),
+            id: convId,
+            title: newTitle,
+            updated_at: savedMsg.created_at,
+          };
+          setConversations(prev => {
+            const exists = prev.some(conversation => conversation.id === convId);
+            return exists
+              ? prev.map(conversation =>
+                  conversation.id === convId ? titledConversation : conversation
+                )
+              : [titledConversation, ...prev];
+          });
+          currentConversationRef.current = titledConversation;
+          setCurrentConversation(titledConversation);
         });
     }
 
@@ -568,6 +607,7 @@ export function useChat(authUser = null, accessToken = null) {
     isRateLimited,
     rateLimitMessage,
     createConversation,
+    startNewConversation,
     selectConversation,
     deleteConversation,
     sendMessage,
