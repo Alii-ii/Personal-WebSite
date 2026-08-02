@@ -65,7 +65,7 @@ const DesktopSlides = ({ frames, activeIndex, imageRatios, stageHeight, dragging
 const MobileSlides = ({ frames, imageRatios, slideRefs }) => (
   <div className="w-full flex md:hidden flex-col items-stretch gap-3 px-4 py-4">
     {frames.map((frame, index) => {
-      const ratio = frame.type === 'image' ? imageRatios[frame.src] : null;
+      const ratio = frame.type === 'image' ? imageRatios[frame.src] : getFrameRatio(frame, imageRatios);
       return (
         <section
           key={frame.id}
