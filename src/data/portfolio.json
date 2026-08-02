@@ -65,38 +65,68 @@
       ],
       "frames": [
         {
-          "id": "nocode-design-mode-cover",
+          "id": "nocode-design-mode-01-p-01",
           "tab": "overview",
           "type": "image",
           "title": {
-            "zh": "项目封面",
-            "en": "Project Cover"
+            "zh": "P 01",
+            "en": "P 01"
           },
           "feed": {
             "w": 532,
             "h": 299
           },
-          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-design-mode/cover.webp",
-          "alt": "NoCode Design Mode 0-1 - 项目封面",
-          "figmaNodeId": "2880:61731",
-          "srcLocal": "/images/portfolio/nocode-design-mode/cover.webp"
+          "src": "/images/portfolio/nocode-design-mode/01-p-01.webp",
+          "alt": "NoCode Design Mode 0-1 - P 01",
+          "figmaNodeId": "2880:64187"
         },
         {
-          "id": "nocode-design-mode-page-02",
+          "id": "nocode-design-mode-02-p-15",
           "tab": "overview",
           "type": "image",
           "title": {
-            "zh": "项目背景",
-            "en": "Project Background"
+            "zh": "P 15",
+            "en": "P 15"
           },
           "feed": {
             "w": 532,
             "h": 299
           },
-          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-design-mode/page-02.webp",
-          "alt": "NoCode Design Mode 0-1 - 项目背景",
-          "figmaNodeId": "2886:66699",
-          "srcLocal": "/images/portfolio/nocode-design-mode/page-02.webp"
+          "src": "/images/portfolio/nocode-design-mode/02-p-15.webp",
+          "alt": "NoCode Design Mode 0-1 - P 15",
+          "figmaNodeId": "2898:112213"
+        },
+        {
+          "id": "nocode-design-mode-03-p-16",
+          "tab": "overview",
+          "type": "image",
+          "title": {
+            "zh": "P 16",
+            "en": "P 16"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-design-mode/03-p-16.webp",
+          "alt": "NoCode Design Mode 0-1 - P 16",
+          "figmaNodeId": "2898:112214"
+        },
+        {
+          "id": "nocode-design-mode-04-p-17",
+          "tab": "overview",
+          "type": "image",
+          "title": {
+            "zh": "P 17",
+            "en": "P 17"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "/images/portfolio/nocode-design-mode/04-p-17.webp",
+          "alt": "NoCode Design Mode 0-1 - P 17",
+          "figmaNodeId": "2898:112215"
         }
       ]
     },
