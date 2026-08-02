@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
  * @param {string} props.shortcut - 快捷键文本
  * @param {string} props.tooltipSide - 提示框位置 ('top' | 'bottom' | 'left' | 'right')
  * @param {number} props.tooltipDelay - Tooltip 悬停延迟（毫秒）
+ * @param {*} props.tooltipDismissSignal - 值变化时主动关闭 Tooltip
  * @param {React.ReactNode} props.rightIcon - 右侧图标元素
  * @param {Object} props.buttonProps - 传递给按钮的其他属性
  * 
@@ -73,10 +74,17 @@ const IconTextButton = ({
   shortcut,
   tooltipSide = "top",
   tooltipDelay = 200,
+  tooltipDismissSignal,
   rightIcon,
   forceTooltipOpen = false, // 新增：强制 tooltip 保持打开状态
   ...buttonProps
 }) => {
+  const [isTooltipOpen, setIsTooltipOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsTooltipOpen(false);
+  }, [tooltipDismissSignal]);
+
   // 基础样式
   const baseStyles = [
     "inline-flex items-center justify-center gap-1",
@@ -147,7 +155,11 @@ const IconTextButton = ({
 
   // 有提示文案时，包装 Tooltip；禁用态包一层 span，避免 pointer-events-none 导致无法触发
   return (
-    <Tooltip delayDuration={tooltipDelay} open={forceTooltipOpen ? true : undefined}>
+    <Tooltip
+      delayDuration={tooltipDelay}
+      open={forceTooltipOpen ? true : isTooltipOpen}
+      onOpenChange={setIsTooltipOpen}
+    >
       <TooltipTrigger asChild>
         {disabled ? <span className="inline-flex size-fit">{renderButton()}</span> : renderButton()}
       </TooltipTrigger>

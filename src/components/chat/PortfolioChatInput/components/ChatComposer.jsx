@@ -46,6 +46,8 @@ export default function ChatComposer({
   onSubmit,
   t,
 }) {
+  const tooltipDismissSignal = `${isOpen}-${isExpanded}-${isHistoryMode}`;
+
   return (
     <TooltipProvider delayDuration={CHAT_TOOLTIP_DELAY} skipDelayDuration={0}>
       <div
@@ -61,6 +63,7 @@ export default function ChatComposer({
         size="sm"
         tooltip={isExpanded ? t('chatCollapse') : t('chatExpand')}
         tooltipDelay={CHAT_TOOLTIP_DELAY}
+        tooltipDismissSignal={tooltipDismissSignal}
         onClick={onToggleExpanded}
         className={[
           'absolute right-3 top-3 z-10 text-tertiary hover:text-main',
@@ -110,6 +113,7 @@ export default function ChatComposer({
             size="sm"
             tooltip={t('chatBack')}
             tooltipDelay={CHAT_TOOLTIP_DELAY}
+            tooltipDismissSignal={tooltipDismissSignal}
             onClick={onExitHistory}
             className="text-disabled [&>span]:opacity-100 hover:text-tertiary"
             aria-label={t('chatBack')}
@@ -122,6 +126,7 @@ export default function ChatComposer({
               size="sm"
               tooltip={isPinned ? t('chatUnpin') : t('chatPin')}
               tooltipDelay={CHAT_TOOLTIP_DELAY}
+              tooltipDismissSignal={tooltipDismissSignal}
               onClick={onTogglePinned}
               className={`text-disabled [&>span]:opacity-100 hover:text-tertiary ${
                 isPinned ? 'bg-hover text-main hover:bg-hover hover:text-main' : ''
@@ -138,6 +143,7 @@ export default function ChatComposer({
                   size="sm"
                   tooltip={t('chatNewConversation')}
                   tooltipDelay={CHAT_TOOLTIP_DELAY}
+                  tooltipDismissSignal={tooltipDismissSignal}
                   onClick={onCreateConversation}
                   disabled={isMessagePending}
                   className="text-disabled [&>span]:opacity-100 hover:text-tertiary disabled:opacity-35"
@@ -150,6 +156,7 @@ export default function ChatComposer({
                     size="sm"
                     tooltip={t('chatHistory')}
                     tooltipDelay={CHAT_TOOLTIP_DELAY}
+                    tooltipDismissSignal={tooltipDismissSignal}
                     onClick={onEnterHistory}
                     disabled={isMessagePending}
                     className="text-disabled [&>span]:opacity-100 hover:text-tertiary disabled:opacity-35"
