@@ -231,8 +231,8 @@
             "h": 299
           },
           "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/04-p-04.webp",
-          "alt": "【美团项目】01 - P 04",
-          "figmaNodeId": "2807:257221",
+          "alt": "NoCode for Pro - P 04",
+          "figmaNodeId": "2792:211769",
           "srcLocal": "/images/portfolio/nocode-for-pro/04-p-04.webp"
         },
         {
@@ -528,23 +528,6 @@
           "alt": "【实习项目】 - 知住 09",
           "figmaNodeId": "513:49975",
           "srcLocal": "/images/portfolio/chatgpt-home-buying/08-zhizhu-09.webp"
-        },
-        {
-          "id": "chatgpt-home-buying-09-zhizhu-10",
-          "tab": "slides",
-          "type": "image",
-          "title": {
-            "zh": "知住 10",
-            "en": "知住 10"
-          },
-          "feed": {
-            "w": 532,
-            "h": 299
-          },
-          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/chatgpt-home-buying/09-zhizhu-10.webp",
-          "alt": "【实习项目】 - 知住 10",
-          "figmaNodeId": "513:49978",
-          "srcLocal": "/images/portfolio/chatgpt-home-buying/09-zhizhu-10.webp"
         }
       ]
     },
