@@ -68,8 +68,8 @@ export default function ChatComposer({
           'before:absolute before:right-0 before:top-0 before:h-3 before:w-3 before:rounded-tr-[8px]',
           'before:border-r-[1.5px] before:border-t-[1.5px] before:border-stroke',
           'before:transition-opacity before:duration-150 hover:before:opacity-0',
-          // 图标与按钮外壳同步显示，避免外壳出现后内部仍短暂空白
-          '[&>span]:opacity-100',
+          // 图标与 hover 背景作为整体即时出现，不为图标设置独立过渡
+          '[&>span]:opacity-0 hover:[&>span]:opacity-100',
           // 外壳显隐（组件只有 transition-colors）
           'transition-[opacity,transform] duration-150',
           isOpen
