@@ -103,10 +103,10 @@ const AppMenu = ({ open, onClose, children, footerActions = null }) => {
         {/* 上方 slot：各页面自定义的导航 / 目录内容 */}
         {children}
 
-        {/* 底栏：切换 + 社交图标 + 关闭，同行横排，空间不够时右侧按钮隐藏 */}
+        {/* 底栏：切换 + 社交图标 + 关闭，同行横排，空间不够时后置操作隐藏 */}
         <div className="flex flex-row items-center justify-between">
-          {/* 左侧：固定为单行紧凑布局，保证 390px 窄屏下所有操作均可达 */}
-          <div className="flex flex-row items-center gap-1 min-w-0 flex-nowrap min-w-[118px] h-full">
+          {/* 左侧：保持原有 footer 菜单布局，超出单行高度的后置操作隐藏 */}
+          <div className="flex flex-row items-center gap-1.5 min-w-0 flex-wrap overflow-hidden min-w-[118px] h-full" style={{ maxHeight: '2.5rem' }}>
             <div className="shrink-0"><ThemeToggle /></div>
             <div className="shrink-0"><LanguageToggle /></div>
             <div className="w-px h-3 mx-0.5 shrink-0" aria-hidden="true" />
