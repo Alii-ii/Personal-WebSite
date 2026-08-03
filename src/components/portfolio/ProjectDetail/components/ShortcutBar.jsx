@@ -93,23 +93,7 @@ const ShortcutBar = ({ onBack, onPrevPage, onNextPage, onPrevProject, onNextProj
           ↓
         </Key>
         <Label>{label.project}</Label>
-        <Divider />
       </div>
-
-      {/* C：最后藏；整栏在 md 以下已隐藏 */}
-      <button
-        type="button"
-        onClick={onComment}
-        title={label.comment}
-        className="group flex items-center gap-1 rounded-[4px] px-0.5 -mx-0.5 cursor-pointer"
-      >
-        <span className="inline-flex items-center justify-center h-5 w-5 rounded-[4px] bg-press font-regular text-[11px] leading-none text-tertiary group-hover:bg-hover group-hover:text-main transition-colors duration-150">
-          C
-        </span>
-        <span className="font-regular text-[12px] leading-[18px] text-tertiary group-hover:text-main transition-colors duration-150 ml-1">
-          {label.comment}
-        </span>
-      </button>
     </div>
   );
 };

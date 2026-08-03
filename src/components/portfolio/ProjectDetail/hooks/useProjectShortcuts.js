@@ -75,12 +75,6 @@ export const useProjectShortcuts = ({
             onProjectChange(state.neighbors.next.slug, { motionDir: 'next' });
           }
           break;
-        case 'c':
-        case 'C':
-          if (event.shiftKey || event.metaKey || event.ctrlKey || event.altKey) return;
-          event.preventDefault();
-          onCommentToggle();
-          break;
         default:
           break;
       }
