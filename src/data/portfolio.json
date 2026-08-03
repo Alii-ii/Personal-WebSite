@@ -338,19 +338,34 @@
           "srcLocal": "/images/portfolio/nocode-for-pro/10-p-10.webp"
         },
         {
+          "id": "nfp-design-figma-01",
+          "tab": "design",
+          "type": "prototype",
+          "title": {
+            "zh": "Figma 原型 01",
+            "en": "Figma Prototype 01"
+          },
+          "feed": {
+            "w": 600,
+            "h": 600
+          },
+          "url": "https://embed.figma.com/proto/WeXLihQ4waQ8qMu2zQJ781/NoCode-Release?node-id=13584-20947&viewport=-1237%2C-3891%2C0.9&scaling=min-zoom&content-scaling=responsive&starting-point-node-id=13584%3A20947&page-id=12938%3A14990&hide-ui=1&embed-host=share",
+          "alt": "NoCode Figma 页面原稿 01"
+        },
+        {
           "id": "nfp-design-figma",
           "tab": "design",
           "type": "prototype",
           "title": {
-            "zh": "Figma 原型",
-            "en": "Figma Prototype"
+            "zh": "Figma 原型 02",
+            "en": "Figma Prototype 02"
           },
           "feed": {
             "w": 1440,
             "h": 900
           },
           "url": "https://embed.figma.com/proto/WeXLihQ4waQ8qMu2zQJ781/NoCode-Release?node-id=8945-14780&viewport=-83%2C-1630%2C0.5&scaling=min-zoom&content-scaling=responsive&starting-point-node-id=8945%3A14780&page-id=8168%3A26959&hide-ui=1&embed-host=share",
-          "alt": "NoCode Figma 页面原稿"
+          "alt": "NoCode Figma 页面原稿 02"
         }
       ]
     },
