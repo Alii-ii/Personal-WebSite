@@ -2,136 +2,15 @@
 
 import { useState } from 'react';
 import Footer from '@/components/footer';
-import IconTextButton from '@/components/icon-text-botton';
+import MenuButton from '@/components/MenuButton';
 import ResumeAbilityItem from '@/components/resume/ResumeAbilityItem';
+import ResumeContactActions from '@/components/resume/ResumeContactActions';
 import ResumeEducationItem from '@/components/resume/ResumeEducationItem';
 import ResumeExperienceItem from '@/components/resume/ResumeExperienceItem';
+import ResumeMenu from '@/components/resume/ResumeMenu';
 import ResumeNavSections from '@/components/resume/ResumeNavSections';
 import DotGrid from '@/effects/DotGrid';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { MailIcon, ChatsIcon, CheckIcon, FigmaIcon, XiaohongshuIcon, DownloadIcon } from '@/public/icons';
-import { ActionSwapIcon } from '@/components/motion/action-swap';
-
-/** 复制文本到剪贴板 */
-const copyToClipboard = async (text) => {
-  try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      await navigator.clipboard.writeText(text);
-    } else {
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-    }
-    return true;
-  } catch (err) {
-    console.error('复制失败', err);
-    return false;
-  }
-};
-
-/** Sidebar 联系方式按钮组 */
-function SidebarContactButtons() {
-  const [copyStates, setCopyStates] = useState({ wechat: false, email: false });
-  const [tooltipStates, setTooltipStates] = useState({ wechat: false, email: false });
-  const [figmaHovered, setFigmaHovered] = useState(false);
-  const [xhsHovered, setXhsHovered] = useState(false);
-
-  const handleCopySuccess = (type) => {
-    setCopyStates(prev => ({ ...prev, [type]: true }));
-    setTooltipStates(prev => ({ ...prev, [type]: true }));
-    setTimeout(() => {
-      setCopyStates(prev => ({ ...prev, [type]: false }));
-      setTooltipStates(prev => ({ ...prev, [type]: false }));
-    }, 1000);
-  };
-
-  return (
-    <div className="mt-4 flex flex-wrap items-center gap-1">
-      <IconTextButton
-        text="下载PDF"
-        icon={<DownloadIcon />}
-        variant="default"
-        size="md"
-        tooltip="下载简历 PDF"
-        onClick={() => {
-          const link = document.createElement('a');
-          link.href = '/resume/resume-zh.pdf';
-          link.download = '【简历】产品设计-黄奕礼.pdf';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }}
-      />
-      <IconTextButton
-        text=""
-        icon={
-          <ActionSwapIcon value={copyStates.wechat ? 'copied' : 'idle'} animation="blur">
-            {copyStates.wechat ? <CheckIcon /> : <ChatsIcon />}
-          </ActionSwapIcon>
-        }
-        variant="ghost"
-        size="md"
-        tooltip={copyStates.wechat ? '已复制 ✓' : '复制微信号'}
-        forceTooltipOpen={tooltipStates.wechat}
-        onClick={async () => {
-          const success = await copyToClipboard('13632359551');
-          if (success) handleCopySuccess('wechat');
-        }}
-      />
-      <IconTextButton
-        text=""
-        icon={
-          <ActionSwapIcon value={copyStates.email ? 'copied' : 'idle'} animation="blur">
-            {copyStates.email ? <CheckIcon /> : <MailIcon />}
-          </ActionSwapIcon>
-        }
-        variant="ghost"
-        size="md"
-        tooltip={copyStates.email ? '已复制 ✓' : '复制邮箱'}
-        forceTooltipOpen={tooltipStates.email}
-        onClick={async () => {
-          const success = await copyToClipboard('alii.wong@foxmail.com');
-          if (success) handleCopySuccess('email');
-        }}
-      />
-      <div
-        onMouseEnter={() => setFigmaHovered(true)}
-        onMouseLeave={() => setFigmaHovered(false)}
-        className="figma-icon-wrapper"
-        style={{ filter: figmaHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
-      >
-        <IconTextButton
-          text=""
-          icon={<FigmaIcon />}
-          variant="ghost"
-          size="md"
-          tooltip="Figma Portfolio"
-          onClick={() => { window.open('https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024', '_blank'); }}
-        />
-      </div>
-      <div
-        onMouseEnter={() => setXhsHovered(true)}
-        onMouseLeave={() => setXhsHovered(false)}
-        style={{ filter: xhsHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
-      >
-        <IconTextButton
-          text=""
-          icon={<XiaohongshuIcon />}
-          variant="ghost"
-          size="md"
-          tooltip="小红书"
-          onClick={() => { window.open('https://www.xiaohongshu.com/user/profile/60877ccc000000000101c324', '_blank'); }}
-        />
-      </div>
-    </div>
-  );
-}
 
 /** 履历区块配置：id、标题、内容 */
 const RESUME_SECTIONS = [
@@ -348,6 +227,7 @@ const RESUME_SECTIONS = [
  */
 export default function ResumePage() {
   const { baseColor, activeColor } = useThemeColors();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen w-full flex flex-col relative bg-bg pb-32 md:pb-40">
@@ -385,14 +265,30 @@ export default function ResumePage() {
                 <p className="font-regular text-[14px] md:text-[16px] leading-[1.6] text-tertiary mt-2">
                   AI 工具产品设计师，擅长在 0-1 场景构建产品方案并以代码交付
                 </p>
-                <SidebarContactButtons />
+                <ResumeContactActions className="hidden md:flex" />
               </div>
             }
           />
         </div>
       </div>
 
-      <Footer isGallery={true} showGallerySubtitle={false} className="pt-0" maskHeight="160px" />
+      <MenuButton
+        label="菜单"
+        onClick={() => setMenuOpen(true)}
+        className="md:hidden fixed right-12 bottom-12 z-30"
+      />
+      <ResumeMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        sections={RESUME_SECTIONS}
+      />
+      <Footer
+        isGallery={true}
+        showGallerySubtitle={false}
+        className="pt-0"
+        maskHeight="160px"
+        hideRight="mobile"
+      />
     </div>
   );
 }

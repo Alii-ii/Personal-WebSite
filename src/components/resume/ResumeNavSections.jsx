@@ -21,7 +21,7 @@ export default function ResumeNavSections({
         <div className="flex flex-col gap-8 pt-0 md:pt-[80px] pb-4 md:fixed md:top-0 md:left-0 md:w-[240px] md:ml-[max(64px,calc((100vw-960px)/2))] md:h-screen md:overflow-y-auto md:z-10">
           {sidebar}
           <nav
-            className="flex flex-col gap-2 text-[16px] md:text-[18px] text-tertiary"
+            className="hidden md:flex flex-col gap-2 text-[16px] md:text-[18px] text-tertiary"
             aria-label="Resume sections"
           >
             {sections.map(({ id, title }) => (

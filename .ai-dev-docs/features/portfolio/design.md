@@ -423,3 +423,60 @@ L3 在移动端（<768px）降级为纵向排列，**不保留**横向滚动、�
 |------|------|---------|
 | `src/components/portfolio/ProjectDetail.jsx` | PC/Mobile 断点分离布局、footer absolute 页数轴 | 15、16 |
 | `src/components/portfolio/FrameRenderer.jsx` | 图片 frame 改 `object-cover` | 17 |
+
+---
+
+## 设计更新 - 2026-08-03（简历页移动端 footer 菜单）
+
+### 架构概览
+
+移动端简历页沿用作品集页的“正文减负 + footer 菜单承载导航”模式，不改变桌面端双栏结构。
+
+```text
+ResumePage
+├── ResumeNavSections
+│   ├── Desktop aside：姓名 + 联系方式 + 节点目录（保持）
+│   ├── Mobile aside：仅姓名 + 职业简介
+│   └── Resume content（保持）
+├── Footer（公共返回与遮罩，保持）
+├── MenuButton（仅移动端，与 Portfolio 相同位置/样式）
+└── ResumeMenu
+    └── AppMenu
+        ├── children：RESUME_SECTIONS 节点目录
+        └── footerActions：简历联系方式按钮组
+```
+
+### AppMenu 扩展策略
+
+`AppMenu` 新增可选 `footerActions` slot。未传入时继续渲染现有主题、语言、邮箱、微信、Figma、Bilibili、小红书底栏，保证 `HomeMenu` 与 `PortfolioMenu` 不变；简历页传入时，仅替换底栏左侧操作区，右侧关闭按钮和所有布局样式保持原样。
+
+简历联系方式操作抽成可复用组件，由桌面 sidebar 与 `ResumeMenu` 共用同一组回调：下载 PDF、复制微信号 `13632359551`、复制邮箱 `alii.wong@foxmail.com`、打开 Figma Portfolio、打开小红书。移动端菜单内仅改变容器布局，不复制操作实现。
+
+### 节点导航
+
+`ResumeMenu` 直接消费 `RESUME_SECTIONS`。点击条目时先关闭菜单，再通过 `document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })` 滚动；节点 id 与正文现有锚点保持一致，不引入第二份目录数据。
+
+### 响应式边界
+
+| 场景 | 侧栏 | footer 菜单 |
+|------|------|-------------|
+| `< 768px` | 显示姓名与简介；隐藏联系方式和节点 nav | 显示 MenuButton，可打开节点目录与联系方式 |
+| `≥ 768px` | 保持完整姓名、联系方式和节点 nav | 不渲染 MenuButton，菜单保持关闭 |
+
+### 文件变更清单
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `src/components/AppMenu.jsx` | 修改 | 增加可选 footerActions slot，默认行为不变 |
+| `src/components/resume/ResumeNavSections.jsx` | 修改 | 移动端隐藏节点 nav，桌面端保持 |
+| `src/components/resume/ResumeMenu.jsx` | 新增 | 注入简历节点目录与联系方式操作 |
+| `src/app/resume/page.jsx` | 修改 | 移动端隐藏 sidebar 联系方式，接入菜单按钮与 ResumeMenu |
+
+### 风险与处理
+
+| 风险 | 处理 |
+|------|------|
+| AppMenu 扩展影响作品集/首页菜单 | 新 slot 可选，默认底栏完整保留 |
+| 点击目录后菜单遮挡或锚点未执行 | 关闭菜单后在下一动画帧执行 scrollIntoView |
+| 复制/下载逻辑出现两份实现 | 抽取联系方式组件并由两个位置复用 |
+| 移动端正文失去导航但菜单不可达 | MenuButton 使用作品集页相同 fixed 位置与 z-index |

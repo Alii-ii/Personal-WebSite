@@ -39,11 +39,12 @@ const copyToClipboard = async (text) => {
  *
  * 中间内容区域通过 children 传入，不同页面按需填充。
  *
- * @param {boolean}   open      - 是否打开
- * @param {Function}  onClose   - 关闭回调
- * @param {ReactNode} children  - 菜单内容区域（导航链接、目录等）
+ * @param {boolean}   open          - 是否打开
+ * @param {Function}  onClose       - 关闭回调
+ * @param {ReactNode} children      - 菜单内容区域（导航链接、目录等）
+ * @param {ReactNode} footerActions - 可选的底栏联系操作；不传时使用默认邮箱与社交操作
  */
-const AppMenu = ({ open, onClose, children }) => {
+const AppMenu = ({ open, onClose, children, footerActions = null }) => {
   const { t } = useLanguage();
 
   const [copyStates, setCopyStates] = useState({ wechat: false });
@@ -104,82 +105,86 @@ const AppMenu = ({ open, onClose, children }) => {
 
         {/* 底栏：切换 + 社交图标 + 关闭，同行横排，空间不够时右侧按钮隐藏 */}
         <div className="flex flex-row items-center justify-between">
-          {/* 左侧 */}
-          <div className="flex flex-row items-center gap-1.5 min-w-0 flex-wrap overflow-hidden min-w-[118px] h-full" style={{ maxHeight: '2.5rem' }}>
+          {/* 左侧：固定为单行紧凑布局，保证 390px 窄屏下所有操作均可达 */}
+          <div className="flex flex-row items-center gap-1 min-w-0 flex-nowrap min-w-[118px] h-full">
             <div className="shrink-0"><ThemeToggle /></div>
             <div className="shrink-0"><LanguageToggle /></div>
             <div className="w-px h-3 mx-0.5 shrink-0" aria-hidden="true" />
 
-            <div className="shrink-0">
-              <CopyEmailButton />
-            </div>
+            {footerActions || (
+              <>
+                <div className="shrink-0">
+                  <CopyEmailButton />
+                </div>
 
-            <div className="shrink-0">
-              <IconTextButton
-                text=""
-                icon={
-                  <ActionSwapIcon value={copyStates.wechat ? 'copied' : 'idle'} animation="blur">
-                    {copyStates.wechat ? <CheckIcon /> : <ChatsIcon />}
-                  </ActionSwapIcon>
-                }
-                variant="ghost"
-                size="md"
-                tooltip={copyStates.wechat ? t('wechatCopied') : t('wechatTooltip')}
-                forceTooltipOpen={tooltipStates.wechat}
-                onClick={async () => {
-                  const ok = await copyToClipboard('_Alii_');
-                  if (ok) handleCopySuccess('wechat');
-                }}
-              />
-            </div>
+                <div className="shrink-0">
+                  <IconTextButton
+                    text=""
+                    icon={
+                      <ActionSwapIcon value={copyStates.wechat ? 'copied' : 'idle'} animation="blur">
+                        {copyStates.wechat ? <CheckIcon /> : <ChatsIcon />}
+                      </ActionSwapIcon>
+                    }
+                    variant="ghost"
+                    size="md"
+                    tooltip={copyStates.wechat ? t('wechatCopied') : t('wechatTooltip')}
+                    forceTooltipOpen={tooltipStates.wechat}
+                    onClick={async () => {
+                      const ok = await copyToClipboard('_Alii_');
+                      if (ok) handleCopySuccess('wechat');
+                    }}
+                  />
+                </div>
 
-            <div
-              className="shrink-0"
-              onMouseEnter={() => setFigmaHovered(true)}
-              onMouseLeave={() => setFigmaHovered(false)}
-              style={{ filter: figmaHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
-            >
-              <IconTextButton
-                text=""
-                icon={<FigmaIcon />}
-                variant="ghost"
-                size="md"
-                tooltip="Figma Portfolio"
-                onClick={() => window.open('https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024', '_blank')}
-              />
-            </div>
-            
-            <div
-              className="shrink-0"
-              onMouseEnter={() => setBilibiliHovered(true)}
-              onMouseLeave={() => setBilibiliHovered(false)}
-              style={{ filter: bilibiliHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
-            >
-              <IconTextButton
-                text=""
-                icon={<BilibiliIcon />}
-                variant="ghost"
-                size="md"
-                tooltip={t('bilibiliTooltip')}
-                onClick={() => window.open('https://space.bilibili.com/38773851/upload/video', '_blank')}
-              />
-            </div>
+                <div
+                  className="shrink-0"
+                  onMouseEnter={() => setFigmaHovered(true)}
+                  onMouseLeave={() => setFigmaHovered(false)}
+                  style={{ filter: figmaHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
+                >
+                  <IconTextButton
+                    text=""
+                    icon={<FigmaIcon />}
+                    variant="ghost"
+                    size="md"
+                    tooltip="Figma Portfolio"
+                    onClick={() => window.open('https://www.figma.com/design/OsMjuOsAZiPIMPK0ztUVR0/Alii---UX-Portfolio-2024', '_blank')}
+                  />
+                </div>
 
-            <div
-              className="shrink-0"
-              onMouseEnter={() => setXhsHovered(true)}
-              onMouseLeave={() => setXhsHovered(false)}
-              style={{ filter: xhsHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
-            >
-              <IconTextButton
-                text=""
-                icon={<XiaohongshuIcon />}
-                variant="ghost"
-                size="md"
-                tooltip="小红书"
-                onClick={() => window.open('https://www.xiaohongshu.com/user/profile/60877ccc000000000101c324', '_blank')}
-              />
-            </div>
+                <div
+                  className="shrink-0"
+                  onMouseEnter={() => setBilibiliHovered(true)}
+                  onMouseLeave={() => setBilibiliHovered(false)}
+                  style={{ filter: bilibiliHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
+                >
+                  <IconTextButton
+                    text=""
+                    icon={<BilibiliIcon />}
+                    variant="ghost"
+                    size="md"
+                    tooltip={t('bilibiliTooltip')}
+                    onClick={() => window.open('https://space.bilibili.com/38773851/upload/video', '_blank')}
+                  />
+                </div>
+
+                <div
+                  className="shrink-0"
+                  onMouseEnter={() => setXhsHovered(true)}
+                  onMouseLeave={() => setXhsHovered(false)}
+                  style={{ filter: xhsHovered ? 'none' : 'grayscale(1)', transition: 'filter 0.2s ease' }}
+                >
+                  <IconTextButton
+                    text=""
+                    icon={<XiaohongshuIcon />}
+                    variant="ghost"
+                    size="md"
+                    tooltip="小红书"
+                    onClick={() => window.open('https://www.xiaohongshu.com/user/profile/60877ccc000000000101c324', '_blank')}
+                  />
+                </div>
+              </>
+            )}
           </div>
           
           {/* 右侧 */}

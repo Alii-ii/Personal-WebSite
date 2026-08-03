@@ -66,6 +66,50 @@ const CopyrightFade = ({ t }) => {
 };
 
 /**
+ * 真机移动浏览器的地址栏 / 工具栏会让 visual viewport 小于 layout viewport。
+ * fixed footer 默认仍可能锚定到 layout viewport 底部，因此按两者差值上移。
+ */
+const useMobileVisualViewportBottom = () => {
+  const [bottom, setBottom] = useState(0);
+
+  useEffect(() => {
+    const visualViewport = window.visualViewport;
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    let animationFrame = 0;
+
+    const sync = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        if (!mediaQuery.matches || !visualViewport) {
+          setBottom(0);
+          return;
+        }
+        const layoutHeight = document.documentElement.clientHeight;
+        const visibleBottom = visualViewport.offsetTop + visualViewport.height;
+        const nextBottom = Math.max(0, Math.round(layoutHeight - visibleBottom));
+        setBottom((previous) => (previous === nextBottom ? previous : nextBottom));
+      });
+    };
+
+    sync();
+    visualViewport?.addEventListener('resize', sync);
+    visualViewport?.addEventListener('scroll', sync);
+    window.addEventListener('orientationchange', sync);
+    mediaQuery.addEventListener('change', sync);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      visualViewport?.removeEventListener('resize', sync);
+      visualViewport?.removeEventListener('scroll', sync);
+      window.removeEventListener('orientationchange', sync);
+      mediaQuery.removeEventListener('change', sync);
+    };
+  }, []);
+
+  return bottom;
+};
+
+/**
  * Footer 组件 - 页面底部区域
  * 包含个人信息、链接和社交图标
  */
@@ -82,6 +126,7 @@ const Footer = ({
   const { t } = useLanguage();
   // 获取路由对象
   const router = useRouter();
+  const mobileVisualViewportBottom = useMobileVisualViewportBottom();
   
   // 复制状态管理
   const [copyStates, setCopyStates] = useState({
@@ -141,7 +186,7 @@ const Footer = ({
   return (
     <footer
       className={[
-        // 布局基础
+        // 布局基础：移动端由 visualViewport 的真实差值修正 fixed 定位
         "footer",
         "fixed bottom-0 left-0 right-0 w-full min-w-[300px] h-fit z-20",
         // 内边距和分行
@@ -151,6 +196,7 @@ const Footer = ({
         // 额外自定义
         className,
       ].join(" ")}
+      style={{ bottom: `${mobileVisualViewportBottom}px` }}
     >
       {/* 背景遮罩 */}
       <EdgeMask from="bottom" height={maskHeight} className="footer__mask z-0 transition-opacity duration-100" />
