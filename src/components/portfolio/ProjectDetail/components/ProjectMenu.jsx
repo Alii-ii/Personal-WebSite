@@ -56,7 +56,7 @@ const ProjectMenu = ({ groups = [], currentSlug, open, onSelect, onClose }) => {
                   disabled={disabled}
                   onClick={disabled ? undefined : () => onSelect?.(project.slug)}
                   className={`w-full flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] text-left transition-colors duration-150 ${
-                    disabled ? 'cursor-default' : isActive ? 'bg-press' : 'hover:bg-hover/60'
+                    disabled ? 'cursor-default' : isActive ? 'bg-press hover:bg-hover' : 'hover:bg-hover'
                   }`}
                 >
                   <span className={`flex-1 font-regular text-[14px] leading-[24px] truncate ${disabled ? 'text-disabled' : 'text-main'}`}>
