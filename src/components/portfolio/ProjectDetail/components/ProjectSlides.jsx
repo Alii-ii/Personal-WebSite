@@ -65,7 +65,17 @@ const DesktopSlides = ({ frames, activeIndex, imageRatios, stageHeight, dragging
 const MobileSlides = ({ frames, imageRatios, slideRefs }) => (
   <div className="w-full flex md:hidden flex-col items-stretch gap-3 px-4 py-4">
     {frames.map((frame, index) => {
-      const ratio = frame.type === 'image' ? imageRatios[frame.src] : getFrameRatio(frame, imageRatios);
+      const ratio =
+        getFrameRatio(frame, imageRatios) ||
+        (frame.feed?.w && frame.feed?.h ? frame.feed.w / frame.feed.h : null);
+      const rotatedStyle = ratio ? { aspectRatio: String(1 / ratio) } : undefined;
+      const frameStyle = ratio
+        ? {
+            width: `${ratio * 100}%`,
+            height: `${100 / ratio}%`,
+          }
+        : undefined;
+
       return (
         <section
           key={frame.id}
@@ -74,12 +84,15 @@ const MobileSlides = ({ frames, imageRatios, slideRefs }) => (
             slideRefs.current[index] = node;
           }}
           data-frame-index={index}
-          style={ratio ? { aspectRatio: String(ratio) } : undefined}
-          className={`w-full rounded-[12px] overflow-hidden bg-card ring-1 ring-stroke ${
-            ratio ? '' : 'min-h-[40vh]'
-          }`}
+          style={rotatedStyle}
+          className={`relative w-full ${ratio ? '' : 'min-h-[40vh]'}`}
         >
-          <FrameRenderer frame={frame} />
+          <div
+            style={frameStyle}
+            className="absolute left-1/2 top-1/2 rounded-[12px] overflow-hidden bg-card ring-1 ring-stroke [transform:translate(-50%,-50%)_rotate(90deg)]"
+          >
+            <FrameRenderer frame={frame} />
+          </div>
         </section>
       );
     })}

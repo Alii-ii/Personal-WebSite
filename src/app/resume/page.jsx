@@ -365,7 +365,7 @@ export default function ResumePage() {
           maxSpeed={0}
           resistance={800}
           returnDuration={1.2}
-          className="opacity-70"
+          className="opacity-50"
         />
       </div>
 

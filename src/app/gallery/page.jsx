@@ -49,7 +49,7 @@ export default function Gallery() {
           maxSpeed={2000}
           resistance={800}
           returnDuration={1.2}
-          className="opacity-75"
+          className="opacity-50"
         />
       </div>
 

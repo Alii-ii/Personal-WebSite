@@ -239,6 +239,53 @@ src/
 
 ---
 
+## 设计更新 - 2026-08-03（移动端 L3 frame 旋转）
+
+### 修改的架构
+
+**之前**：`MobileSlides` 直接以图片原始宽高比设置 section 的 `aspect-ratio`，frame 内容保持原方向。
+
+**现在**：仅在 `MobileSlides` 中增加两层容器。外层 section 负责旋转后的文档流占位，内层负责承载既有 frame 外观并执行 `rotate(90deg)`。桌面端 `DesktopSlides`、`FrameRenderer`、frame 数据结构和移动端断点均不变。
+
+```text
+MobileSlides
+└── section（旋转后的占位框：宽 = 可用宽度，高 = 可用宽度 ÷ 原始宽高比的倒数）
+    └── div（原始 frame 尺寸，absolute 居中，rotate(90deg)）
+        └── FrameRenderer（保持不变）
+```
+
+### 尺寸与变换策略
+
+设移动端容器可用宽度为 `W`，frame 原始宽高比为 `R = width / height`。旋转 90° 后的视觉宽高比为 `1 / R`，因此外层 section 使用 `aspect-ratio: 1 / R`。内层在旋转前交换占位框宽高，即 `width = section height`、`height = section width`，以中心点执行 `transform: translate(-50%, -50%) rotate(90deg)`，旋转后恰好填满外层 section。
+
+无可用比例的 frame 沿用原有最小高度降级逻辑，并以容器尺寸作为旋转前尺寸；不修改 iframe、rich content 或图片渲染行为。
+
+### 响应式边界
+
+| 场景 | 行为 |
+|------|------|
+| `< 768px` 的 L3 | 外框与内容整体顺时针旋转 90°，纵向列表保留 |
+| `≥ 768px` 的 L3 | 沿用桌面横向幻灯片，不旋转 |
+| L2、Gallery、Resume、首页 | 不经过 `MobileSlides`，完全不变 |
+
+### 文件变更清单
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `src/components/portfolio/ProjectDetail/components/ProjectSlides.jsx` | 修改 | 增加移动端旋转占位与变换，桌面分支不动 |
+| `.ai-dev-docs/features/portfolio/{requirements,design,tasks,qa}.md` | 追加 | 记录需求、设计、任务及验收结果 |
+
+### 风险与处理
+
+| 风险 | 处理 |
+|------|------|
+| 旋转后宽高仍按原比例导致裁切 | 外层使用倒数比例，内层交换宽高 |
+| `overflow-hidden` 提前裁掉旋转内容 | 旋转在内层完成，外层只裁切最终视觉边界 |
+| prototype / rich frame 的滚动和点击坐标异常 | 旋转容器与内容一同变换，浏览器自动映射命中区域；人工验证交互 |
+| SSR 初次渲染误判设备 | 沿用 CSS `md:hidden` 分支控制可见性，不依赖 JS 才决定旋转 |
+
+---
+
 ## 交互补充设计 - 2026-07-28（第二轮）
 
 第一轮实现后的交互细化，共 9 项。均以设计稿与实际手感为准，不改动数据模型与路由结构。

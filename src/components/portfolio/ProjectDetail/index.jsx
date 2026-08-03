@@ -34,7 +34,7 @@ const ProjectBackground = ({ baseColor, activeColor }) => (
       maxSpeed={2000}
       resistance={800}
       returnDuration={1.2}
-      className="opacity-75"
+      className="opacity-50"
     />
   </div>
 );
@@ -116,7 +116,7 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
   if (!hasProjectPage(project)) return <MissingProject onBack={goBack} />;
 
   return (
-    <div className="relative h-screen w-full flex flex-col bg-bg overflow-hidden">
+    <div className="relative h-screen supports-[height:100dvh]:h-[100dvh] w-full flex flex-col bg-bg overflow-hidden">
       <PrototypePreloader urls={preloadUrls} />
       <ProjectBackground baseColor={baseColor} activeColor={activeColor} />
 
