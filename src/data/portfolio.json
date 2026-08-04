@@ -354,6 +354,74 @@
           "srcLocal": "/images/portfolio/nocode-for-pro/10-p-10.webp"
         },
         {
+          "id": "nocode-for-pro-design-01-chat",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "/chat",
+            "en": "/chat"
+          },
+          "feed": {
+            "w": 532,
+            "h": 342
+          },
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/design-01-chat.webp",
+          "alt": "NoCode for Pro - /chat",
+          "figmaNodeId": "10243:33060",
+          "srcLocal": "/images/portfolio/nocode-for-pro/design-01-chat.webp"
+        },
+        {
+          "id": "nocode-for-pro-design-02-code",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "/code",
+            "en": "/code"
+          },
+          "feed": {
+            "w": 532,
+            "h": 342
+          },
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/design-02-code.webp",
+          "alt": "NoCode for Pro - /code",
+          "figmaNodeId": "8945:14780",
+          "srcLocal": "/images/portfolio/nocode-for-pro/design-02-code.webp"
+        },
+        {
+          "id": "nocode-for-pro-design-03-database",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "/database",
+            "en": "/database"
+          },
+          "feed": {
+            "w": 532,
+            "h": 342
+          },
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/design-03-database.webp",
+          "alt": "NoCode for Pro - /database",
+          "figmaNodeId": "10243:34097",
+          "srcLocal": "/images/portfolio/nocode-for-pro/design-03-database.webp"
+        },
+        {
+          "id": "nocode-for-pro-design-04-setting",
+          "tab": "design",
+          "type": "image",
+          "title": {
+            "zh": "/setting",
+            "en": "/setting"
+          },
+          "feed": {
+            "w": 532,
+            "h": 342
+          },
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-for-pro/design-04-setting.webp",
+          "alt": "NoCode for Pro - /setting",
+          "figmaNodeId": "10243:35832",
+          "srcLocal": "/images/portfolio/nocode-for-pro/design-04-setting.webp"
+        },
+        {
           "id": "nfp-design-figma-01",
           "tab": "design",
           "type": "prototype",
