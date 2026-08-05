@@ -8,6 +8,7 @@ import {
   pickLocale,
 } from '@/contexts/ProjectContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { EASE_OUT_CSS } from '@/lib/ease';
 import DotGrid from '@/effects/DotGrid';
 import PortfolioMenu from '@/components/portfolio/PortfolioMenu';
 import {
@@ -34,6 +35,7 @@ const ProjectBackground = ({ baseColor, activeColor }) => (
       maxSpeed={2000}
       resistance={800}
       returnDuration={1.2}
+      constrainToContainer
       className="opacity-50"
     />
   </div>
@@ -51,16 +53,18 @@ const PrototypePreloader = ({ urls }) =>
     />
   ));
 
-const MissingProject = ({ onBack }) => (
+const MissingProject = ({ onBack, language }) => (
   <div className="min-h-screen w-full flex items-center justify-center bg-bg">
     <div className="flex flex-col items-center gap-4">
-      <p className="font-regular text-[15px] text-tertiary">项目不存在</p>
+      <p className="font-regular text-[15px] text-tertiary">
+        {language === 'en' ? 'Project not found' : '项目不存在'}
+      </p>
       <button
         type="button"
         onClick={onBack}
         className="font-regular text-[14px] text-secondary underline underline-offset-4 hover:text-main"
       >
-        返回作品集
+        {language === 'en' ? 'Back to portfolio' : '返回作品集'}
       </button>
     </div>
   </div>
@@ -69,11 +73,22 @@ const MissingProject = ({ onBack }) => (
 /**
  * L3 项目详情：负责组合导航、舞台和页面 chrome，具体交互下沉到模块 hooks。
  */
-const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) => {
-  const { language } = useLanguage();
+const ProjectDetail = ({
+  slug,
+  initialFrameId = null,
+  initialEnterDir = null,
+  commentOpen: controlledCommentOpen,
+  onCommentOpenChange,
+}) => {
+  const { language, t } = useLanguage();
   const { baseColor, activeColor } = useThemeColors();
   const isMobile = useIsMobile();
-  const navigation = useProjectNavigation({ slug, initialFrameId });
+  const navigation = useProjectNavigation({
+    slug,
+    initialFrameId,
+    commentOpen: controlledCommentOpen,
+    onCommentOpenChange,
+  });
   const {
     project,
     groups,
@@ -83,6 +98,7 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
     preloadUrls,
     activeTab,
     activeIndex,
+    activeFrameId,
     menuOpen,
     commentOpen,
     setActiveIndex,
@@ -113,63 +129,80 @@ const ProjectDetail = ({ slug, initialFrameId = null, initialEnterDir = null }) 
     onCommentClose: () => setCommentOpen(false),
   });
 
-  if (!hasProjectPage(project)) return <MissingProject onBack={goBack} />;
+  if (!hasProjectPage(project)) return <MissingProject onBack={goBack} language={language} />;
 
   return (
-    <div className="relative h-screen supports-[height:100dvh]:h-[100dvh] w-full flex flex-col bg-bg overflow-hidden">
-      <PrototypePreloader urls={preloadUrls} />
-      <ProjectBackground baseColor={baseColor} activeColor={activeColor} />
+    <div className="flex h-screen w-full overflow-hidden bg-others supports-[height:100dvh]:h-[100dvh]">
+      <div
+        className={`relative z-10 flex min-w-0 flex-1 self-stretch flex-col overflow-hidden bg-bg transition-[border-radius,box-shadow] duration-[420ms] ${
+          commentOpen
+            ? 'md:rounded-r-[24px] md:shadow-[20px_0_56px_hsl(var(--neutral-fg-main)/0.22)]'
+            : 'rounded-r-none shadow-none'
+        }`}
+        style={{ transitionTimingFunction: EASE_OUT_CSS }}
+      >
+        <PrototypePreloader urls={preloadUrls} />
+        <ProjectBackground baseColor={baseColor} activeColor={activeColor} />
 
-      <ProjectHeader
-        projectTitle={pickLocale(project.title, language)}
-        period={project.period}
-        visibleTabs={visibleTabs}
-        activeTab={activeTab}
-        language={language}
-        menuOpen={menuOpen}
-        isMobile={isMobile}
-        groups={groups}
-        currentSlug={slug}
-        onMenuToggle={() => setMenuOpen((previous) => !previous)}
-        onTabChange={changeTab}
-        onProjectSelect={(targetSlug) => {
-          setMenuOpen(false);
-          goProject(targetSlug);
-        }}
-        onMenuClose={() => setMenuOpen(false)}
-      />
+        <ProjectHeader
+          projectTitle={pickLocale(project.title, language)}
+          period={project.period}
+          visibleTabs={visibleTabs}
+          activeTab={activeTab}
+          language={language}
+          menuOpen={menuOpen}
+          isMobile={isMobile}
+          groups={groups}
+          currentSlug={slug}
+          onMenuToggle={() => setMenuOpen((previous) => !previous)}
+          onTabChange={changeTab}
+          onProjectSelect={(targetSlug) => {
+            setMenuOpen(false);
+            goProject(targetSlug);
+          }}
+          onMenuClose={() => setMenuOpen(false)}
+        />
 
-      <ProjectStage
-        frames={frames}
-        activeIndex={activeIndex}
-        imageRatios={imageRatios}
-        isMobile={isMobile}
-        enterDirection={initialEnterDir}
-        onActiveIndexChange={setActiveIndex}
-        onPreviousPage={goPrevPage}
-        onNextPage={goNextPage}
-      />
+        <ProjectStage
+          frames={frames}
+          activeIndex={activeIndex}
+          imageRatios={imageRatios}
+          isMobile={isMobile}
+          enterDirection={initialEnterDir}
+          onActiveIndexChange={setActiveIndex}
+          onPreviousPage={goPrevPage}
+          onNextPage={goNextPage}
+        />
 
-      <ProjectFooter
-        framesCount={frames.length}
-        activeIndex={activeIndex}
-        isMobile={isMobile}
-        onSelectFrame={setActiveIndex}
-        onBack={goBack}
-        onPrevPage={goPrevPage}
-        onNextPage={goNextPage}
-        onPrevProject={() => neighbors.prev && goProject(neighbors.prev.slug, { motionDir: 'prev' })}
-        onNextProject={() => neighbors.next && goProject(neighbors.next.slug, { motionDir: 'next' })}
-        onComment={toggleComment}
-        onOpenMobileMenu={() => setMenuOpen(true)}
-      />
+        <ProjectFooter
+          framesCount={frames.length}
+          activeIndex={activeIndex}
+          isMobile={isMobile}
+          onSelectFrame={setActiveIndex}
+          onBack={goBack}
+          onPrevPage={goPrevPage}
+          onNextPage={goNextPage}
+          onPrevProject={() => neighbors.prev && goProject(neighbors.prev.slug, { motionDir: 'prev' })}
+          onNextProject={() => neighbors.next && goProject(neighbors.next.slug, { motionDir: 'next' })}
+          onComment={toggleComment}
+          onOpenMobileMenu={() => setMenuOpen(true)}
+          labels={{
+            back: t('projectBackToPortfolio'),
+            menu: t('projectMenu'),
+          }}
+        />
+      </div>
 
       <CommentDrawer
         open={commentOpen}
-        language={language}
-        targetPath={getCommentTargetPath(project.slug)}
+        targetPath={getCommentTargetPath(project.slug, activeFrameId)}
         onClose={() => setCommentOpen(false)}
+        labels={{
+          drawer: t('commentDrawerLabel'),
+          close: t('commentClose'),
+        }}
       />
+
       <PortfolioMenu
         open={menuOpen && isMobile}
         onClose={() => setMenuOpen(false)}

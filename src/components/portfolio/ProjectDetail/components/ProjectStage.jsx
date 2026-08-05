@@ -21,6 +21,7 @@ const ProjectStage = ({
     desktopSlideRefs,
     mobileSlideRefs,
     stageHeight,
+    stageWidth,
     trackOffset,
     disableTrackTransition,
   } = useProjectTrack({
@@ -63,6 +64,7 @@ const ProjectStage = ({
           activeIndex={activeIndex}
           imageRatios={imageRatios}
           stageHeight={stageHeight}
+          stageWidth={stageWidth}
           dragging={dragging}
           desktopSlideRefs={desktopSlideRefs}
           mobileSlideRefs={mobileSlideRefs}

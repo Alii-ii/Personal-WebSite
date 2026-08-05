@@ -44,7 +44,12 @@ const getProjectEdgeFrameId = (targetSlug, edge) => {
   return edge === 'end' ? scopedFrames[scopedFrames.length - 1].id : scopedFrames[0].id;
 };
 
-export const useProjectNavigation = ({ slug, initialFrameId }) => {
+export const useProjectNavigation = ({
+  slug,
+  initialFrameId,
+  commentOpen,
+  onCommentOpenChange,
+}) => {
   const router = useRouter();
   const project = useMemo(() => getProjectBySlug(slug), [slug]);
   const groups = useMemo(() => getProjectsByCategory(), []);
@@ -57,7 +62,6 @@ export const useProjectNavigation = ({ slug, initialFrameId }) => {
   const [activeTab, setActiveTab] = useState(initialSelection.tabKey);
   const [activeIndex, setActiveIndex] = useState(initialSelection.index);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [commentOpen, setCommentOpen] = useState(false);
 
   useEffect(() => {
     setActiveTab(initialSelection.tabKey);
@@ -84,6 +88,8 @@ export const useProjectNavigation = ({ slug, initialFrameId }) => {
     [project, activeTab],
   );
 
+  const activeFrameId = frames[activeIndex]?.id ?? null;
+
   const latestStateRef = useRef({});
   latestStateRef.current = {
     activeIndex,
@@ -101,10 +107,11 @@ export const useProjectNavigation = ({ slug, initialFrameId }) => {
       const search = new URLSearchParams();
       if (options.frameId) search.set('frame', options.frameId);
       if (options.motionDir) search.set('enterDir', options.motionDir);
+      if (commentOpen) search.set('comments', 'open');
       const query = search.toString() ? `?${search.toString()}` : '';
       router.push(`/portfolio/${targetSlug}${query}`);
     },
-    [router],
+    [commentOpen, router],
   );
 
   const goPrevPage = useCallback(() => {
@@ -155,7 +162,20 @@ export const useProjectNavigation = ({ slug, initialFrameId }) => {
   }, []);
 
   const goBack = useCallback(() => router.push('/portfolio'), [router]);
-  const toggleComment = useCallback(() => setCommentOpen((previous) => !previous), []);
+  const setCommentOpen = useCallback(
+    (nextValue) => {
+      const next =
+        typeof nextValue === 'function'
+          ? nextValue(commentOpen)
+          : nextValue;
+      onCommentOpenChange(Boolean(next));
+    },
+    [commentOpen, onCommentOpenChange],
+  );
+  const toggleComment = useCallback(
+    () => onCommentOpenChange(!commentOpen),
+    [commentOpen, onCommentOpenChange],
+  );
 
   return {
     project,
@@ -166,6 +186,7 @@ export const useProjectNavigation = ({ slug, initialFrameId }) => {
     preloadUrls,
     activeTab,
     activeIndex,
+    activeFrameId,
     menuOpen,
     commentOpen,
     setActiveIndex,

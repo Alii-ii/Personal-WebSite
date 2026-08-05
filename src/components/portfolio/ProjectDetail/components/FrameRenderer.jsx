@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
+import { AlertCircleIcon } from '@/public/icons';
 import { toPortfolioLocalSrc } from '@/utils/portfolioImage';
 
 /**
@@ -11,12 +12,7 @@ import { toPortfolioLocalSrc } from '@/utils/portfolioImage';
  */
 const FrameFallback = ({ message, action }) => (
   <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-press">
-    <svg width="32" height="32" viewBox="0 0 24 24" className="text-disabled">
-      <path
-        d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 1.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM12 15a1 1 0 1 1 0 2 1 1 0 0 1 0-2Zm0-8a.75.75 0 0 1 .75.75v5a.75.75 0 0 1-1.5 0v-5A.75.75 0 0 1 12 7Z"
-        fill="currentColor"
-      />
-    </svg>
+    <AlertCircleIcon className="text-disabled" />
     <p className="font-regular text-[13px] leading-[20px] text-tertiary">{message}</p>
     {action}
   </div>

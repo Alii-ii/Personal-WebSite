@@ -1,116 +1,204 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import IconTextButton from '@/components/icon-text-botton';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { EASE_OUT_CSS } from '@/lib/ease';
+import { DeleteIcon, LikeIcon, LoadingSpinnerIcon, ReplyIcon, SendIcon } from '@/public/icons';
 
-/**
- * 把时间戳格式化为相对时间文案
- * 不引第三方日期库，站内只需要「刚刚 / N 分钟前 / N 小时前 / N 天前 / 具体日期」这几档
- * @param {string} isoString - ISO 时间字符串（Supabase created_at）
- * @returns {string} 相对时间文案
- */
-const formatRelativeTime = (isoString) => {
+export const formatRelativeTime = (isoString, t) => {
   if (!isoString) return '';
-
   const target = new Date(isoString);
   const timestamp = target.getTime();
   if (Number.isNaN(timestamp)) return '';
 
-  // 允许轻微的客户端/服务端时钟偏差，负数一律按「刚刚」处理
   const diffSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
-
-  if (diffSeconds < 60) return '刚刚';
-
+  if (diffSeconds < 60) return t('timeJustNow');
   const diffMinutes = Math.floor(diffSeconds / 60);
-  if (diffMinutes < 60) return `${diffMinutes} 分钟前`;
-
+  if (diffMinutes < 60) return t('timeMinutesAgo', { n: diffMinutes });
   const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours} 小时前`;
-
+  if (diffHours < 24) return t('timeHoursAgo', { n: diffHours });
   const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 30) return `${diffDays} 天前`;
+  if (diffDays < 30) return t('timeDaysAgo', { n: diffDays });
 
-  // 超过 30 天直接显示日期，同年省略年份，窄栏更省空间
   const month = String(target.getMonth() + 1).padStart(2, '0');
   const day = String(target.getDate()).padStart(2, '0');
-  if (target.getFullYear() === new Date().getFullYear()) {
-    return `${month}-${day}`;
-  }
-  return `${target.getFullYear()}-${month}-${day}`;
+  return target.getFullYear() === new Date().getFullYear()
+    ? `${month}-${day}`
+    : `${target.getFullYear()}-${month}-${day}`;
 };
 
-/**
- * 单条评论
- * 无头像设计：只呈现昵称、相对时间和正文，适配 380px 窄栏抽屉
- * @param {Object} props - 组件属性
- * @param {Object} props.comment - 评论数据 { id, user_id, content, created_at, site_profiles }
- * @param {Object} [props.currentUser] - 当前登录用户，用于判断删除权限
- * @param {Function} props.onDelete - 删除回调，接收 commentId，返回 { error?: string }
- */
-const CommentItem = ({ comment, currentUser, onDelete }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState(null);
+const CommentActions = ({
+  replyCount,
+  liked,
+  likeAnimating,
+  canDelete,
+  isDeleting,
+  onDelete,
+  onReply,
+  onLike,
+  t,
+}) => (
+  <div className="hidden items-center gap-1 group-hover/comment:flex group-focus-within/comment:flex">
+    {canDelete ? (
+      <IconTextButton
+        icon={isDeleting ? <LoadingSpinnerIcon width={16} height={16} className="animate-spin text-current" /> : <DeleteIcon />}
+        variant="ghost"
+        size="sm"
+        onClick={onDelete}
+        disabled={isDeleting}
+        className="h-6 min-w-6 px-1 text-tertiary hover:bg-hover hover:text-main [&>span]:opacity-100"
+        aria-label={isDeleting ? t('commentDeleting') : t('commentDelete')}
+      />
+    ) : null}
+    <IconTextButton
+      icon={<ReplyIcon />}
+      text={replyCount > 0 ? String(replyCount) : undefined}
+      variant="ghost"
+      size="sm"
+      onClick={onReply}
+      className="h-6 min-w-6 px-1 text-tertiary hover:bg-hover hover:text-main [&>span]:opacity-100"
+      aria-label={t('commentReply')}
+    />
+    <IconTextButton
+      icon={(
+        <span
+          className={`inline-flex transform-gpu transition-transform duration-200 ease-out ${
+            likeAnimating ? 'scale-125' : 'scale-100'
+          }`}
+        >
+          <LikeIcon filled={liked} />
+        </span>
+      )}
+      variant="ghost"
+      size="sm"
+      onClick={onLike}
+      className={`h-6 min-w-6 px-1 hover:bg-hover [&>span]:opacity-100 ${liked ? 'text-main' : 'text-tertiary hover:text-main'}`}
+      aria-label={liked ? t('commentUnlike') : t('commentLike')}
+      aria-pressed={liked}
+    />
+  </div>
+);
 
-  // 昵称在 JOIN 出来的关联表里，可能为空
-  const nickname = comment?.site_profiles?.nickname || '匿名访客';
-  const isOwner = Boolean(currentUser?.id) && comment?.user_id === currentUser.id;
+export default function CommentItem({
+  comment,
+  isReply = false,
+  replyCount = 0,
+  liked,
+  canDelete = false,
+  onDelete,
+  onReply,
+  onLike,
+}) {
+  const { t } = useLanguage();
+  const nickname = comment?.site_profiles?.nickname || t('commentAnonymous');
+  const replyToNickname = comment?.replyToNickname;
+  const [likeAnimating, setLikeAnimating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+  const [isEntered, setIsEntered] = useState(false);
+  const prevLikedRef = useRef(liked);
+
+  useEffect(() => {
+    const wasLiked = prevLikedRef.current;
+    prevLikedRef.current = liked;
+    // 仅在点赞成功时触发动效，取消点赞不触发
+    if (wasLiked || !liked) return undefined;
+    setLikeAnimating(true);
+    const timer = window.setTimeout(() => setLikeAnimating(false), 200);
+    return () => window.clearTimeout(timer);
+  }, [liked]);
+
+  useEffect(() => {
+    // 首次挂载时做一次轻量出现动效
+    const timer = window.setTimeout(() => setIsEntered(true), 16);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const handleDelete = async () => {
-    if (isDeleting) return;
-
+    if (!canDelete || isDeleting || isLeaving) return;
     setIsDeleting(true);
-    setDeleteError(null);
-
-    const result = await onDelete?.(comment.id);
-
-    // 删除成功时该条会被父级移除，无需再回写 state
-    if (result?.error) {
-      setDeleteError(result.error);
+    setIsLeaving(true);
+    setDeleteError('');
+    // 先做退场动画，再真正删除，避免列表项突兀消失
+    await new Promise((resolve) => window.setTimeout(resolve, 220));
+    const result = await onDelete?.();
+    if (result?.error || result?.errorCode) {
+      setDeleteError(result.errorCode ? t(result.errorCode) : result.error);
       setIsDeleting(false);
+      setIsLeaving(false);
     }
   };
 
   return (
-    <li className="group flex flex-col gap-1 py-3 border-b border-divider last:border-b-0">
-      {/* 头部：昵称 + 时间 + 删除 */}
-      <div className="flex items-center gap-2">
-        <span className="font-system text-[13px] leading-[20px] text-secondary truncate min-w-0">
-          {nickname}
+    <li
+      className={`group/comment relative flex flex-col overflow-hidden rounded-lg py-1.5 transition-[max-height,opacity,transform,margin,padding,background-color] duration-300 hover:bg-hover ${
+        isLeaving
+          ? 'my-0 max-h-0 translate-y-1 py-0 opacity-0'
+          : isEntered
+            ? 'max-h-60 translate-y-0 opacity-100'
+            : 'max-h-60 translate-y-1 opacity-0'
+      } ${isReply ? 'pl-9 pr-2' : 'pl-3 pr-2'}`}
+      style={{ transitionTimingFunction: EASE_OUT_CSS }}
+    >
+      {isReply ? (
+        <span className="absolute left-3 top-[11px] flex size-4 items-center justify-center text-quaternary opacity-50">
+          <SendIcon className="transform -scale-x-100 size-3.5" />
         </span>
-        <span className="font-light text-[11px] leading-[16px] text-quaternary flex-shrink-0">
-          {formatRelativeTime(comment?.created_at)}
-        </span>
+      ) : null}
 
-        {isOwner && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={isDeleting}
-            title="删除这条评论"
-            className={[
-              'ml-auto flex-shrink-0 rounded-[6px] px-1.5 py-0.5',
-              'font-regular text-[11px] leading-[16px] text-quaternary',
-              'transition-colors hover:bg-hover hover:text-secondary active:bg-press',
-              'opacity-0 group-hover:opacity-100 focus-visible:opacity-100',
-              'disabled:pointer-events-none disabled:opacity-50',
-            ].join(' ')}
+      <div className="flex min-h-6 items-center gap-2">
+        {/* user id */}
+        <button
+          type="button"
+          onClick={onReply}
+          className="group/id flex min-w-0 items-center truncate rounded-[4px] font-system text-[14px] leading-6 text-quaternary transition-colors duration-150 hover:text-main focus-visible:text-main focus-visible:outline-none"
+          style={{ transitionTimingFunction: EASE_OUT_CSS }}
+          aria-label={t('commentReplyTo', { name: nickname })}
+        >
+          <span
+            aria-hidden="true"
+            className="max-w-0 overflow-hidden opacity-0 transition-[max-width,opacity] duration-150 group-hover/id:max-w-4 group-hover/id:opacity-100 group-focus-visible/id:max-w-4 group-focus-visible/id:opacity-100"
+            style={{ transitionTimingFunction: EASE_OUT_CSS }}
           >
-            {isDeleting ? '删除中' : '删除'}
-          </button>
-        )}
+            @
+          </span>
+          <span className="truncate">{nickname}</span>
+        </button>
+
+        {/* 右 */}
+        <div className="ml-auto flex h-6 shrink-0 items-center gap-1">
+          <span className="font-light text-[12px] leading-[18px] text-tertiary group-hover/comment:hidden group-focus-within/comment:hidden">
+            {formatRelativeTime(comment?.created_at, t)}
+          </span>
+          <CommentActions
+            replyCount={replyCount}
+            liked={liked}
+            likeAnimating={likeAnimating}
+            canDelete={canDelete}
+            isDeleting={isDeleting}
+            onDelete={handleDelete}
+            onReply={onReply}
+            onLike={onLike}
+            t={t}
+          />
+        </div>
       </div>
 
-      {/* 正文：保留用户换行，长串字符强制断行避免撑破窄栏 */}
-      <p className="font-system text-[13px] leading-[20px] text-main whitespace-pre-wrap break-words">
-        {comment?.content}
+      <p className="min-h-6 whitespace-pre-wrap break-words font-system text-[14px] leading-6 text-main">
+        {isReply && replyToNickname ? (
+          <>{t('commentReplyPrefix')}<span className="text-quaternary">{t('commentReplyTarget', { name: replyToNickname })}</span>{comment?.content}</>
+        ) : comment?.content}
       </p>
-
-      {deleteError && (
-        <p className="font-light text-[11px] leading-[16px] text-quaternary">
-          {deleteError}
-        </p>
-      )}
+      <div
+        className={`overflow-hidden transition-[max-height,opacity,margin-top] duration-250 ${
+          deleteError ? 'mt-1 max-h-10 opacity-100' : 'mt-0 max-h-0 opacity-0'
+        }`}
+        style={{ transitionTimingFunction: EASE_OUT_CSS }}
+      >
+        <p className="font-light text-[11px] leading-4 text-quaternary">{deleteError}</p>
+      </div>
     </li>
   );
-};
-
-export default CommentItem;
+}

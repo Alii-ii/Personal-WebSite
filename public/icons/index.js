@@ -7,12 +7,26 @@ export { default as FigmaIcon } from './figma-icon';
 export { default as GlobeIcon } from './globe-icon';
 export { default as DownloadIcon } from './download-icon';
 export { default as XiaohongshuIcon } from './xiaohongshu-icon';
-export {
-  BackIcon,
-  CollapseIcon,
-  ExpandIcon,
-  HistoryIcon,
-  LoginIcon,
-  PinIcon,
-  SendIcon,
-} from './chat-input-icons';
+export { default as ReplyIcon } from './reply-icon';
+export { default as LikeIcon } from './like-icon';
+export { default as EnterIcon } from './enter-icon';
+export { default as DeleteIcon } from './delete-icon';
+export { CloseFillIcon, CloseStrokeIcon } from './close-icon';
+export { default as ChevronDownIcon } from './chevron-down-icon';
+export { default as ExternalLinkIcon } from './external-link-icon';
+export { default as LanguageCnIcon } from './language-cn-icon';
+export { default as LanguageEnIcon } from './language-en-icon';
+export { default as MenuIcon } from './menu-icon';
+export { default as SunIcon } from './sun-icon';
+export { default as MoonIcon } from './moon-icon';
+export { default as BackIcon } from './back-icon';
+export { default as CollapseIcon } from './collapse-icon';
+export { default as ExpandIcon } from './expand-icon';
+export { default as HistoryIcon } from './history-icon';
+export { default as LoginIcon } from './login-icon';
+export { default as PinIcon } from './pin-icon';
+export { default as SendIcon } from './send-icon';
+export { default as LoadingSpinnerIcon } from './loading-spinner-icon';
+export { default as AlertCircleIcon } from './alert-circle-icon';
+export { default as ImageOffIcon } from './image-off-icon';
+export { default as TypeBadgeIcon } from './type-badge-icon';

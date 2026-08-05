@@ -36,22 +36,23 @@ export function useComments(targetPath) {
 
     try {
       setError(null);
+      const replyPathPrefix = `${targetPath}/comments/`;
       const { data, error: fetchError } = await supabase
         .from('site_comments')
-        .select('id, user_id, content, created_at, site_profiles(nickname, avatar_seed)')
-        .eq('target_path', targetPath)
+        .select('id, user_id, target_path, content, created_at, site_profiles(nickname, avatar_seed)')
+        .or(`target_path.eq.${targetPath},target_path.like.${replyPathPrefix}%`)
         .order('created_at', { ascending: true });
 
       if (fetchError) {
         console.error('Fetch comments error:', fetchError);
-        setError('加载评论失败');
+        setError('commentLoadFailed');
         return;
       }
 
       setComments(data || []);
     } catch (err) {
       console.error('Fetch comments error:', err);
-      setError('加载评论失败');
+      setError('commentLoadFailed');
     } finally {
       setIsLoading(false);
     }
@@ -64,13 +65,13 @@ export function useComments(targetPath) {
   }, [fetchComments]);
 
   // 新增评论
-  const addComment = useCallback(async (content) => {
+  const addComment = useCallback(async (content, options = {}) => {
     const trimmed = content?.trim();
     if (!trimmed) {
-      return { error: '评论内容不能为空' };
+      return { errorCode: 'commentEmptyError' };
     }
     if (trimmed.length > 500) {
-      return { error: '评论最多 500 字符' };
+      return { errorCode: 'commentTooLong' };
     }
 
     // 客户端限流检查
@@ -79,29 +80,33 @@ export function useComments(targetPath) {
       t => now - t < RATE_WINDOW_MS
     );
     if (recentTimestamps.current.length >= RATE_LIMIT) {
-      return { error: '评论太频繁，请稍后再试' };
+      return { errorCode: 'commentRateLimited' };
     }
 
     try {
       // 获取当前用户
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        return { error: '请先登录' };
+        return { errorCode: 'commentSignInRequired' };
       }
 
+      const { parentId, replyToId } = options;
+      const commentTargetPath = parentId
+        ? `${targetPath}/comments/${parentId}${replyToId ? `/${replyToId}` : ''}`
+        : targetPath;
       const { data, error: insertError } = await supabase
         .from('site_comments')
         .insert({
           user_id: user.id,
-          target_path: targetPath,
+          target_path: commentTargetPath,
           content: trimmed,
         })
-        .select('id, user_id, content, created_at, site_profiles(nickname, avatar_seed)')
+        .select('id, user_id, target_path, content, created_at, site_profiles(nickname, avatar_seed)')
         .single();
 
       if (insertError) {
         console.error('Insert comment error:', insertError);
-        return { error: '发送失败，请重试' };
+        return { errorCode: 'commentSendFailed' };
       }
 
       // 记录时间戳用于限流
@@ -112,13 +117,45 @@ export function useComments(targetPath) {
       return {};
     } catch (err) {
       console.error('Add comment error:', err);
-      return { error: '发送失败，请重试' };
+      return { errorCode: 'commentSendFailed' };
     }
   }, [targetPath]);
 
-  // 删除评论
+  // 删除评论：根评论删除时先删除自己拥有的二级回复，再删除根评论。
+  // RLS 仍是最终权限边界；若回复属于其他用户，数据库会拒绝，避免产生静默孤儿数据。
   const deleteComment = useCallback(async (commentId) => {
     try {
+      const rootPath = `${targetPath}/comments/${commentId}`;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return { errorCode: 'commentSignInRequired' };
+
+      const { data: replies, error: replyLookupError } = await supabase
+        .from('site_comments')
+        .select('id, user_id, target_path')
+        .like('target_path', `${rootPath}%`);
+
+      if (replyLookupError) {
+        console.error('Lookup comment replies error:', replyLookupError);
+        return { errorCode: 'commentDeleteFailed' };
+      }
+
+      if (replies?.some((comment) => comment.user_id !== user.id)) {
+        return { errorCode: 'commentDeleteHasReplies' };
+      }
+
+      if (replies?.length) {
+        const replyIds = replies.map((comment) => comment.id);
+        const { error: replyDeleteError } = await supabase
+          .from('site_comments')
+          .delete()
+          .in('id', replyIds);
+
+        if (replyDeleteError) {
+          console.error('Delete comment replies error:', replyDeleteError);
+          return { errorCode: 'commentDeleteFailed' };
+        }
+      }
+
       const { error: deleteError } = await supabase
         .from('site_comments')
         .delete()
@@ -126,17 +163,18 @@ export function useComments(targetPath) {
 
       if (deleteError) {
         console.error('Delete comment error:', deleteError);
-        return { error: '删除失败' };
+        return { errorCode: 'commentDeleteFailed' };
       }
 
-      // 乐观更新：从列表中移除
-      setComments(prev => prev.filter(c => c.id !== commentId));
+      setComments((previous) => previous.filter((comment) => (
+        comment.id !== commentId && !comment.target_path?.startsWith(rootPath)
+      )));
       return {};
     } catch (err) {
       console.error('Delete comment error:', err);
-      return { error: '删除失败' };
+      return { errorCode: 'commentDeleteFailed' };
     }
-  }, []);
+  }, [targetPath]);
 
   return {
     comments,

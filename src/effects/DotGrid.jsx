@@ -68,6 +68,7 @@ const DotGrid = ({
   maxSpeed = 5000,
   resistance = 750,
   returnDuration = 1.5,
+  constrainToContainer = false,
   className = '',
   style
 }) => {
@@ -106,11 +107,11 @@ const DotGrid = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // 网格只覆盖一屏视口，不跟随文档高度增长。
-    // 页面很长时（如作品墙），若按容器尺寸构建会产生数万个点、上亿像素的 canvas，
-    // 每帧全量重绘导致掉帧；锁定视口后点数恒定在一屏范围内。
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    // 默认只覆盖一屏视口；嵌入式页面可选择以自身容器作为水平边界。
+    // 高度仍限制在一屏，避免长页面产生超大 canvas。
+    const wrapper = wrapperRef.current;
+    const width = constrainToContainer && wrapper ? wrapper.clientWidth : window.innerWidth;
+    const height = constrainToContainer && wrapper ? wrapper.clientHeight : window.innerHeight;
     // dpr 上限 2：3x 屏下像素量再翻 2.25 倍，视觉收益极小但开销显著
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     dprRef.current = dpr;
@@ -153,7 +154,7 @@ const DotGrid = ({
     }
     dotsRef.current = dots;
     needsRedrawRef.current = true;
-  }, [dotSize, gap]);
+  }, [dotSize, gap, constrainToContainer]);
 
   useEffect(() => {
     if (!circlePath) return;
@@ -230,12 +231,16 @@ const DotGrid = ({
 
   useEffect(() => {
     buildGrid();
-    // 网格只依赖视口尺寸，因此监听 window.resize 即可。
-    // 不能观察 wrapper：它的高度会随页面内容（如瀑布流图片陆续加载）不断变化，
-    // 会触发大量无谓的网格重建。
     window.addEventListener('resize', buildGrid);
-    return () => window.removeEventListener('resize', buildGrid);
-  }, [buildGrid]);
+    const observer = constrainToContainer && wrapperRef.current
+      ? new ResizeObserver(buildGrid)
+      : null;
+    if (observer && wrapperRef.current) observer.observe(wrapperRef.current);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', buildGrid);
+    };
+  }, [buildGrid, constrainToContainer]);
 
   useEffect(() => {
     const onMove = e => {
@@ -260,9 +265,11 @@ const DotGrid = ({
       pr.vy = vy;
       pr.speed = speed;
 
-      // canvas 固定在视口，视口坐标即 canvas 局部坐标，无需 getBoundingClientRect
-      pr.x = e.clientX;
-      pr.y = e.clientY;
+      const rect = constrainToContainer
+        ? canvasRef.current?.getBoundingClientRect()
+        : null;
+      pr.x = constrainToContainer && rect ? e.clientX - rect.left : e.clientX;
+      pr.y = constrainToContainer && rect ? e.clientY - rect.top : e.clientY;
       needsRedrawRef.current = true;
 
       if (speed <= speedTrigger) return;
@@ -297,9 +304,11 @@ const DotGrid = ({
     };
 
     const onClick = e => {
-      // canvas 固定在视口，直接用视口坐标
-      const cx = e.clientX;
-      const cy = e.clientY;
+      const rect = constrainToContainer
+        ? canvasRef.current?.getBoundingClientRect()
+        : null;
+      const cx = constrainToContainer && rect ? e.clientX - rect.left : e.clientX;
+      const cy = constrainToContainer && rect ? e.clientY - rect.top : e.clientY;
       const shockSq = shockRadius * shockRadius;
       needsRedrawRef.current = true;
 
@@ -341,17 +350,15 @@ const DotGrid = ({
       window.removeEventListener('mousemove', throttledMove);
       window.removeEventListener('click', onClick);
     };
-  }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength]);
+  }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength, constrainToContainer]);
 
   return (
     <section className={`h-full w-full relative ${className}`} style={style}>
-      {/* canvas 固定在视口：点阵作为背景纹理只需覆盖一屏，
-          不随页面滚动、也不随文档高度增长 */}
-      <div ref={wrapperRef} className="w-full h-full relative">
+      <div ref={wrapperRef} className="w-full h-full relative overflow-hidden">
         <canvas
           ref={canvasRef}
-          className="fixed top-0 left-0 pointer-events-none"
-          style={{ width: '100vw', height: '100vh' }}
+          className={`${constrainToContainer ? 'absolute inset-0' : 'fixed left-0 top-0'} pointer-events-none`}
+          style={constrainToContainer ? { width: '100%', height: '100%' } : { width: '100vw', height: '100vh' }}
         />
       </div>
     </section>

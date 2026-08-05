@@ -58,6 +58,41 @@ const translations = {
     chatResponseSaveFailed: "回复已显示，但未保存到历史记录，请复制后重试",
     chatHistoryPlaceholder: "↑ ↓ 切换, ↵ 选择, esc 返回",
     chatBack: "返回",
+
+    // 评论
+    commentSectionTitle: "本页评论",
+    commentPlaceholder: "给本页留下评论…",
+    commentNicknamePlaceholder: "先输入昵称，1-20 个字符…",
+    commentNicknameSubmitting: "正在记录昵称…",
+    commentReplyingTo: "回复 {name}",
+    commentReplyTo: "回复 {name}",
+    commentCancel: "取消",
+    commentInputLabel: "评论输入框",
+    commentNicknameInputLabel: "昵称输入框",
+    commentSend: "发送评论",
+    commentSetNickname: "设置昵称",
+    commentReply: "回复",
+    commentLike: "喜欢",
+    commentUnlike: "取消喜欢",
+    commentDelete: "删除",
+    commentDeleting: "删除中…",
+    commentAnonymous: "匿名访客",
+    commentReplyPrefix: "回复 ",
+    commentReplyTarget: "{name} ",
+    commentEmpty: "还没有评论，来说点什么吧",
+    commentRetry: "重试",
+    commentLoadFailed: "加载评论失败",
+    commentEmptyError: "评论内容不能为空",
+    commentTooLong: "评论最多 500 字符",
+    commentRateLimited: "评论太频繁，请稍后再试",
+    commentSignInRequired: "请先设置昵称",
+    commentSendFailed: "发送失败，请重试",
+    commentDeleteFailed: "删除失败",
+    commentDeleteHasReplies: "已有其他用户回复，暂不能删除",
+    commentDrawerLabel: "本页评论",
+    commentClose: "关闭评论",
+    projectBackToPortfolio: "返回作品集",
+    projectMenu: "菜单",
     timeJustNow: "刚刚",
     timeMinutesAgo: "{n}分钟前",
     timeHoursAgo: "{n}小时前",
@@ -132,6 +167,41 @@ const translations = {
     chatResponseSaveFailed: "The reply is visible but wasn’t saved to history. Copy it and try again",
     chatHistoryPlaceholder: "↑ ↓ to navigate, ↵ to select, esc to go back",
     chatBack: "Back",
+
+    // Comments
+    commentSectionTitle: "Comments on this page",
+    commentPlaceholder: "Leave a comment on this page…",
+    commentNicknamePlaceholder: "Choose a nickname (1–20 characters)…",
+    commentNicknameSubmitting: "Saving your nickname…",
+    commentReplyingTo: "Replying to {name}",
+    commentReplyTo: "Reply to {name}",
+    commentCancel: "Cancel",
+    commentInputLabel: "Comment input",
+    commentNicknameInputLabel: "Nickname input",
+    commentSend: "Send comment",
+    commentSetNickname: "Set nickname",
+    commentReply: "Reply",
+    commentLike: "Like",
+    commentUnlike: "Unlike",
+    commentDelete: "Delete",
+    commentDeleting: "Deleting…",
+    commentAnonymous: "Anonymous visitor",
+    commentReplyPrefix: "Reply to ",
+    commentReplyTarget: "{name} ",
+    commentEmpty: "No comments yet. Start the conversation",
+    commentRetry: "Retry",
+    commentLoadFailed: "Couldn’t load comments",
+    commentEmptyError: "A comment can’t be empty",
+    commentTooLong: "Comments can contain up to 500 characters",
+    commentRateLimited: "You’re commenting too quickly. Please try again later",
+    commentSignInRequired: "Please choose a nickname first",
+    commentSendFailed: "Couldn’t send the comment. Please try again",
+    commentDeleteFailed: "Couldn’t delete the comment",
+    commentDeleteHasReplies: "This comment has replies from other people and can’t be deleted",
+    commentDrawerLabel: "Comments on this page",
+    commentClose: "Close comments",
+    projectBackToPortfolio: "Back to portfolio",
+    projectMenu: "Menu",
     timeJustNow: "just now",
     timeMinutesAgo: "{n} min ago",
     timeHoursAgo: "{n} hr ago",
@@ -222,8 +292,12 @@ export const LanguageProvider = ({ children }) => {
   };
 
   // 获取翻译文本
-  const t = (key) => {
-    return translations[language]?.[key] || key;
+  const t = (key, values = {}) => {
+    const template = translations[language]?.[key] || key;
+    return Object.entries(values).reduce(
+      (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
+      template,
+    );
   };
 
   // 获取当前语言的显示名称

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
+import { ImageOffIcon, TypeBadgeIcon } from '@/public/icons';
 import { toPortfolioLocalSrc, toPortfolioThumbSrc } from '@/utils/portfolioImage';
 
 /**
@@ -10,12 +11,7 @@ import { toPortfolioLocalSrc, toPortfolioThumbSrc } from '@/utils/portfolioImage
  */
 const ImageFallback = ({ label }) => (
   <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-press">
-    <svg width="28" height="28" viewBox="0 0 24 24" className="text-disabled">
-      <path
-        d="M20.9672 8.47255C21.2585 8.17807 21.7333 8.1755 22.0278 8.46681C22.3223 8.75811 22.3248 9.23298 22.0335 9.52745C21.3553 10.2131 20.6425 10.8156 19.8957 11.3347L22.4627 13.9016C22.7556 14.1945 22.7556 14.6694 22.4627 14.9623C22.1698 15.2552 21.6949 15.2552 21.402 14.9623L18.5825 12.1428C17.5839 12.6816 16.531 13.0853 15.425 13.3533L16.3894 16.9526C16.4966 17.3527 16.2592 17.764 15.8591 17.8712C15.459 17.9784 15.0477 17.741 14.9405 17.3409L13.9454 13.6269C13.3128 13.7089 12.6644 13.75 12.0004 13.75C11.3363 13.75 10.6879 13.7089 10.0553 13.6269L9.06011 17.3409C8.95291 17.741 8.54166 17.9784 8.14156 17.8712C7.74146 17.764 7.50401 17.3527 7.61121 16.9526L8.57566 13.3533C7.46966 13.0853 6.41676 12.6816 5.41817 12.1428L2.59869 14.9623C2.3058 15.2552 1.83093 15.2552 1.53803 14.9623C1.24514 14.6694 1.24514 14.1945 1.53803 13.9016L4.10497 11.3347C3.3582 10.8156 2.64538 10.2131 1.96715 9.52745C1.67584 9.23298 1.67841 8.75811 1.97289 8.46681C2.26736 8.1755 2.74223 8.17807 3.03353 8.47255C5.5312 10.9974 8.50611 12.25 12.0004 12.25C15.4946 12.25 18.4695 10.9974 20.9672 8.47255Z"
-        fill="currentColor"
-      />
-    </svg>
+    <ImageOffIcon className="text-disabled" />
     {label ? (
       <span className="font-regular text-[12px] leading-[18px] text-disabled px-4 text-center line-clamp-2">
         {label}
@@ -28,17 +24,9 @@ const ImageFallback = ({ label }) => (
  * 类型角标：让作品墙上一眼分得清图片 / 代码原型 / 图文混排
  */
 const TypeBadge = ({ type }) => {
-  const paths = {
-    image: 'M3 5.5A2.5 2.5 0 0 1 5.5 3h9A2.5 2.5 0 0 1 17 5.5v9a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 3 14.5v-9Zm2.5-1a1 1 0 0 0-1 1v6.3l2.6-2.2a1 1 0 0 1 1.3 0l2.7 2.3 1.6-1.3a1 1 0 0 1 1.3 0l1.5 1.3V5.5a1 1 0 0 0-1-1h-9Zm2 2.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z',
-    prototype: 'M7.4 5.3a.75.75 0 0 1 0 1.06L4.06 9.7a.42.42 0 0 0 0 .6l3.34 3.34a.75.75 0 1 1-1.06 1.06l-3.34-3.34a1.92 1.92 0 0 1 0-2.72L6.34 5.3a.75.75 0 0 1 1.06 0Zm5.2 0a.75.75 0 0 1 1.06 0L17 8.64a1.92 1.92 0 0 1 0 2.72L13.66 14.7a.75.75 0 1 1-1.06-1.06l3.34-3.34a.42.42 0 0 0 0-.6L12.6 6.36a.75.75 0 0 1 0-1.06Z',
-    rich: 'M4 5.25c0-.41.34-.75.75-.75h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 5.25Zm0 3.5c0-.41.34-.75.75-.75h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 8.75Zm0 3.5c0-.41.34-.75.75-.75h6.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Z',
-  };
-
   return (
     <div className="w-7 h-7 rounded-[6px] bg-card/80 backdrop-blur-sm flex items-center justify-center text-secondary shadow-sm">
-      <svg width="20" height="20" viewBox="0 0 20 20">
-        <path d={paths[type] || paths.image} fill="currentColor" />
-      </svg>
+      <TypeBadgeIcon type={type} />
     </div>
   );
 };

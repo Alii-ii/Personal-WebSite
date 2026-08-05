@@ -4,7 +4,7 @@ import CopyEmailButton from '@/components/CopyEmailButton';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { hasProjectPage, pickLocale } from '@/contexts/ProjectContext';
-import { ChatsIcon, BilibiliIcon, FigmaIcon, XiaohongshuIcon } from '@/public/icons';
+import { ChatsIcon, BilibiliIcon, ChevronDownIcon, FigmaIcon, XiaohongshuIcon } from '@/public/icons';
 
 /**
  * 侧栏分隔位（隐藏横线，仅保留原分割线占位的间距）
@@ -30,17 +30,7 @@ const IconButton = ({ children, label, onClick }) => (
  * 展开箭头（随展开状态旋转）
  */
 const ArrowIcon = ({ expanded }) => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 20 20"
-    className={`text-tertiary transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
-  >
-    <path
-      d="M5.47 7.47a.75.75 0 0 1 1.06 0L10 10.94l3.47-3.47a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 0 1 0-1.06Z"
-      fill="currentColor"
-    />
-  </svg>
+  <ChevronDownIcon className={`text-tertiary transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
 );
 
 /**

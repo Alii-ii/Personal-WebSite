@@ -179,3 +179,68 @@ WHEN 访客在评论相关界面操作, THE SYSTEM SHALL 提供流畅的交互�
 | 评论数据模型与读写 | 98% | 已实现并测试通过：CRUD + JOIN + 乐观更新 + 客户端限流 |
 | RLS 安全策略 | 98% | 已配置并测试通过：公开可读、auth.uid() 鉴权写入/删除 |
 | 评论 UI 交互 | 待定 | 等 Figma 设计稿完成后实现 |
+
+---
+
+## 迭代 2 - 2026-08-05
+
+### 新增需求：L3 Frame 级嵌入式评论抽屉
+
+WHEN 用户在作品 L3 详情页打开评论区, THE SYSTEM SHALL 在原 L3 主页面右侧以固定 360px 的同级 flex 抽屉展示评论，并让主舞台依据剩余容器宽度自适应。
+
+#### Scenario 2.1: 评论按 Frame 隔离
+- GIVEN 当前 Project 包含多个 Frame
+- WHEN 用户切换 Frame 或跨 Project 导航
+- THEN 评论查询与发送目标更新为 `project/{projectSlug}/frames/{frameId}`
+- AND 不混用 Project 级或其他 Frame 的评论
+- AND 评论区当前开启或关闭状态不因 Frame、Tab、Project 切换而改变
+
+#### Scenario 2.2: 两级回复
+- GIVEN 当前 Frame 已有一级评论
+- WHEN 用户回复一级或二级评论
+- THEN 回复统一展示在对应一级评论下的第二级
+- AND 二次回复只记录目标二级评论，不递归生成第三级
+
+#### Scenario 2.3: 输入与身份
+- GIVEN 用户尚未创建匿名身份
+- WHEN 用户点击评论输入框
+- THEN 输入框直接进入昵称模式，不展示遮罩弹窗
+- AND 昵称建立成功后切换为评论模式
+- AND 评论发送与 AI Chat 完全隔离
+- AND textarea 初始一行、随内容增高、最大高度为 50vh
+
+#### Scenario 2.4: 列表与输入框布局
+- GIVEN 评论内容未超过可视高度
+- WHEN 评论区渲染
+- THEN 输入框处于评论列表正常流末尾
+- AND 零评论时不展示空态文案
+- WHEN 评论内容超过可视高度
+- THEN 输入框 sticky 在评论区底边
+- AND 评论区可滚动但不展示滚动条
+
+#### Scenario 2.5: 评论操作
+- GIVEN 评论项未 hover
+- THEN 右上角仅展示相对时间，操作按钮不占位
+- WHEN 评论项 hover 或 focus-within
+- THEN 时间被删除、回复、喜欢操作替换
+- AND 仅评论作者可见删除按钮，删除按钮位于操作区最左侧
+- AND 根评论存在其他用户回复时禁止删除，避免孤儿回复
+
+#### Scenario 2.6: 视觉与国际化
+- GIVEN 评论抽屉展开
+- THEN 点阵背景仅覆盖原 L3 主页面
+- AND 主页面右侧使用 24px 圆角和投影形成抽屉层次
+- AND User ID 默认使用 `text-quaternary`，hover/focus 使用 `text-main`
+- AND 回复正文中的“回复/Reply to”与正文同色，被回复 ID 使用 `text-quaternary`
+- AND 所有静态文本、错误和无障碍标签支持中英文
+
+### 修改的需求
+
+原“评论只做平铺、不做嵌套回复”变更为“只允许一级与二级回复”；原“空评论状态展示引导文案”变更为零评论不展示空态文案；原“未登录输入框不可用或弹窗”变更为输入框原位昵称模式。
+
+### 约束与边界
+
+- 喜欢状态当前仅为客户端会话态，不写入数据库。
+- 删除仍由 Supabase RLS 的 `auth.uid() = user_id` 做最终鉴权。
+- 根评论如包含其他用户回复，当前拒绝删除；根评论与回复均属于本人时可一并清理。
+- 本轮不新增数据库字段，二级关系编码在 `target_path` 中。

@@ -43,7 +43,15 @@ const Label = ({ children }) => (
  *   - 切换页面、切换项目：仅符号可点，文字不可点
  * 移动端隐藏（无键盘）
  */
-const ShortcutBar = ({ onBack, onPrevPage, onNextPage, onPrevProject, onNextProject, onComment }) => {
+const ShortcutBar = ({
+  availableWidth = Number.POSITIVE_INFINITY,
+  onBack,
+  onPrevPage,
+  onNextPage,
+  onPrevProject,
+  onNextProject,
+  onComment,
+}) => {
   const { language } = useLanguage();
   const label = {
     back: language === 'en' ? 'Back' : '返回',
@@ -52,10 +60,16 @@ const ShortcutBar = ({ onBack, onPrevPage, onNextPage, onPrevProject, onNextProj
     comment: language === 'en' ? 'Comment' : '评论',
   };
 
+  // Footer 会被评论抽屉真实挤压，因此按其左侧安全区而非 viewport
+  // 决定缩减级别，并给中间进度条保留不重叠的空间。
+  const showBack = availableWidth >= 128;
+  const showPage = availableWidth >= 244;
+  const showProject = availableWidth >= 356;
+
   return (
     <div className="hidden md:flex items-center gap-1 select-none min-w-0">
       {/* ESC：第三藏，保留优先级高于双向箭头 */}
-      <div className="contents max-[860px]:hidden">
+      <div className={showBack ? 'contents' : 'hidden'}>
         <button
           type="button"
           onClick={onBack}
@@ -73,7 +87,7 @@ const ShortcutBar = ({ onBack, onPrevPage, onNextPage, onPrevProject, onNextProj
       </div>
 
       {/* ←→：第二藏 */}
-      <div className="contents max-[980px]:hidden">
+      <div className={showPage ? 'contents' : 'hidden'}>
         <Key onClick={onPrevPage} title={label.page}>
           ←
         </Key>
@@ -85,7 +99,7 @@ const ShortcutBar = ({ onBack, onPrevPage, onNextPage, onPrevProject, onNextProj
       </div>
 
       {/* ↑↓：最先藏 */}
-      <div className="contents max-[1100px]:hidden">
+      <div className={showProject ? 'contents' : 'hidden'}>
         <Key onClick={onPrevProject} title={label.project}>
           ↑
         </Key>
@@ -93,7 +107,23 @@ const ShortcutBar = ({ onBack, onPrevPage, onNextPage, onPrevProject, onNextProj
           ↓
         </Key>
         <Label>{label.project}</Label>
+        <Divider />
       </div>
+
+      {/* C：最后藏；整栏在 md 以下已隐藏 */}
+      <button
+        type="button"
+        onClick={onComment}
+        title={label.comment}
+        className="group flex items-center gap-1 rounded-[4px] px-0.5 -mx-0.5 cursor-pointer"
+      >
+        <span className="inline-flex items-center justify-center h-5 w-5 rounded-[4px] bg-press font-regular text-[11px] leading-none text-tertiary group-hover:bg-hover group-hover:text-main transition-colors duration-150">
+          C
+        </span>
+        <span className="font-regular text-[12px] leading-[18px] text-tertiary group-hover:text-main transition-colors duration-150 ml-1">
+          {label.comment}
+        </span>
+      </button>
     </div>
   );
 };

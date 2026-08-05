@@ -10,35 +10,31 @@ const getFrameRatio = (frame, imageRatios) => {
   return frame.feed?.w && frame.feed?.h ? frame.feed.w / frame.feed.h : null;
 };
 
-const getDesktopFrameStyle = ({ frame, ratio, isActive, stageHeight }) => {
+const getDesktopFrameStyle = ({ frame, ratio, isActive, stageHeight, stageWidth }) => {
   const height = stageHeight ? stageHeight * (isActive ? 1 : STAGE_SHRINK) : 0;
-  const viewportWidth = isActive ? 92 : 74;
+  const maxWidth = stageWidth ? stageWidth * (isActive ? 0.92 : 0.74) : 0;
 
   if (ratio) {
-    if (height) {
-      return {
-        width: `min(${(height * ratio).toFixed(2)}px, ${viewportWidth}vw)`,
-        aspectRatio: String(ratio),
-      };
-    }
+    const heightBasedWidth = height ? height * ratio : 0;
     return {
-      width: `min(${((isActive ? 68 : 56) * ratio).toFixed(4)}vh, ${viewportWidth}vw)`,
+      width: `${Math.max(0, Math.min(heightBasedWidth, maxWidth || heightBasedWidth)).toFixed(2)}px`,
       aspectRatio: String(ratio),
     };
   }
 
   if (frame.type !== 'image') return undefined;
+  const fallbackWidth = Math.min(height * 1.6, maxWidth || height * 1.6);
   return height
-    ? { height: `${height.toFixed(2)}px`, width: `${(height * 1.6).toFixed(2)}px` }
-    : { height: '68vh', width: '108.8vh' };
+    ? { height: `${(fallbackWidth / 1.6).toFixed(2)}px`, width: `${fallbackWidth.toFixed(2)}px` }
+    : undefined;
 };
 
-const DesktopSlides = ({ frames, activeIndex, imageRatios, stageHeight, dragging, slideRefs }) => (
+const DesktopSlides = ({ frames, activeIndex, imageRatios, stageHeight, stageWidth, dragging, slideRefs }) => (
   <div className="hidden md:flex items-center gap-6">
     {frames.map((frame, index) => {
       const isActive = index === activeIndex;
       const ratio = getFrameRatio(frame, imageRatios);
-      const style = getDesktopFrameStyle({ frame, ratio, isActive, stageHeight });
+      const style = getDesktopFrameStyle({ frame, ratio, isActive, stageHeight, stageWidth });
 
       return (
         <section
@@ -51,9 +47,7 @@ const DesktopSlides = ({ frames, activeIndex, imageRatios, stageHeight, dragging
           style={style}
           className={`shrink-0 rounded-[12px] overflow-hidden bg-card ring-1 ring-stroke transition-all duration-500 ease-out ${
             dragging ? 'cursor-grabbing' : isActive ? 'cursor-default' : 'cursor-pointer'
-          } ${isActive ? 'opacity-100 shadow-2xl' : 'opacity-50 shadow-lg hover:opacity-75'} ${
-            ratio ? '' : isActive ? 'w-[68vw] h-[68vh]' : 'w-[56vw] h-[56vh]'
-          }`}
+          } ${isActive ? 'opacity-100 shadow-2xl' : 'opacity-50 shadow-lg hover:opacity-75'}`}
         >
           <FrameRenderer frame={frame} />
         </section>
@@ -104,6 +98,7 @@ const ProjectSlides = ({
   activeIndex,
   imageRatios,
   stageHeight,
+  stageWidth,
   dragging,
   desktopSlideRefs,
   mobileSlideRefs,
@@ -114,6 +109,7 @@ const ProjectSlides = ({
       activeIndex={activeIndex}
       imageRatios={imageRatios}
       stageHeight={stageHeight}
+      stageWidth={stageWidth}
       dragging={dragging}
       slideRefs={desktopSlideRefs}
     />

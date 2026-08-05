@@ -1,11 +1,14 @@
 "use client";
 
 // 页面固定控件：包含顶部标题与目录、底部页数轴与快捷栏、评论抽屉。
+import { useEffect, useRef, useState } from 'react';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageToggle from '@/components/LanguageToggle';
 import EdgeMask from '@/components/EdgeMask';
 import MenuButton from '@/components/MenuButton';
 import CommentSection from '@/components/comments/CommentSection';
+import { EASE_OUT_CSS } from '@/lib/ease';
+import { CloseFillIcon } from '@/public/icons';
 import ProjectMenu from './ProjectMenu';
 import ShortcutBar from './ShortcutBar';
 import SlideProgress from './SlideProgress';
@@ -97,75 +100,122 @@ export const ProjectFooter = ({
   onNextProject,
   onComment,
   onOpenMobileMenu,
-}) => (
-  <footer className="absolute inset-x-0 bottom-0 z-20 isolate px-12 md:px-16 pb-12 md:pb-8 pt-2 pointer-events-auto">
-    <EdgeMask from="bottom" height="300%" className="md:hidden" />
+  labels,
+}) => {
+  const desktopRowRef = useRef(null);
+  const progressRef = useRef(null);
+  const controlsRef = useRef(null);
+  const [shortcutWidth, setShortcutWidth] = useState(0);
 
-    <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 md:translate-y-[calc(-50%-10px)] translate-y-[calc(-50%-20px)]">
-      <SlideProgress
-        total={framesCount}
-        activeIndex={activeIndex}
-        onSelect={onSelectFrame}
-        interactive={!isMobile}
-      />
-    </div>
+  useEffect(() => {
+    const desktopRow = desktopRowRef.current;
+    const progress = progressRef.current;
+    const controls = controlsRef.current;
+    if (!desktopRow || !progress || !controls) return undefined;
 
-    <div className="hidden md:flex items-center justify-between gap-4">
-      <ShortcutBar
-        onBack={onBack}
-        onPrevPage={onPrevPage}
-        onNextPage={onNextPage}
-        onPrevProject={onPrevProject}
-        onNextProject={onNextProject}
-        onComment={onComment}
-      />
-      <div className="flex items-center gap-3">
-        <ThemeToggle />
-        <LanguageToggle />
+    const measure = () => {
+      const rowRect = desktopRow.getBoundingClientRect();
+      const progressRect = progress.getBoundingClientRect();
+      const controlsRect = controls.getBoundingClientRect();
+      const safeGap = 16;
+      const beforeProgress = progressRect.left - rowRect.left - safeGap;
+      const beforeControls = controlsRect.left - rowRect.left - safeGap;
+      // 左栏是 Footer 的 flex item，右侧控制组也必须从可分配宽度中扣除；
+      // 进度条的左边界则是更严格的视觉安全线。
+      const flexAllocation = rowRect.width - controlsRect.width - safeGap;
+      const nextWidth = Math.max(
+        0,
+        Math.min(beforeProgress, beforeControls, flexAllocation)
+      );
+
+      setShortcutWidth((previous) =>
+        Math.abs(previous - nextWidth) < 0.5 ? previous : nextWidth
+      );
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(desktopRow);
+    observer.observe(progress);
+    observer.observe(controls);
+    window.addEventListener('resize', measure);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [framesCount]);
+
+  return (
+    <footer className="absolute inset-x-0 bottom-0 z-20 isolate px-12 md:px-16 pb-12 md:pb-8 pt-2 pointer-events-auto">
+      <EdgeMask from="bottom" height="300%" className="md:hidden" />
+
+      <div
+        ref={progressRef}
+        className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 md:translate-y-[calc(-50%-10px)] translate-y-[calc(-50%-20px)]"
+      >
+        <SlideProgress
+          total={framesCount}
+          activeIndex={activeIndex}
+          onSelect={onSelectFrame}
+          interactive={!isMobile}
+        />
       </div>
-    </div>
 
-    <div className="flex md:hidden items-center justify-between">
-      <button
-        type="button"
-        aria-label="返回作品集"
-        onClick={onBack}
-        className="text-secondary text-[32px] leading-[80%] hover:opacity-80 transition-opacity duration-200 cursor-pointer font-Ding"
-      >
-        ←
-      </button>
-      <MenuButton onClick={onOpenMobileMenu} label="菜单" />
-    </div>
-  </footer>
-);
+      <div ref={desktopRowRef} className="hidden md:flex items-center justify-between gap-4">
+        <ShortcutBar
+          availableWidth={shortcutWidth}
+          onBack={onBack}
+          onPrevPage={onPrevPage}
+          onNextPage={onNextPage}
+          onPrevProject={onPrevProject}
+          onNextProject={onNextProject}
+          onComment={onComment}
+        />
+        <div ref={controlsRef} className="flex shrink-0 items-center gap-3">
+          <ThemeToggle />
+          <LanguageToggle />
+        </div>
+      </div>
 
-// 评论抽屉片段：按需挂载当前项目的评论内容。
-export const CommentDrawer = ({ open, language, targetPath, onClose }) => (
+      <div className="flex md:hidden items-center justify-between">
+        <button
+          type="button"
+          aria-label={labels.back}
+          onClick={onBack}
+          className="text-secondary text-[32px] leading-[80%] hover:opacity-80 transition-opacity duration-200 cursor-pointer font-Ding"
+        >
+          ←
+        </button>
+        <MenuButton onClick={onOpenMobileMenu} label={labels.menu} />
+      </div>
+    </footer>
+  );
+};
+
+// 评论侧栏与主页面同处横向 flex；桌面端展开后固定占据 360px。
+export const CommentDrawer = ({ open, targetPath, onClose, labels }) => (
   <aside
-    className={`fixed top-0 right-0 h-full w-full md:w-[380px] bg-card border-l border-stroke z-50 transition-transform duration-300 ease-out flex flex-col ${
-      open ? 'translate-x-0' : 'translate-x-full'
+    aria-hidden={!open}
+    aria-label={labels.drawer}
+    className={`relative z-0 flex self-stretch overflow-hidden transition-[width,opacity] duration-[420ms] ${
+      open
+        ? 'w-full p-4 pl-5 opacity-100 md:w-[360px] md:min-w-[360px] md:flex-none'
+        : 'pointer-events-none w-0 min-w-0 p-0 opacity-0'
     }`}
+    style={{ transitionTimingFunction: EASE_OUT_CSS }}
   >
-    <div className="flex items-center justify-between px-5 py-4 border-b border-divider shrink-0">
-      <span className="font-Ding text-[16px] leading-[24px] text-main">
-        {language === 'en' ? 'Comments' : '评论'}
-      </span>
+    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-transparent">
       <button
         type="button"
-        aria-label="关闭评论"
+        aria-label={labels.close}
         onClick={onClose}
-        className="w-7 h-7 rounded-[6px] flex items-center justify-center text-tertiary hover:text-main hover:bg-hover transition-colors"
+        className="absolute right-3 top-3 z-30 flex size-6 items-center justify-center rounded-[6px] text-tertiary transition-colors duration-150 hover:bg-hover hover:text-main"
+        style={{ transitionTimingFunction: EASE_OUT_CSS }}
       >
-        <svg width="16" height="16" viewBox="0 0 16 16">
-          <path
-            d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"
-            fill="currentColor"
-          />
-        </svg>
+        <CloseFillIcon />
       </button>
-    </div>
-    <div className="flex-1 overflow-y-auto">
-      {open ? <CommentSection targetPath={targetPath} /> : null}
+      {open ? <CommentSection key={targetPath} targetPath={targetPath} /> : null}
     </div>
   </aside>
 );

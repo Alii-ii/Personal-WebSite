@@ -6,7 +6,7 @@ import LanguageToggle from '@/components/LanguageToggle';
 import CopyEmailButton from '@/components/CopyEmailButton';
 import IconTextButton from '@/components/icon-text-botton';
 import { ActionSwapIcon } from '@/components/motion/action-swap';
-import { ChatsIcon, CheckIcon, BilibiliIcon, FigmaIcon, XiaohongshuIcon } from '@/public/icons';
+import { ChatsIcon, CheckIcon, BilibiliIcon, CloseStrokeIcon, FigmaIcon, XiaohongshuIcon } from '@/public/icons';
 import { useLanguage } from '@/contexts/LanguageContext';
 import EdgeMask from '@/components/EdgeMask';
 
@@ -194,9 +194,7 @@ const AppMenu = ({ open, onClose, children, footerActions = null }) => {
             onClick={onClose}
             className="shrink-0 w-8 h-8 rounded-[8px] flex items-center justify-center text-secondary hover:text-main transition-colors duration-150 cursor-pointer"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <CloseStrokeIcon />
           </button>
 
         </div>

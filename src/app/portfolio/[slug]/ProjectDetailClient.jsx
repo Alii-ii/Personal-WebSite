@@ -11,6 +11,7 @@ import ProjectDetail from '@/components/portfolio/ProjectDetail';
 export default function ProjectDetailClient({ slug }) {
   const [initialFrameId, setInitialFrameId] = useState(null);
   const [initialEnterDir, setInitialEnterDir] = useState(null);
+  const [commentOpen, setCommentOpen] = useState(false);
 
   useEffect(() => {
     // 兼容 query/hash 两种定位参数，优先 query（新逻辑）。
@@ -18,10 +19,12 @@ export default function ProjectDetailClient({ slug }) {
       const query = new URLSearchParams(window.location.search);
       const queryFrame = query.get('frame');
       const queryEnterDir = query.get('enterDir');
+      const queryComments = query.get('comments');
       const hash = window.location.hash?.slice(1);
       const hashFrame = hash ? decodeURIComponent(hash) : null;
       setInitialFrameId(queryFrame || hashFrame || null);
       setInitialEnterDir(queryEnterDir === 'next' || queryEnterDir === 'prev' ? queryEnterDir : null);
+      if (queryComments === 'open') setCommentOpen(true);
     };
 
     readFromLocation();
@@ -39,6 +42,8 @@ export default function ProjectDetailClient({ slug }) {
       slug={slug}
       initialFrameId={initialFrameId}
       initialEnterDir={initialEnterDir}
+      commentOpen={commentOpen}
+      onCommentOpenChange={setCommentOpen}
     />
   );
 }

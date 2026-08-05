@@ -17,6 +17,7 @@ export const useProjectTrack = ({
   const mobileSlideRefs = useRef([]);
   const enterAnimationAppliedRef = useRef(false);
   const [stageHeight, setStageHeight] = useState(0);
+  const [stageWidth, setStageWidth] = useState(0);
   const [trackOffset, setTrackOffset] = useState(0);
   const [disableTrackTransition, setDisableTrackTransition] = useState(false);
 
@@ -47,24 +48,28 @@ export const useProjectTrack = ({
     const viewport = viewportRef.current;
     if (!viewport) return undefined;
 
-    const readStageHeight = () => {
+    const readStageSize = () => {
       const styles = getComputedStyle(viewport);
       const height =
         viewport.clientHeight -
         parseFloat(styles.paddingTop || 0) -
         parseFloat(styles.paddingBottom || 0);
+      const width = viewport.clientWidth;
       if (height > 0) {
         setStageHeight((previous) => (Math.abs(previous - height) < 0.5 ? previous : height));
       }
+      if (width > 0) {
+        setStageWidth((previous) => (Math.abs(previous - width) < 0.5 ? previous : width));
+      }
     };
 
-    readStageHeight();
-    const observer = new ResizeObserver(readStageHeight);
+    readStageSize();
+    const observer = new ResizeObserver(readStageSize);
     observer.observe(viewport);
-    window.addEventListener('resize', readStageHeight);
+    window.addEventListener('resize', readStageSize);
     return () => {
       observer.disconnect();
-      window.removeEventListener('resize', readStageHeight);
+      window.removeEventListener('resize', readStageSize);
     };
   }, []);
 
@@ -142,6 +147,7 @@ export const useProjectTrack = ({
     desktopSlideRefs,
     mobileSlideRefs,
     stageHeight,
+    stageWidth,
     trackOffset,
     disableTrackTransition,
   };
