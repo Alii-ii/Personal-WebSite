@@ -24,6 +24,8 @@ export function useComments(targetPath) {
   const [comments, setComments] = useState([]);
   const [likesByComment, setLikesByComment] = useState({});
   const [likedCommentIds, setLikedCommentIds] = useState(() => new Set());
+  const likedCommentIdsRef = useRef(new Set());
+  const likeRequestIdsRef = useRef(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -57,6 +59,7 @@ export function useComments(targetPath) {
       const commentIds = nextComments.map((comment) => comment.id);
       if (!commentIds.length) {
         setLikesByComment({});
+        likedCommentIdsRef.current = new Set();
         setLikedCommentIds(new Set());
         return;
       }
@@ -72,6 +75,7 @@ export function useComments(targetPath) {
       if (likesError) {
         console.error('Fetch comment likes error:', likesError);
         setLikesByComment({});
+        likedCommentIdsRef.current = new Set();
         setLikedCommentIds(new Set());
         return;
       }
@@ -83,6 +87,7 @@ export function useComments(targetPath) {
         if (user?.id === like.user_id) likedIds.add(like.comment_id);
       });
       setLikesByComment(counts);
+      likedCommentIdsRef.current = likedIds;
       setLikedCommentIds(likedIds);
     } catch (err) {
       console.error('Fetch comments error:', err);
@@ -156,20 +161,34 @@ export function useComments(targetPath) {
   }, [targetPath]);
 
   const toggleLike = useCallback(async (commentId) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return { errorCode: 'commentSignInRequired' };
+    const wasLiked = likedCommentIdsRef.current.has(commentId);
+    const optimisticLikedIds = new Set(likedCommentIdsRef.current);
+    if (wasLiked) optimisticLikedIds.delete(commentId);
+    else optimisticLikedIds.add(commentId);
+    likedCommentIdsRef.current = optimisticLikedIds;
+    setLikedCommentIds(optimisticLikedIds);
 
-    const wasLiked = likedCommentIds.has(commentId);
-    setLikedCommentIds((previous) => {
-      const next = new Set(previous);
-      if (wasLiked) next.delete(commentId);
-      else next.add(commentId);
-      return next;
-    });
+    const requestId = (likeRequestIdsRef.current.get(commentId) || 0) + 1;
+    likeRequestIdsRef.current.set(commentId, requestId);
     setLikesByComment((previous) => ({
       ...previous,
       [commentId]: Math.max(0, (previous[commentId] || 0) + (wasLiked ? -1 : 1)),
     }));
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      if (likeRequestIdsRef.current.get(commentId) === requestId) {
+        likedCommentIdsRef.current = new Set(likedCommentIdsRef.current);
+        if (wasLiked) likedCommentIdsRef.current.add(commentId);
+        else likedCommentIdsRef.current.delete(commentId);
+        setLikedCommentIds(new Set(likedCommentIdsRef.current));
+        setLikesByComment((previous) => ({
+          ...previous,
+          [commentId]: Math.max(0, (previous[commentId] || 0) + (wasLiked ? 1 : -1)),
+        }));
+      }
+      return { errorCode: 'commentSignInRequired' };
+    }
 
     const query = supabase.from('site_comment_likes');
     const { error: likeError } = wasLiked
@@ -178,21 +197,21 @@ export function useComments(targetPath) {
 
     if (likeError) {
       console.error('Toggle comment like error:', likeError);
-      setLikedCommentIds((previous) => {
-        const next = new Set(previous);
-        if (wasLiked) next.add(commentId);
-        else next.delete(commentId);
-        return next;
-      });
-      setLikesByComment((previous) => ({
-        ...previous,
-        [commentId]: Math.max(0, (previous[commentId] || 0) + (wasLiked ? 1 : -1)),
-      }));
+      if (likeRequestIdsRef.current.get(commentId) === requestId) {
+        likedCommentIdsRef.current = new Set(likedCommentIdsRef.current);
+        if (wasLiked) likedCommentIdsRef.current.add(commentId);
+        else likedCommentIdsRef.current.delete(commentId);
+        setLikedCommentIds(new Set(likedCommentIdsRef.current));
+        setLikesByComment((previous) => ({
+          ...previous,
+          [commentId]: Math.max(0, (previous[commentId] || 0) + (wasLiked ? 1 : -1)),
+        }));
+      }
       return { errorCode: 'commentLikeFailed' };
     }
 
     return {};
-  }, [likedCommentIds]);
+  }, []);
 
   // 删除评论：根评论删除时先删除自己拥有的二级回复，再删除根评论。
   // RLS 仍是最终权限边界；若回复属于其他用户，数据库会拒绝，避免产生静默孤儿数据。
