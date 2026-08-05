@@ -134,10 +134,10 @@ const ProjectDetail = ({
   return (
     <div className="flex h-screen w-full overflow-hidden bg-others supports-[height:100dvh]:h-[100dvh]">
       <div
-        className={`relative z-10 flex min-w-0 flex-1 self-stretch flex-col overflow-hidden bg-bg transition-[border-radius,box-shadow] duration-[420ms] ${
+        className={`relative z-10 flex min-w-0 flex-1 self-stretch flex-col overflow-hidden bg-bg transition-[border-radius,box-shadow,border-color] duration-[420ms] ${
           commentOpen
-            ? 'md:rounded-r-[24px] md:shadow-[20px_0_56px_hsl(var(--neutral-fg-main)/0.22)]'
-            : 'rounded-r-none shadow-none'
+            ? 'md:rounded-r-[24px] md:border-r md:border-divider md:shadow-[20px_0_56px_hsl(var(--neutral-fg-main)/0.22)]'
+            : 'rounded-r-none border-r border-transparent shadow-none'
         }`}
         style={{ transitionTimingFunction: EASE_OUT_CSS }}
       >
