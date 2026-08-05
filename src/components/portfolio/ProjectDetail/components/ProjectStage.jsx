@@ -10,6 +10,7 @@ const ProjectStage = ({
   activeIndex,
   imageRatios,
   isMobile,
+  resizeDriven,
   enterDirection,
   onActiveIndexChange,
   onPreviousPage,
@@ -66,6 +67,7 @@ const ProjectStage = ({
           stageHeight={stageHeight}
           stageWidth={stageWidth}
           dragging={dragging}
+          resizeDriven={resizeDriven}
           desktopSlideRefs={desktopSlideRefs}
           mobileSlideRefs={mobileSlideRefs}
         />

@@ -30,6 +30,7 @@ export const formatRelativeTime = (isoString, t) => {
 
 const CommentActions = ({
   replyCount,
+  likeCount,
   liked,
   likeAnimating,
   canDelete,
@@ -70,6 +71,7 @@ const CommentActions = ({
           <LikeIcon filled={liked} />
         </span>
       )}
+      text={likeCount > 0 ? String(likeCount) : undefined}
       variant="ghost"
       size="sm"
       onClick={onLike}
@@ -84,6 +86,7 @@ export default function CommentItem({
   comment,
   isReply = false,
   replyCount = 0,
+  likeCount = 0,
   liked,
   canDelete = false,
   onDelete,
@@ -174,6 +177,7 @@ export default function CommentItem({
           </span>
           <CommentActions
             replyCount={replyCount}
+            likeCount={likeCount}
             liked={liked}
             likeAnimating={likeAnimating}
             canDelete={canDelete}

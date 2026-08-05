@@ -353,6 +353,8 @@ L3 详情页新增横向 flex 外壳：原 L3 页面为 `flex-1 min-w-0 self-str
 
 评论项默认只展示相对时间；hover/focus 时使用 `hidden/flex` 原位替换为操作按钮，不保留不可见占位。作者本人额外在最左侧看到删除按钮。删除由 RLS 最终鉴权：二级评论直接删除；根评论仅在其回复均属于当前用户时先清理回复再删除，否则返回本地化提示，避免孤儿回复。
 
+点赞使用 `site_comment_likes(comment_id, user_id)` 关系表，联合主键保证每位用户对每条评论最多点赞一次，评论或用户删除时由外键级联清理。公开读取用于计算真实点赞总量；新增和删除仅允许 `auth.uid() = user_id`。客户端加载评论后批量查询点赞关系，按评论聚合总量并标记当前用户状态；点击时先乐观更新，数据库失败则回滚。
+
 ### 国际化与视觉
 
 评论标题、输入状态、错误、空状态策略、操作 aria-label 和相对时间统一由 `LanguageContext.t(key, values)` 提供，中英文支持参数插值。User ID 默认 `text-quaternary`，hover/focus 为 `text-main`；回复前缀继承正文色，被回复 ID 使用 `text-quaternary`。
@@ -375,7 +377,8 @@ useComments(targetPath) => {
 | `src/components/comments/CommentItem.jsx` | 修改 | 两级展示、时间/操作替换、作者删除、i18n |
 | `src/components/comments/CommentList.jsx` | 修改 | 路径解析、两级分组、作者权限、无空态 |
 | `src/components/comments/CommentSection.jsx` | 修改 | Frame 数据、滚动容器、末尾 sticky Composer |
-| `src/hooks/useComments.js` | 修改 | Frame 前缀查询、回复写入、删除一致性兜底 |
+| `src/hooks/useComments.js` | 修改 | Frame 前缀查询、回复写入、删除一致性、真实点赞读写 |
+| `.ai-dev-docs/features/comment-system/migration-comment-likes.sql` | 新增 | 点赞关系表、索引与 RLS 部署脚本 |
 | `src/components/portfolio/ProjectDetail/**` | 修改 | 抽屉布局、舞台自适应、跨导航状态、Footer 响应 |
 | `src/effects/DotGrid.jsx` | 修改 | 支持仅覆盖主页面容器 |
 | `src/contexts/LanguageContext.js` | 修改 | 评论静态文本、错误与参数插值 |

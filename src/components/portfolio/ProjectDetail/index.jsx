@@ -1,6 +1,7 @@
 "use client";
 
 // ProjectDetail 页面入口：组合项目导航、展示舞台、顶部/底部控件和浮层。
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   getCommentTargetPath,
@@ -83,6 +84,16 @@ const ProjectDetail = ({
   const { language, t } = useLanguage();
   const { baseColor, activeColor } = useThemeColors();
   const isMobile = useIsMobile();
+  const [drawerResizing, setDrawerResizing] = useState(false);
+  const previousCommentOpenRef = useRef(controlledCommentOpen);
+
+  useEffect(() => {
+    if (previousCommentOpenRef.current === controlledCommentOpen) return undefined;
+    previousCommentOpenRef.current = controlledCommentOpen;
+    setDrawerResizing(true);
+    const timer = window.setTimeout(() => setDrawerResizing(false), 440);
+    return () => window.clearTimeout(timer);
+  }, [controlledCommentOpen]);
   const navigation = useProjectNavigation({
     slug,
     initialFrameId,
@@ -136,10 +147,15 @@ const ProjectDetail = ({
       <div
         className={`relative z-10 flex min-w-0 flex-1 self-stretch flex-col overflow-hidden bg-bg transition-[border-radius,box-shadow,border-color] duration-[420ms] ${
           commentOpen
-            ? 'md:rounded-r-[24px] md:border-r md:border-divider md:shadow-[20px_0_56px_hsl(var(--neutral-fg-main)/0.22)]'
-            : 'rounded-r-none border-r border-transparent shadow-none'
+            ? 'md:rounded-r-[24px] md:border-r md:border-divider'
+            : 'rounded-r-none border-r border-transparent'
         }`}
-        style={{ transitionTimingFunction: EASE_OUT_CSS }}
+        style={{
+          transitionTimingFunction: EASE_OUT_CSS,
+          boxShadow: commentOpen
+            ? '0 0 50px -12px hsl(var(--neutral-bg-divider))'
+            : 'none',
+        }}
       >
         <PrototypePreloader urls={preloadUrls} />
         <ProjectBackground baseColor={baseColor} activeColor={activeColor} />
@@ -168,6 +184,7 @@ const ProjectDetail = ({
           activeIndex={activeIndex}
           imageRatios={imageRatios}
           isMobile={isMobile}
+          resizeDriven={drawerResizing}
           enterDirection={initialEnterDir}
           onActiveIndexChange={setActiveIndex}
           onPreviousPage={goPrevPage}

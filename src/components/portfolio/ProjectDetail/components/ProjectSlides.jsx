@@ -29,7 +29,16 @@ const getDesktopFrameStyle = ({ frame, ratio, isActive, stageHeight, stageWidth 
     : undefined;
 };
 
-const DesktopSlides = ({ frames, activeIndex, imageRatios, stageHeight, stageWidth, dragging, slideRefs }) => (
+const DesktopSlides = ({
+  frames,
+  activeIndex,
+  imageRatios,
+  stageHeight,
+  stageWidth,
+  dragging,
+  resizeDriven,
+  slideRefs,
+}) => (
   <div className="hidden md:flex items-center gap-6">
     {frames.map((frame, index) => {
       const isActive = index === activeIndex;
@@ -44,8 +53,13 @@ const DesktopSlides = ({ frames, activeIndex, imageRatios, stageHeight, stageWid
             slideRefs.current[index] = node;
           }}
           data-frame-index={index}
-          style={style}
-          className={`shrink-0 rounded-[12px] overflow-hidden bg-card ring-1 ring-stroke transition-[opacity,box-shadow] duration-500 ease-out ${
+          style={{
+            ...style,
+            transitionProperty: resizeDriven
+              ? 'opacity, box-shadow'
+              : 'all',
+          }}
+          className={`shrink-0 rounded-[12px] overflow-hidden bg-card ring-1 ring-stroke duration-500 ease-out ${
             dragging ? 'cursor-grabbing' : isActive ? 'cursor-default' : 'cursor-pointer'
           } ${isActive ? 'opacity-100 shadow-2xl' : 'opacity-50 shadow-lg hover:opacity-75'}`}
         >
@@ -100,6 +114,7 @@ const ProjectSlides = ({
   stageHeight,
   stageWidth,
   dragging,
+  resizeDriven,
   desktopSlideRefs,
   mobileSlideRefs,
 }) => (
@@ -111,6 +126,7 @@ const ProjectSlides = ({
       stageHeight={stageHeight}
       stageWidth={stageWidth}
       dragging={dragging}
+      resizeDriven={resizeDriven}
       slideRefs={desktopSlideRefs}
     />
     <MobileSlides frames={frames} imageRatios={imageRatios} slideRefs={mobileSlideRefs} />

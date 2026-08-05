@@ -8,7 +8,18 @@ import CommentComposer from './CommentComposer';
 
 export default function CommentSection({ targetPath, className = '' }) {
   const { t } = useLanguage();
-  const { comments, count, isLoading, error, addComment, deleteComment, refresh } = useComments(targetPath);
+  const {
+    comments,
+    likesByComment,
+    likedCommentIds,
+    count,
+    isLoading,
+    error,
+    addComment,
+    deleteComment,
+    toggleLike,
+    refresh,
+  } = useComments(targetPath);
   const [replyTarget, setReplyTarget] = useState(null);
 
   useEffect(() => setReplyTarget(null), [targetPath]);
@@ -30,11 +41,14 @@ export default function CommentSection({ targetPath, className = '' }) {
         <div className="flex min-h-full flex-col">
           <CommentList
             comments={comments}
+            likesByComment={likesByComment}
+            likedCommentIds={likedCommentIds}
             targetPath={targetPath}
             isLoading={isLoading}
             error={error}
             onReply={setReplyTarget}
             onDelete={deleteComment}
+            onLike={toggleLike}
             onRetry={refresh}
           />
 

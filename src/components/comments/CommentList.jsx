@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuthContext } from '@/contexts/AuthContext';
 import CommentItem from './CommentItem';
@@ -26,16 +26,18 @@ const parseCommentPath = (comment, targetPath) => {
 
 export default function CommentList({
   comments = [],
+  likesByComment = {},
+  likedCommentIds = new Set(),
   targetPath,
   isLoading,
   error,
   onReply,
   onDelete,
+  onLike,
   onRetry,
 }) {
   const { t } = useLanguage();
   const { user } = useAuthContext();
-  const [likedIds, setLikedIds] = useState(() => new Set());
 
   const { roots, repliesByParent, commentsById } = useMemo(() => {
     const rootItems = [];
@@ -58,15 +60,6 @@ export default function CommentList({
 
     return { roots: rootItems, repliesByParent: replies, commentsById: byId };
   }, [comments, targetPath]);
-
-  const toggleLike = (commentId) => {
-    setLikedIds((current) => {
-      const next = new Set(current);
-      if (next.has(commentId)) next.delete(commentId);
-      else next.add(commentId);
-      return next;
-    });
-  };
 
   if (isLoading) return <ListSkeleton />;
 
@@ -92,8 +85,9 @@ export default function CommentList({
             <CommentItem
               comment={comment}
               replyCount={replies.length}
-              liked={likedIds.has(comment.id)}
-              onLike={() => toggleLike(comment.id)}
+              liked={likedCommentIds.has(comment.id)}
+              likeCount={likesByComment[comment.id] || 0}
+              onLike={() => onLike?.(comment.id)}
               canDelete={Boolean(user?.id) && comment.user_id === user.id}
               onDelete={() => onDelete?.(comment.id)}
               onReply={() => onReply?.({
@@ -110,8 +104,9 @@ export default function CommentList({
                   key={reply.id}
                   comment={{ ...reply, replyToNickname }}
                   isReply
-                  liked={likedIds.has(reply.id)}
-                  onLike={() => toggleLike(reply.id)}
+                  liked={likedCommentIds.has(reply.id)}
+                  likeCount={likesByComment[reply.id] || 0}
+                  onLike={() => onLike?.(reply.id)}
                   canDelete={Boolean(user?.id) && reply.user_id === user.id}
                   onDelete={() => onDelete?.(reply.id)}
                   onReply={() => onReply?.({

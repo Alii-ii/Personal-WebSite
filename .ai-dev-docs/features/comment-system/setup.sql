@@ -67,3 +67,26 @@ CREATE POLICY "site_comments_insert" ON site_comments
 
 CREATE POLICY "site_comments_delete" ON site_comments
   FOR DELETE USING (auth.uid() = user_id);
+
+-- 7. 创建评论点赞关系表
+CREATE TABLE site_comment_likes (
+  comment_id UUID NOT NULL REFERENCES site_comments(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  PRIMARY KEY (comment_id, user_id)
+);
+
+CREATE INDEX idx_site_comment_likes_user ON site_comment_likes(user_id);
+CREATE INDEX idx_site_comment_likes_comment ON site_comment_likes(comment_id);
+
+-- 8. RLS 策略 - site_comment_likes
+ALTER TABLE site_comment_likes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "site_comment_likes_select" ON site_comment_likes
+  FOR SELECT USING (true);
+
+CREATE POLICY "site_comment_likes_insert" ON site_comment_likes
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "site_comment_likes_delete" ON site_comment_likes
+  FOR DELETE USING (auth.uid() = user_id);
