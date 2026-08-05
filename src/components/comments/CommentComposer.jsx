@@ -38,11 +38,13 @@ export default function CommentComposer({
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    textarea.style.height = 'auto';
+    textarea.style.height = '24px';
     const maxHeight = window.innerHeight * 0.5;
-    const nextHeight = Math.min(textarea.scrollHeight, maxHeight);
+    const nextHeight = content
+      ? Math.min(textarea.scrollHeight, maxHeight)
+      : 24;
     textarea.style.height = `${nextHeight}px`;
-    textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
+    textarea.style.overflowY = content && textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
   }, [content, isNicknameMode, replyTarget]);
 
   const submit = async () => {
@@ -89,7 +91,7 @@ export default function CommentComposer({
   };
 
   return (
-    <div className="relative flex h-fit min-h-10 w-full shrink-0 flex-col overflow-hidden rounded-[16px] border border-divider bg-[hsl(var(--neutral-bg-card)/0.88)] px-3 pb-8 pt-2 backdrop-blur-[24px] backdrop-saturate-150 overflow-hidden">
+    <div className="relative flex h-fit min-h-10 w-full shrink-0 flex-col overflow-hidden rounded-[16px] border border-divider bg-[hsl(var(--neutral-bg-card)/0.88)] px-3 pb-8 pt-2 backdrop-blur-[24px] backdrop-saturate-150">
       {replyTarget && canComment ? (
         <div className="mb-1 flex items-center gap-1 pl-1 pr-7 font-system text-[12px] leading-[18px] text-tertiary">
           <span className="truncate">{t('commentReplyingTo', { name: replyTarget.nickname })}</span>

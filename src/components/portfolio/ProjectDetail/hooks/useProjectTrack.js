@@ -127,7 +127,6 @@ export const useProjectTrack = ({
     };
 
     scheduleMeasure();
-    const timer = setTimeout(scheduleMeasure, 520);
     const observer = new ResizeObserver(scheduleMeasure);
     desktopSlideRefs.current.forEach((node) => node && observer.observe(node));
     if (viewportRef.current) observer.observe(viewportRef.current);
@@ -135,7 +134,6 @@ export const useProjectTrack = ({
 
     return () => {
       cancelAnimationFrame(animationFrame);
-      clearTimeout(timer);
       observer.disconnect();
       window.removeEventListener('resize', scheduleMeasure);
     };

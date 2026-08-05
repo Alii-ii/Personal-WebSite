@@ -198,14 +198,14 @@ export const CommentDrawer = ({ open, targetPath, onClose, labels }) => (
   <aside
     aria-hidden={!open}
     aria-label={labels.drawer}
-    className={`relative z-0 flex self-stretch overflow-hidden transition-[width,opacity] duration-[420ms] ${
+    className={`relative z-0 min-w-0 self-stretch overflow-hidden transition-[width,opacity] duration-[420ms] md:flex-none ${
       open
-        ? 'w-full p-4 pl-5 opacity-100 md:w-[360px] md:min-w-[360px] md:flex-none'
-        : 'pointer-events-none w-0 min-w-0 p-0 opacity-0'
+        ? 'w-full opacity-100 md:w-[360px]'
+        : 'pointer-events-none w-0 opacity-0'
     }`}
     style={{ transitionTimingFunction: EASE_OUT_CSS }}
   >
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-transparent">
+    <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden bg-transparent p-4 pl-5 md:w-[360px]">
       <button
         type="button"
         aria-label={labels.close}

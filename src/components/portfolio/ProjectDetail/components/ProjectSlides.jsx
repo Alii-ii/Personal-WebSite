@@ -45,7 +45,7 @@ const DesktopSlides = ({ frames, activeIndex, imageRatios, stageHeight, stageWid
           }}
           data-frame-index={index}
           style={style}
-          className={`shrink-0 rounded-[12px] overflow-hidden bg-card ring-1 ring-stroke transition-all duration-500 ease-out ${
+          className={`shrink-0 rounded-[12px] overflow-hidden bg-card ring-1 ring-stroke transition-[opacity,box-shadow] duration-500 ease-out ${
             dragging ? 'cursor-grabbing' : isActive ? 'cursor-default' : 'cursor-pointer'
           } ${isActive ? 'opacity-100 shadow-2xl' : 'opacity-50 shadow-lg hover:opacity-75'}`}
         >
