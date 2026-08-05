@@ -140,9 +140,10 @@
             "w": 532,
             "h": 299
           },
-          "src": "/images/portfolio/nocode-design-mode/05-p-05.webp",
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-design-mode/05-p-05.webp",
           "alt": "NoCode Design Mode 0-1 - P 05",
-          "figmaNodeId": "2943:65092"
+          "figmaNodeId": "2943:22332",
+          "srcLocal": "/images/portfolio/nocode-design-mode/05-p-05.webp"
         }
       ]
     },
