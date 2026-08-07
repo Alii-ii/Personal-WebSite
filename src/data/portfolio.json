@@ -206,6 +206,19 @@
       ],
       "frames": [
         {
+          "id": "nocode-for-pro-code-cat-tooltip",
+          "tab": "code",
+          "type": "nocode-for-pro-code",
+          "title": {
+            "zh": "Cat Tooltip 组件",
+            "en": "Cat Tooltip Component"
+          },
+          "feed": {
+            "w": 1440,
+            "h": 900
+          }
+        },
+        {
           "id": "nocode-for-pro-01-p-01",
           "tab": "strategy",
           "type": "image",

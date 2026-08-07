@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
 import { AlertCircleIcon } from '@/public/icons';
 import { toPortfolioLocalSrc } from '@/utils/portfolioImage';
+import NoCodeForProCodeDemo from '@/components/portfolio/NoCodeForProCodeDemo';
 
 /**
  * 通用错误 / 占位态
@@ -193,6 +194,7 @@ const FrameRenderer = ({ frame }) => {
   if (frame.type === 'image') return <ImageFrame frame={frame} title={title} />;
   if (frame.type === 'prototype') return <PrototypeFrame frame={frame} title={title} />;
   if (frame.type === 'rich') return <RichFrame frame={frame} language={language} />;
+  if (frame.type === 'nocode-for-pro-code') return <NoCodeForProCodeDemo />;
 
   return <FrameFallback message={`未知的内容类型：${frame.type}`} />;
 };
