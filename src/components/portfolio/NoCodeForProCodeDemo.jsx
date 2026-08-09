@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 
 const STEP_CONFIGS = [
@@ -91,6 +92,23 @@ const getTooltipPosition = ({ arrowDirection, arrowOffset }) => {
   return { right: 'calc(100% + 10px)', top: '50%', transform: `translateY(-${arrowOffset})` };
 };
 
+const getTooltipMotion = ({ arrowDirection, arrowOffset }) => {
+  const initialOffset = {
+    top: { x: 0, y: -6 },
+    bottom: { x: 0, y: 6 },
+    left: { x: -6, y: 0 },
+    right: { x: 6, y: 0 },
+  }[arrowDirection];
+  const transformOrigin = {
+    top: `${arrowOffset} 0%`,
+    bottom: `${arrowOffset} 100%`,
+    left: `0% ${arrowOffset}`,
+    right: `100% ${arrowOffset}`,
+  }[arrowDirection];
+
+  return { initialOffset, transformOrigin };
+};
+
 const Arrow = ({ direction, offset }) => {
   const props = {
     top: { className: 'absolute top-[-4px] rotate-180 -translate-x-1/2', style: { left: offset } },
@@ -149,36 +167,53 @@ const CatButt = ({ position, orientation }) => {
   );
 };
 
-const CatTooltip = ({ config, step, onNext }) => (
-  <div
-    data-cat-tooltip={config.tooltipDirection}
-    className="absolute z-10 flex min-w-[180px] w-fit max-w-[360px] flex-col justify-between gap-3 bg-[#111925] p-3 pt-6 text-white shadow-[0_3px_12px_rgba(27,31,38,0.18)]"
-    style={{ ...getTooltipPosition(config), borderRadius: getBorderRadius(config) }}
-  >
-    <div className="z-10 h-fit px-2 text-center text-[14px] leading-[1.5]">
-      {config.text.split('\n').map((line, index) => (
-        <span key={line} className="whitespace-nowrap">
-          {line}{index < config.text.split('\n').length - 1 && <br />}
-        </span>
-      ))}
-    </div>
-    <div className="z-10 flex h-fit w-full flex-row items-center justify-between">
-      <div className="ml-1 flex select-none flex-row items-center gap-2 text-[14px] text-white">
-        <span>{step + 1}</span><span className="opacity-50">/</span><span className="opacity-50">8</span>
-      </div>
-      <button
-        type="button"
-        className="select-none rounded-[8px] bg-white px-3 py-1 text-[12px] text-[#111925]/90 hover:bg-opacity-90"
-        onClick={onNext}
+const CatTooltip = ({ config, step, onNext }) => {
+  const { initialOffset, transformOrigin } = getTooltipMotion(config);
+
+  return (
+    <div
+      data-cat-tooltip={config.tooltipDirection}
+      className="absolute z-10"
+      style={getTooltipPosition(config)}
+    >
+      <motion.div
+        className="relative flex min-w-[180px] w-fit max-w-[360px] flex-col justify-between gap-3 bg-[#111925] p-3 pt-6 text-white shadow-[0_3px_12px_rgba(27,31,38,0.18)]"
+        style={{ borderRadius: getBorderRadius(config), transformOrigin }}
+        initial={{ opacity: 0, scale: 0.9, ...initialOffset }}
+        animate={{ opacity: [0, 1, 1, 1], scale: [0.9, 1.04, 0.99, 1], x: 0, y: 0 }}
+        transition={{
+          opacity: { duration: 0.12, times: [0, 0.55, 0.8, 1], ease: 'easeOut' },
+          scale: { duration: 0.28, times: [0, 0.5, 0.78, 1], ease: ['easeOut', 'easeInOut', 'easeOut'] },
+          x: { duration: 0.18, ease: 'easeOut' },
+          y: { duration: 0.18, ease: 'easeOut' },
+        }}
       >
-        {step === 7 ? '再看一次' : '我知道了👌'}
-      </button>
+        <div className="z-10 h-fit px-2 text-center text-[14px] leading-[1.5]">
+          {config.text.split('\n').map((line, index) => (
+            <span key={line} className="whitespace-nowrap">
+              {line}{index < config.text.split('\n').length - 1 && <br />}
+            </span>
+          ))}
+        </div>
+        <div className="z-10 flex h-fit w-full flex-row items-center justify-between">
+          <div className="ml-1 flex select-none flex-row items-center gap-2 text-[14px] text-white">
+            <span>{step + 1}</span><span className="opacity-50">/</span><span className="opacity-50">8</span>
+          </div>
+          <button
+            type="button"
+            className="select-none rounded-[8px] bg-white px-3 py-1 text-[12px] text-[#111925]/90 hover:bg-opacity-90"
+            onClick={onNext}
+          >
+            {step === 7 ? '再看一次' : '我知道了👌'}
+          </button>
+        </div>
+        <CatHead orientation={config.catOrientation} />
+        <CatButt position={config.catPosition} orientation={config.catOrientation} />
+        <Arrow direction={config.arrowDirection} offset={config.arrowOffset} />
+      </motion.div>
     </div>
-    <CatHead orientation={config.catOrientation} />
-    <CatButt position={config.catPosition} orientation={config.catOrientation} />
-    <Arrow direction={config.arrowDirection} offset={config.arrowOffset} />
-  </div>
-);
+  );
+};
 
 const NoCodeForProCodeDemo = () => {
   const [step, setStep] = useState(0);

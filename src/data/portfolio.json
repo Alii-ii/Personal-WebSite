@@ -182,6 +182,23 @@
           "alt": "NoCode Design Mode 0-1 - P 07",
           "figmaNodeId": "3130:23922",
           "srcLocal": "/images/portfolio/nocode-design-mode/07-p-07.webp"
+        },
+        {
+          "id": "nocode-design-mode-08-p-08",
+          "tab": "overview",
+          "type": "image",
+          "title": {
+            "zh": "P 08",
+            "en": "P 08"
+          },
+          "feed": {
+            "w": 532,
+            "h": 299
+          },
+          "src": "https://pub-1a0773e1cc80472bbfb854bcaa76d941.r2.dev/portfolio/nocode-design-mode/08-p-08-bef6009c.webp",
+          "alt": "NoCode Design Mode 0-1 - P 08",
+          "figmaNodeId": "3215:19805",
+          "srcLocal": "/images/portfolio/nocode-design-mode/08-p-08.webp"
         }
       ]
     },
