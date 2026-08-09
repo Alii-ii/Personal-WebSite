@@ -480,3 +480,65 @@ ResumePage
 | 点击目录后菜单遮挡或锚点未执行 | 关闭菜单后在下一动画帧执行 scrollIntoView |
 | 复制/下载逻辑出现两份实现 | 抽取联系方式组件并由两个位置复用 |
 | 移动端正文失去导航但菜单不可达 | MenuButton 使用作品集页相同 fixed 位置与 z-index |
+
+---
+
+## 设计更新 - 2026-08-09（L3 与 Figma 快捷键作用域）
+
+### 架构概览
+
+采用“活动 frame 门控”，不增加额外的原型激活遮罩或二次点击。L3 已有的 `activeIndex` 是唯一交互权威：只有当前活动的 Figma frame 可以接收指针和 Tab 焦点，非活动 Figma iframe 保持渲染与预加载，但不能截获交互。
+
+```text
+ProjectDetail（持有 activeIndex）
+└── ProjectStage
+    └── ProjectSlides
+        └── FrameRenderer(frame, isActive)
+            └── PrototypeFrame
+                ├── 活动 Figma：pointer-events auto，tabIndex 0
+                └── 非活动 Figma：pointer-events none，tabIndex -1
+```
+
+键盘所有权由浏览器焦点自然决定：焦点仍在父文档时，`useProjectShortcuts` 响应 L3 快捷键；用户点击活动 Figma iframe 后，焦点进入跨域文档，Figma 响应其内部快捷键。父页面不监听、转发或模拟 Figma 内部键盘事件。
+
+### 交互状态与数据流
+
+| L3 frame 状态 | iframe 指针 | iframe Tab 聚焦 | 快捷键所有权 | 切换方式 |
+|---------------|------------|----------------|-------------|---------|
+| 非活动 Figma | 禁用 | `tabIndex=-1` | L3 | 快捷键、相邻页点击、拖拽或进度轴 |
+| 活动 Figma，尚未点击内部 | 启用 | `tabIndex=0` | L3 | L3 快捷键仍可继续切页 |
+| 活动 Figma，焦点已进入内部 | 启用 | iframe 内部管理 | Figma | 通过 iframe 外的进度轴、tab、页头/页脚控件离开 |
+| 非 Figma frame | 保持现状 | 保持现状 | L3 | 既有导航方式 |
+
+当 `activeIndex` 改变时，React 重新计算每个 frame 的 `isActive`。此前活动的 Figma iframe 立即失去指针与 Tab 可达性；用户下一次在父页面执行操作时，键盘继续由 L3 处理。由于跨域限制，不尝试读取 Figma 内部页面或强制派发 `blur`。
+
+### 接口变更
+
+```jsx
+<FrameRenderer frame={frame} isActive={isActive} />
+```
+
+`isActive` 由 `DesktopSlides` 根据 `index === activeIndex` 计算并传入。移动端没有桌面快捷键条，且当前需求针对 L3 桌面切页冲突；移动端 `FrameRenderer` 保持默认可交互，避免 IntersectionObserver 的活动项变化导致滚动中的原型突然失去触控。
+
+`PrototypeFrame` 仅对 `isFigma` 应用门控，普通 prototype 保持现有行为，避免扩大回归范围。
+
+### 文件变更清单
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `src/components/portfolio/ProjectDetail/components/ProjectSlides.jsx` | 修改 | 将桌面 frame 的 `isActive` 传给渲染器 |
+| `src/components/portfolio/ProjectDetail/components/FrameRenderer.jsx` | 修改 | 仅对非活动 Figma iframe 禁用 pointer 与 Tab 聚焦 |
+| `src/components/portfolio/ProjectDetail/hooks/useProjectNavigation.js` | 修改 | 预加载 URL 固定为项目全部 prototype，不随 activeTab 改变 |
+| `.ai-dev-docs/features/portfolio/{requirements,design,tasks,qa}.md` | 追加 | 记录需求、设计、任务与验收状态 |
+
+### 风险与处理
+
+| 风险 | 处理 |
+|------|------|
+| 相邻 Figma iframe 截获点击或焦点 | 非活动 iframe 使用 `pointer-events-none` 与 `tabIndex=-1` 双重门控 |
+| 为所有 prototype 改行为导致普通嵌入回归 | 门控条件限定为 `isFigma` |
+| 活动 Figma 内按键无法让 L3 切页 | 这是跨域 iframe 的预期边界；外层进度轴、tab 与页脚控件保持可用 |
+| 移动端滚动改变 activeIndex 后原型触控中断 | 门控只应用于桌面 slides，移动端维持现有交互 |
+| 增加显式激活层导致首次点击无响应 | 不采用遮罩，切到活动 frame 后即可直接点击原型 |
+| 预加载器随 activeTab 变化而卸载 | `preloadUrls` 仅依赖项目，进入项目即加载全部 prototype，并在 tab 切换时保持挂载 |
+| 复用隐藏 iframe 导致 Figma 画布缩放或空白 | 预加载和正式展示使用独立 iframe；预加载只提前网络与资源缓存，不迁移运行实例 |

@@ -83,9 +83,9 @@ export const useProjectNavigation = ({
   const preloadUrls = useMemo(
     () =>
       (project?.frames || [])
-        .filter((frame) => frame.type === 'prototype' && frame.url && frame.tab !== activeTab)
+        .filter((frame) => frame.type === 'prototype' && frame.url)
         .map((frame) => frame.url),
-    [project, activeTab],
+    [project],
   );
 
   const activeFrameId = frames[activeIndex]?.id ?? null;

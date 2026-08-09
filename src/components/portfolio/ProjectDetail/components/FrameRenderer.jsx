@@ -1,7 +1,7 @@
 "use client";
 
 // 项目帧内容渲染器：按 image、prototype、rich 等 frame 类型选择具体展示方式。
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { pickLocale } from '@/contexts/ProjectContext';
 import { AlertCircleIcon } from '@/public/icons';
@@ -19,6 +19,20 @@ const FrameFallback = ({ message, action }) => (
   </div>
 );
 
+const FrameSkeleton = () => (
+  <div
+    className="absolute inset-0 z-10 overflow-hidden bg-card"
+    role="status"
+    aria-label="内容加载中"
+  >
+    <div className="absolute inset-0 animate-pulse bg-press" />
+    <div className="absolute inset-x-[12%] bottom-[12%] flex flex-col gap-3">
+      <div className="h-3 w-2/5 rounded-full bg-divider" />
+      <div className="h-3 w-3/5 rounded-full bg-divider" />
+    </div>
+  </div>
+);
+
 /**
  * 图片型 frame
  * 外框已按图片真实比例定尺寸（见 ProjectDetail 的 useImageRatios），
@@ -30,25 +44,52 @@ const ImageFrame = ({ frame, title }) => {
   const localSrc = toPortfolioLocalSrc(frame.src, frame.srcLocal);
   // 优先 CDN；失败后切本地兜底，再失败才显示错误态
   const [src, setSrc] = useState(frame.src);
+  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
+  const imageRef = useRef(null);
+
+  useEffect(() => {
+    let animationFrame = 0;
+
+    const syncLoadedState = () => {
+      const image = imageRef.current;
+      if (!image) return;
+      if (image.naturalWidth > 0) {
+        setLoaded(true);
+        return;
+      }
+      animationFrame = window.requestAnimationFrame(syncLoadedState);
+    };
+
+    syncLoadedState();
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [src]);
 
   if (error) return <FrameFallback message={frame.alt || title || '图片加载失败'} />;
   return (
-    <img
-      src={src}
-      alt={frame.alt || title}
-      loading="lazy"
-      decoding="async"
-      draggable={false}
-      className="block w-full h-full object-cover select-none [-webkit-user-drag:none]"
-      onError={() => {
-        if (localSrc && src !== localSrc) {
-          setSrc(localSrc);
-          return;
-        }
-        setError(true);
-      }}
-    />
+    <div className="relative w-full h-full bg-card">
+      {!loaded && <FrameSkeleton />}
+      <img
+        ref={imageRef}
+        src={src}
+        alt={frame.alt || title}
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+        className={`block w-full h-full object-cover select-none [-webkit-user-drag:none] transition-opacity duration-200 ${
+          loaded ? 'opacity-100' : 'opacity-0'
+        }`}
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          if (localSrc && src !== localSrc) {
+            setLoaded(false);
+            setSrc(localSrc);
+            return;
+          }
+          setError(true);
+        }}
+      />
+    </div>
   );
 };
 
@@ -58,7 +99,8 @@ const ImageFrame = ({ frame, title }) => {
  *   - url  : 外链原型，用 iframe 沙箱内嵌
  *   - html : 内联 HTML 片段，直接渲染
  */
-const PrototypeFrame = ({ frame, title }) => {
+const PrototypeFrame = ({ frame, title, isActive }) => {
+  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
 
   if (frame.url) {
@@ -84,18 +126,26 @@ const PrototypeFrame = ({ frame, title }) => {
     //   - storage-access：第三方 cookie/storage（Figma 内部跨域资源依赖此权限）
     //   - 不设 sandbox：Figma 内部多层 iframe + WASM 需要完整浏览器能力
     const isFigma = frame.url.includes('figma.com');
+    const isInactiveFigma = isFigma && isActive === false;
     return (
-      <iframe
-        src={frame.url}
-        title={title || 'prototype'}
-        {...(!isFigma && { loading: 'lazy', sandbox: 'allow-scripts allow-same-origin allow-forms' })}
-        {...(isFigma && {
-          allow: 'clipboard-write; storage-access; cross-origin-isolated',
-        })}
-        allowFullScreen
-        className="w-full h-full border-0 bg-card"
-        onError={() => setError(true)}
-      />
+      <div className="relative w-full h-full bg-card">
+        {!loaded && <FrameSkeleton />}
+        <iframe
+          src={frame.url}
+          title={title || 'prototype'}
+          {...(!isFigma && { loading: 'lazy', sandbox: 'allow-scripts allow-same-origin allow-forms' })}
+          {...(isFigma && {
+            allow: 'clipboard-write; storage-access; cross-origin-isolated',
+            tabIndex: isInactiveFigma ? -1 : 0,
+          })}
+          allowFullScreen
+          className={`w-full h-full border-0 bg-card transition-opacity duration-200 ${
+            loaded ? 'opacity-100' : 'opacity-0'
+          } ${isInactiveFigma ? 'pointer-events-none' : ''}`}
+          onLoad={() => setLoaded(true)}
+          onError={() => setError(true)}
+        />
+      </div>
     );
   }
 
@@ -185,14 +235,16 @@ const RichFrame = ({ frame, language }) => {
  * 按 frame.type 分发，新增类型只加一个分支，不影响既有类型
  * @param {Object} frame - 项目 frame 数据
  */
-const FrameRenderer = ({ frame }) => {
+const FrameRenderer = ({ frame, isActive }) => {
   const { language } = useLanguage();
   if (!frame) return null;
 
   const title = pickLocale(frame.title, language);
 
   if (frame.type === 'image') return <ImageFrame frame={frame} title={title} />;
-  if (frame.type === 'prototype') return <PrototypeFrame frame={frame} title={title} />;
+  if (frame.type === 'prototype') {
+    return <PrototypeFrame frame={frame} title={title} isActive={isActive} />;
+  }
   if (frame.type === 'rich') return <RichFrame frame={frame} language={language} />;
   if (frame.type === 'nocode-for-pro-code') return <NoCodeForProCodeDemo />;
 

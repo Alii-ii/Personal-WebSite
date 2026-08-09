@@ -140,3 +140,25 @@
 | HomeMenu 与 PortfolioMenu 的内容和底栏行为不变 | 人工-逻辑 | P0 | ✅ PASS |
 | 无新增 lint 错误 | 自动化 | P1 | ✅ PASS |
 | Next.js 生产构建与静态导出通过 | 自动化 | P0 | ✅ PASS |
+
+---
+
+## 迭代 6 验收项 - 2026-08-09
+
+| 验收项 | 验收类型 | 阻塞级别 | 验收结果 |
+|--------|---------|---------|---------|
+| 非活动 Figma frame 不接收鼠标点击、触控或 Tab 焦点 | 自动化+人工 | P0 | ✅ PASS |
+| 切到 Figma frame 但未点击原型时，←→ 继续切换 L3 页面 | 人工-交互 | P0 | ✅ PASS |
+| 切到 Figma frame 但未点击原型时，↑↓ 与 Alt+数字继续执行 L3 导航 | 人工-交互 | P0 | ✅ PASS |
+| 点击活动 Figma iframe 后，Figma 内部点击与键盘操作正常 | 人工-交互 | P0 | ✅ PASS |
+| Figma 获得焦点时，L3 不同时执行同一按键对应的导航 | 人工-逻辑 | P0 | ✅ PASS |
+| 通过进度轴、tab 或相邻 frame 离开 Figma 后，L3 快捷键恢复 | 人工-交互 | P0 | ✅ PASS |
+| 进入项目即请求全部 Figma URL，且预加载器不随 activeTab 改变 | 自动化-浏览器 | P0 | ✅ PASS |
+| 正式 Figma iframe 与 0×0 预加载 iframe 独立，不迁移运行实例 | 自动化-浏览器 | P0 | ✅ PASS |
+| localhost:3000 首次切入 Figma 的主观等待时间符合预期 | 人工-体验 | P0 | ⏳ 待用户确认 |
+| 舞台尺寸未就绪时显示目标 frame 比例骨架，不挂载裸露素材 | 自动化+人工 | P0 | ✅ PASS |
+| 图片与 iframe 加载完成前保持 frame 内骨架，完成后原位淡入 | 自动化+人工 | P0 | ✅ PASS |
+| 普通 prototype、图片、rich 与代码 frame 的交互保持现状 | 人工-逻辑 | P1 | ✅ PASS |
+| 移动端 Figma 原型仍可直接触控，不受桌面活动态门控影响 | 人工-交互 | P1 | ✅ PASS |
+| 无新增 lint 错误 | 自动化 | P1 | ✅ PASS |
+| Next.js 生产构建与静态导出通过 | 自动化 | P0 | ✅ PASS |
