@@ -11,12 +11,28 @@ const CardImage = ({ src, alt, eager = false, showErrorTitle = false, errorTitle
   const [status, setStatus] = useState(src ? 'loading' : 'error');
 
   useEffect(() => {
-    setStatus(src ? 'loading' : 'error');
-
     const image = imageRef.current;
-    if (image?.complete) {
-      setStatus(image.naturalWidth > 0 ? 'loaded' : 'error');
+    if (!src || !image) {
+      setStatus('error');
+      return undefined;
     }
+
+    const syncStatus = () => {
+      if (!image.complete) return;
+      setStatus(image.naturalWidth > 0 ? 'loaded' : 'error');
+    };
+    const handleLoad = () => setStatus('loaded');
+    const handleError = () => setStatus('error');
+
+    setStatus('loading');
+    image.addEventListener('load', handleLoad);
+    image.addEventListener('error', handleError);
+    syncStatus();
+
+    return () => {
+      image.removeEventListener('load', handleLoad);
+      image.removeEventListener('error', handleError);
+    };
   }, [src]);
 
   const isLoaded = status === 'loaded';
@@ -83,7 +99,7 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, d
    */
   const strokeOverlay = (
     <div
-      className="absolute inset-0 rounded-[12px] pointer-events-none"
+      className="absolute inset-0 rounded-[16px] pointer-events-none"
       style={{ border: '0.5px solid hsl(var(--neutral-bg-stroke))' }}
     />
   );
@@ -100,8 +116,8 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, d
       style={{
         zIndex: 30,
         border: `0.5px solid ${strokeColor}`,
-        borderRadius: '12px',
-        clipPath: 'inset(0 12px 0 0)',
+        borderRadius: '16px',
+        clipPath: 'inset(0 16px 0 0)',
         opacity: hovered ? 1 : 0,
         transition: 'opacity 0.3s ease-out',
       }}
@@ -120,7 +136,7 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, d
    */
   const hoverMask = (
     <div
-      className="absolute inset-0 rounded-[12px] overflow-hidden pointer-events-none"
+      className="absolute inset-0 rounded-[16px] overflow-hidden pointer-events-none"
       style={{
         zIndex: 20,
         opacity: hovered ? 1 : 0,
@@ -140,7 +156,7 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, d
   // ── 禁用卡片：纯占位，不可点击，无 hover 效果 ──
   if (disabled) {
     return (
-      <div className="relative w-full rounded-[12px] px-8 py-5 bg-press/50">
+      <div className="relative w-full rounded-[16px] px-8 py-5 bg-press/50">
         <div className="flex flex-col gap-1">
           <span className="text-tertiary font-regular text-[16px]">{title}</span>
           {subtitle && <span className="text-disabled font-regular text-[13px]">{subtitle}</span>}
@@ -161,7 +177,7 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, d
         className="group relative w-full cursor-pointer focus:outline-none"
         style={{ aspectRatio: `${W} / ${H}` }}
       >
-        <div className="absolute top-0 left-0 w-full h-full rounded-[12px] overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full rounded-[16px] overflow-hidden">
           <CardImage
             src={coverSrc}
             alt={title}
@@ -204,7 +220,7 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, d
         return (
           <div
             key={i}
-            className="absolute rounded-[12px] overflow-hidden"
+            className="absolute rounded-[16px] overflow-hidden"
             style={{
               width: `${wPct}%`,
               height: `${hPct}%`,
@@ -237,7 +253,7 @@ const PortfolioCard = ({ project, previewSrcs = [], onClick, isResume = false, d
 
       {/* ── 最前层 p01：第 1 帧封面图 ── */}
       <div
-        className="absolute top-0 left-0 rounded-[12px] overflow-hidden"
+        className="absolute top-0 left-0 rounded-[16px] overflow-hidden"
         style={{
           width: `${(533 / W) * 100}%`,
           height: '100%',

@@ -63,17 +63,21 @@ export default function CopyEmailButton({ appearance = 'footer' }) {
 
   if (appearance === 'sidebar') {
     return (
-      <button
-        type="button"
+      <IconTextButton
+        text=""
+        icon={
+          <ActionSwapIcon value={copied ? 'copied' : 'idle'} animation="blur">
+            {copied ? <CheckIcon /> : <MailIcon />}
+          </ActionSwapIcon>
+        }
+        variant="ghost"
+        size="sm"
+        tooltip={copied ? t('emailCopied') : t('emailTooltip')}
+        forceTooltipOpen={tooltipOpen}
         aria-label={copied ? t('emailCopied') : t('emailTooltip')}
-        title={copied ? t('emailCopied') : t('emailTooltip')}
+        className="text-secondary hover:text-main grayscale hover:grayscale-0"
         onClick={handleClick}
-        className="w-6 h-6 rounded-[6px] flex items-center justify-center text-secondary hover:text-main hover:bg-hover transition-all duration-200 grayscale hover:grayscale-0"
-      >
-        <ActionSwapIcon value={copied ? 'copied' : 'idle'} animation="blur">
-          {copied ? <CheckIcon className="w-4 h-4" /> : <MailIcon className="w-4 h-4" />}
-        </ActionSwapIcon>
-      </button>
+      />
     );
   }
 
